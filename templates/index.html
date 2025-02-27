@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="jumbotron">
+  <h1 class="display-4">Sermon Search</h1>
+  <p class="lead">Search our collection of sermons by keyword or phrase.</p>
+  <hr class="my-4">
+  <form action="{{ url_for('search') }}" method="get">
+    <div class="input-group">
+      <input type="text" name="q" class="form-control" placeholder="Enter search term...">
+      <div class="input-group-append">
+        <button class="btn btn-primary" type="submit">Search</button>
+      </div>
+    </div>
+  </form>
+</div>
+{% endblock %}

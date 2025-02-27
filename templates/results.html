@@ -1,0 +1,17 @@
+{% extends "layout.html" %}
+{% block content %}
+<h2>Search Results for "{{ query }}"</h2>
+{% if results %}
+  <div class="list-group">
+    {% for row in results %}
+      <a href="{{ url_for('audiofiles', filename=row['mp3_file']) }}" class="list-group-item list-group-item-action">
+        <h5 class="mb-1">{{ row['title'] }}</h5>
+        <p class="mb-1">{{ row['transcript'][:200] }}...</p>
+        <small>Listen to sermon</small>
+      </a>
+    {% endfor %}
+  </div>
+{% else %}
+  <p>No results found.</p>
+{% endif %}
+{% endblock %}
