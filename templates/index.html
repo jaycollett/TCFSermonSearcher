@@ -1,61 +1,105 @@
 {% extends "layout.html" %}
 {% block content %}
 <style>
-  .hero {
-    background: url("https://source.unsplash.com/1600x900/?church,bible") center/cover no-repeat;
-    height: 300px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    color: white;
-  }
-  .hero-overlay {
-    background: rgba(0, 0, 0, 0.6);
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-  }
-  .content-section {
-    max-width: 800px;
-    margin: 40px auto;
-    text-align: center;
-  }
-  .content-section p {
-    font-size: 1.1rem;
-    line-height: 1.6;
-    color: #333;
-  }
+    .hero {
+        background: url("https://source.unsplash.com/1600x900/?church,bible") center/cover no-repeat;
+        height: 400px; /* Increased height for more impact */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        color: white;
+        position: relative; /* Needed for overlay */
+    }
+
+    .hero-overlay {
+        background: rgba(0, 0, 0, 0.6);
+        position: absolute; /* Positioned over the background */
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+
+    .hero-content {
+        position: relative; /* For z-index if needed */
+        z-index: 1; /* Ensure text is above overlay */
+    }
+
+    .hero h1 {
+        font-size: 3rem; /* Larger title */
+        margin-bottom: 15px;
+        font-weight: 600; /* Slightly bolder */
+    }
+
+    .hero p {
+        font-size: 1.2rem; /* Slightly larger lead text */
+        margin-bottom: 25px;
+    }
+
+    .content-section {
+        max-width: 800px;
+        margin: 40px auto;
+        padding: 20px; /* Added padding */
+        text-align: left; /* Changed to left align for readability */
+        background-color: #f9f9f9; /* Light background for content area */
+        border-radius: 8px; /* Rounded corners */
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    }
+
+    .content-section h2 {
+        font-size: 2rem;
+        margin-bottom: 20px;
+        color: #333;
+    }
+
+    .content-section p {
+        font-size: 1.1rem;
+        line-height: 1.7; /* Increased line height */
+        color: #444; /* Slightly darker text */
+    }
+
+    .btn-primary {
+        background-color: #007bff; /* Standard primary color */
+        border-color: #007bff;
+        padding: 12px 25px; /* Larger button */
+        font-size: 1.1rem;
+    }
+
+    .btn-primary:hover {
+        background-color: #0056b3; /* Darker hover color */
+        border-color: #0056b3;
+    }
 </style>
 
 <div class="hero">
-  <div class="hero-overlay">
-    <div class="text-center">
-      <h1 class="display-4">Welcome to Sermon Search</h1>
-      <p class="lead">Find and revisit past sermons with ease.</p>
-      <a href="{{ url_for('search') }}" class="btn btn-primary btn-lg">Start Searching</a>
+    <div class="hero-overlay"></div>
+    <div class="hero-content text-center">
+        <h1 class="display-4">Welcome to Sermon Search</h1>
+        <p class="lead">Find and revisit past sermons with ease.</p>
+        <a href="{{ url_for('search') }}" class="btn btn-primary btn-lg">Start Searching</a>
     </div>
-  </div>
 </div>
 
 <div class="content-section">
-  <h2>The Inspiration Behind This Project</h2>
-  <p>
-    This project was born from a light-hearted moment during a <strong>Craw/LaSage homegroup</strong> meeting.
-    As we shared together, <strong>Brian Craw</strong> mentioned how amazing it would be to 
-    easily search through past sermons to find something he remembered from one of the past sermons.
-  </p>
-  <p>
-    With my proclivity for technology, I took this idea and developed a solution—<strong>Sermon Search</strong>.
-    This web application automatically transcribes sermons and makes them searchable,
-    allowing anyone to quickly search through past sermons from TCF.
-  </p>
-  <p>
-    I hope this tool helps deepen your connection with the teachings and makes it easier 
-    to reflect on past messages. Enjoy exploring, and may these sermons continue to bless you!
-  </p>
+    <h2>The Inspiration Behind This Project</h2>
+    <p>
+        This project was born from a light-hearted moment during a <strong>Craw/LaSage homegroup</strong> meeting.
+        As we shared together, <strong>Brian Craw</strong> mentioned how amazing it would be to
+        easily search through past sermons to find something he remembered from one of the past sermons.
+    </p>
+    <p>
+        With my proclivity for technology, I took this idea and developed a solution—<strong>Sermon Search</strong>.
+        This web application automatically transcribes sermons and makes them searchable,
+        allowing anyone to quickly search through past sermons from TCF.
+    </p>
+    <p>
+        I hope this tool helps deepen your connection with the teachings and makes it easier
+        to reflect on past messages. Enjoy exploring, and may these sermons continue to bless you!
+    </p>
 </div>
 {% endblock %}

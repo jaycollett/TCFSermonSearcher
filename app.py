@@ -29,19 +29,22 @@ def close_connection(exception):
 def extract_relevant_snippets(transcript, query, max_snippets=3, context_words=8):
     """Extract snippets of text surrounding the search query."""
     matched_snippets = []
-    
+
+    # Escape the query for use in regex
+    escaped_query = re.escape(query)
+
     # Use regular expression to find the exact phrase in the transcript
-    matches = re.finditer(re.escape(query), transcript)
-    
+    matches = re.finditer(escaped_query, transcript, re.IGNORECASE)
+
     for match in matches:
-        start = max(0, match.start() - context_words * 5) #Multiply context words to get character context.
+        start = max(0, match.start() - context_words * 5)
         end = min(len(transcript), match.end() + context_words * 5)
         snippet = transcript[start:end]
         matched_snippets.append(snippet)
-        
+
         if len(matched_snippets) >= max_snippets:
             break
-    
+
     return matched_snippets if matched_snippets else ["(No exact match found)"]
 
 def format_text_into_paragraphs(text, min_sentences=3, max_sentences=6):
@@ -63,7 +66,10 @@ def highlight_search_terms(text, query):
     if not query or query.strip() == "":
         return text
 
-    regex = re.compile(rf'({re.escape(query)})', re.IGNORECASE)
+    # Escape the query for use in regex
+    escaped_query = re.escape(query)
+
+    regex = re.compile(rf'({escaped_query})', re.IGNORECASE)
     text = regex.sub(r'<span class="highlight">\1</span>', text)
 
     return text
@@ -86,7 +92,11 @@ def search():
 
     try:
         db = get_db()
-        cur = db.execute("SELECT id, title, mp3_file, transcript FROM sermons_fts WHERE sermons_fts MATCH ? LIMIT 25", (query,))
+        # Escape double quotes within the query
+        escaped_query = query.replace('"', '""')
+        # Explicit string concatenation
+        fts_query = '"' + escaped_query + '"'
+        cur = db.execute("SELECT id, title, mp3_file, transcript FROM sermons_fts WHERE sermons_fts MATCH ? LIMIT 25", (fts_query,))
         sermons = cur.fetchall()
 
         for sermon in sermons:

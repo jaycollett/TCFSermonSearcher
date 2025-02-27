@@ -1,32 +1,65 @@
 {% extends "layout.html" %}
 {% block content %}
 <style>
-  .search-container {
-    max-width: 600px;
-    margin: auto;
-    text-align: center;
-    padding-top: 50px;
-  }
-  .search-box {
-    width: 100%;
-    padding: 10px;
-    font-size: 18px;
-    border: 2px solid #ccc;
-    border-radius: 5px;
-  }
-  .search-button {
-    margin-top: 10px;
-    padding: 10px 20px;
-    font-size: 18px;
-  }
+    .search-container {
+        max-width: 600px;
+        margin: 80px auto; /* Increased top margin for better spacing */
+        text-align: center;
+        padding: 40px; /* Added padding for a cleaner look */
+        background-color: #f9f9f9; /* Light background */
+        border-radius: 10px; /* Rounded corners */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    }
+
+    .search-container h1 {
+        font-size: 2.5rem; /* Larger heading */
+        margin-bottom: 15px;
+        color: #333;
+    }
+
+    .search-container p {
+        font-size: 1.1rem;
+        color: #555;
+        margin-bottom: 30px;
+    }
+
+    .search-box {
+        width: 100%;
+        padding: 12px 15px; /* Increased padding */
+        font-size: 18px;
+        border: 2px solid #ddd; /* Lightened border */
+        border-radius: 8px; /* More rounded corners */
+        transition: border-color 0.3s ease; /* Smooth border transition */
+    }
+
+    .search-box:focus {
+        border-color: #007bff; /* Highlight border on focus */
+        outline: none; /* Remove default focus outline */
+    }
+
+    .search-button {
+        margin-top: 20px;
+        padding: 12px 25px; /* Increased padding */
+        font-size: 18px;
+        background-color: #007bff; /* Primary button color */
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .search-button:hover {
+        background-color: #0056b3; /* Darker background on hover */
+    }
 </style>
 
 <div class="search-container">
-  <h1>🔍 Search Sermons</h1>
-  <p>Enter a keyword or phrase to find sermons.</p>
-  <form action="{{ url_for('search') }}" method="get">
-    <input type="text" name="q" class="search-box" placeholder="Type your search term..." required>
-    <button type="submit" class="btn btn-primary search-button">Search</button>
-  </form>
+    <h1>🔍 Search Sermons</h1>
+    <p>Enter a keyword or phrase to find sermons.</p>
+    <form action="{{ url_for('search') }}" method="get">
+        <input type="text" name="q" class="search-box" placeholder="Type your search term..." required>
+        <button type="submit" class="search-button">Search</button>
+    </form>
 </div>
 {% endblock %}

@@ -1,0 +1,44 @@
+{% extends "layout.html" %}
+{% block content %}
+<style>
+    .error-container {
+        max-width: 600px;
+        margin: 100px auto;
+        padding: 40px;
+        text-align: center;
+        background-color: #f8f8f8;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .error-container h1 {
+        color: #d9534f; /* Red color for error */
+        margin-bottom: 20px;
+    }
+
+    .error-container p {
+        font-size: 1.1rem;
+        color: #333;
+        margin-bottom: 30px;
+    }
+
+    .error-container a {
+        background-color: #5bc0de; /* Blue color for button */
+        color: white;
+        padding: 10px 20px;
+        border-radius: 5px;
+        text-decoration: none;
+        transition: background-color 0.3s ease;
+    }
+
+    .error-container a:hover {
+        background-color: #46b8da;
+    }
+</style>
+
+<div class="error-container">
+    <h1>Oops! An Error Occurred</h1>
+    <p>{{ message }}</p>
+    <a href="{{ url_for('index') }}">Go Back to Home</a>
+</div>
+{% endblock %}
