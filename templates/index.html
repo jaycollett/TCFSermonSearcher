@@ -3,18 +3,22 @@
 <style>
     .hero {
         background: url("https://source.unsplash.com/1600x900/?church,bible") center/cover no-repeat;
-        height: 400px; /* Increased height for more impact */
+        height: 450px;
         display: flex;
         align-items: center;
         justify-content: center;
         text-align: center;
         color: white;
-        position: relative; /* Needed for overlay */
+        position: relative;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        margin-bottom: 30px;
     }
 
     .hero-overlay {
         background: rgba(0, 0, 0, 0.6);
-        position: absolute; /* Positioned over the background */
+        position: absolute;
         top: 0;
         left: 0;
         width: 100%;
@@ -26,53 +30,69 @@
     }
 
     .hero-content {
-        position: relative; /* For z-index if needed */
-        z-index: 1; /* Ensure text is above overlay */
+        position: relative;
+        z-index: 1;
     }
 
     .hero h1 {
-        font-size: 3rem; /* Larger title */
-        margin-bottom: 15px;
-        font-weight: 600; /* Slightly bolder */
+        font-size: 3.5rem;
+        margin-bottom: 20px;
+        font-weight: 600;
+        font-family: 'Merriweather', serif;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
     }
 
     .hero p {
-        font-size: 1.2rem; /* Slightly larger lead text */
-        margin-bottom: 25px;
+        font-size: 1.3rem;
+        margin-bottom: 30px;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.6);
     }
 
     .content-section {
-        max-width: 800px;
-        margin: 40px auto;
-        padding: 20px; /* Added padding */
-        text-align: left; /* Changed to left align for readability */
-        background-color: #f9f9f9; /* Light background for content area */
-        border-radius: 8px; /* Rounded corners */
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+        max-width: 900px;
+        margin: 50px auto;
+        padding: 40px;
+        text-align: left;
+        background-color: #ffffff;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        transition: box-shadow 0.3s ease, transform 0.2s ease;
+    }
+
+    .content-section:hover {
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        transform: translateY(-5px);
     }
 
     .content-section h2 {
-        font-size: 2rem;
-        margin-bottom: 20px;
+        font-size: 2.5rem;
+        margin-bottom: 25px;
         color: #333;
+        font-family: 'Merriweather', serif;
+        border-bottom: 2px solid #eee;
+        padding-bottom: 10px;
     }
 
     .content-section p {
-        font-size: 1.1rem;
-        line-height: 1.7; /* Increased line height */
-        color: #444; /* Slightly darker text */
+        font-size: 1.15rem;
+        line-height: 1.8;
+        color: #444;
     }
 
     .btn-primary {
-        background-color: #007bff; /* Standard primary color */
+        background-color: #007bff;
         border-color: #007bff;
-        padding: 12px 25px; /* Larger button */
-        font-size: 1.1rem;
+        padding: 15px 30px;
+        font-size: 1.2rem;
+        border-radius: 8px;
+        transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
     }
 
     .btn-primary:hover {
-        background-color: #0056b3; /* Darker hover color */
+        background-color: #0056b3;
         border-color: #0056b3;
+        transform: translateY(-3px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     }
 </style>
 

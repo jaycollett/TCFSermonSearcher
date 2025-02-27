@@ -3,18 +3,25 @@
 <style>
     .search-container {
         max-width: 600px;
-        margin: 80px auto; /* Increased top margin for better spacing */
+        margin: 80px auto;
         text-align: center;
-        padding: 40px; /* Added padding for a cleaner look */
-        background-color: #f9f9f9; /* Light background */
-        border-radius: 10px; /* Rounded corners */
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+        padding: 40px;
+        background-color: #f9f9f9;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        transition: box-shadow 0.3s ease, transform 0.2s ease;
+    }
+
+    .search-container:hover {
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        transform: translateY(-5px);
     }
 
     .search-container h1 {
-        font-size: 2.5rem; /* Larger heading */
+        font-size: 2.5rem;
         margin-bottom: 15px;
         color: #333;
+        font-family: 'Merriweather', serif;
     }
 
     .search-container p {
@@ -25,32 +32,35 @@
 
     .search-box {
         width: 100%;
-        padding: 12px 15px; /* Increased padding */
+        padding: 12px 15px;
         font-size: 18px;
-        border: 2px solid #ddd; /* Lightened border */
-        border-radius: 8px; /* More rounded corners */
-        transition: border-color 0.3s ease; /* Smooth border transition */
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
     }
 
     .search-box:focus {
-        border-color: #007bff; /* Highlight border on focus */
-        outline: none; /* Remove default focus outline */
+        border-color: #007bff;
+        outline: none;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
     .search-button {
         margin-top: 20px;
-        padding: 12px 25px; /* Increased padding */
+        padding: 12px 25px;
         font-size: 18px;
-        background-color: #007bff; /* Primary button color */
+        background-color: #007bff;
         color: white;
         border: none;
         border-radius: 8px;
         cursor: pointer;
-        transition: background-color 0.3s ease;
+        transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
     }
 
     .search-button:hover {
-        background-color: #0056b3; /* Darker background on hover */
+        background-color: #0056b3;
+        transform: translateY(-3px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     }
 </style>
 

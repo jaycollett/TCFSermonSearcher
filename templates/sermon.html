@@ -1,53 +1,93 @@
 {% extends "layout.html" %}
 {% block content %}
 <style>
-  /* 🔹 Sticky audio player */
-  .sticky-audio {
-    position: sticky;
-    top: 70px;
-    background: white;
-    padding: 10px;
-    z-index: 1000;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  }
+    /* 🔹 Sticky audio player */
+    .sticky-audio {
+        position: sticky;
+        top: 70px;
+        background: white;
+        padding: 20px;
+        z-index: 1000;
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        border-radius: 10px;
+        margin-bottom: 30px;
+    }
 
-  /* 🔹 Improved paragraph readability */
-  .sermon-text {
-    font-size: 1.1rem;
-    line-height: 1.8;
-    color: #333;
-    max-width: 800px;
-    margin: auto;
-  }
-  .sermon-text p {
-    margin-bottom: 20px; /* 🔹 Adds spacing between paragraphs */
-  }
+    .sticky-audio h3 {
+        font-size: 1.8rem;
+        margin-bottom: 15px;
+        color: #333;
+        font-family: 'Merriweather', serif;
+    }
 
-  /* 🔹 Search Term Highlighting */
-  .highlight {
-    background-color: yellow;
-    font-weight: bold;
-    padding: 2px 4px;
-    border-radius: 3px;
-  }
+    /* 🔹 Improved paragraph readability */
+    .sermon-text {
+        font-size: 1.15rem;
+        line-height: 1.8;
+        color: #444;
+        max-width: 800px;
+        margin: 30px auto;
+        padding: 20px;
+        background-color: #ffffff;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        transition: box-shadow 0.3s ease, transform 0.2s ease;
+    }
+
+    .sermon-text:hover {
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        transform: translateY(-5px);
+    }
+
+    .sermon-text p {
+        margin-bottom: 25px;
+    }
+
+    /* 🔹 Search Term Highlighting */
+    .highlight {
+        background-color: yellow;
+        font-weight: bold;
+        padding: 2px 4px;
+        border-radius: 3px;
+    }
+
+    /* 🔹 Back to Search Button */
+    .back-button {
+        background: #6c757d;
+        color: white;
+        font-weight: bold;
+        border: none;
+        padding: 12px 20px;
+        border-radius: 8px;
+        transition: background 0.3s, transform 0.2s, box-shadow 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        text-decoration: none;
+        margin-bottom: 20px;
+    }
+
+    .back-button:hover {
+        background: #5a6268;
+        transform: scale(1.05);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
 </style>
 
-<!-- 🔹 Back to Search Button -->
 <div class="mb-3">
-    <a href="{{ url_for('search') }}" class="btn btn-secondary">⬅ Back to Search</a>
-  </div>  
-
-<!-- 🔹 Sticky Audio Player -->
-<div class="sticky-audio">
-  <h3>{{ sermon['title'] }}</h3>
-  <audio controls style="width: 100%;">
-    <source src="{{ url_for('audiofiles', filename=sermon['mp3_file']) }}" type="audio/mpeg">
-    Your browser does not support the audio element.
-  </audio>
+    <a href="{{ url_for('search') }}" class="back-button">
+        <span>⬅</span> Back to Search
+    </a>
 </div>
 
-<!-- 🔹 Display Formatted & Highlighted Sermon Text -->
+<div class="sticky-audio">
+    <h3>{{ sermon['title'] }}</h3>
+    <audio controls style="width: 100%;">
+        <source src="{{ url_for('audiofiles', filename=sermon['mp3_file']) }}" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+</div>
+
 <div class="sermon-text mt-4">
-  {{ formatted_transcript | safe }}
+    {{ formatted_transcript | safe }}
 </div>
 {% endblock %}
