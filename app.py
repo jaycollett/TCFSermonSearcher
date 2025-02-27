@@ -23,11 +23,30 @@ def close_connection(exception):
         db.close()
 
 
-def extract_relevant_snippets(transcript, query, max_snippets=3):
-    """Extract up to max_snippets sentences that contain the search term."""
-    sentences = re.split(r'(?<=[.!?])\s+', transcript)  # Split transcript into sentences
-    matched_sentences = [s for s in sentences if re.search(rf'\b{re.escape(query)}\b', s, re.IGNORECASE)]
-    return matched_sentences[:max_snippets] if matched_sentences else ["(No exact match found)"]
+def extract_relevant_snippets(transcript, query, max_snippets=3, context_words=8):
+    """
+    Extract snippets of text surrounding the search query.
+    
+    - `max_snippets`: Maximum number of snippets to return.
+    - `context_words`: Number of words before and after the search term for context.
+    """
+    words = transcript.split()  # Tokenize transcript into words
+    query_lower = query.lower()
+    matched_snippets = []
+    
+    for i, word in enumerate(words):
+        if query_lower in word.lower():
+            start = max(0, i - context_words)
+            end = min(len(words), i + context_words + 1)
+            snippet = " ".join(words[start:end])
+            matched_snippets.append(snippet)
+
+            # Stop if we have enough snippets
+            if len(matched_snippets) >= max_snippets:
+                break
+    
+    return matched_snippets if matched_snippets else ["(No exact match found)"]
+
 
 
 def format_text_into_paragraphs(text, min_sentences=3, max_sentences=6):
@@ -44,15 +63,14 @@ def format_text_into_paragraphs(text, min_sentences=3, max_sentences=6):
 
     return ''.join(f"<p>{p}</p>" for p in paragraphs)  # Wrap each in <p> tags
 
-
 def highlight_search_terms(text, query):
-    """Wraps search terms in a highlight span tag."""
+    """Wrap search terms in a highlight span tag with full case-insensitive matching."""
     if not query or query.strip() == "":
         return text  # No query provided, return text unchanged
 
     words = query.split()  # Split multi-word searches
     for word in words:
-        regex = re.compile(rf'(\b{re.escape(word)}\b)', re.IGNORECASE)  # Match words exactly
+        regex = re.compile(rf'\b({re.escape(word)})\b', re.IGNORECASE)  # Match whole words only
         text = regex.sub(r'<span class="highlight">\1</span>', text)  # Apply highlight
 
     return text
@@ -69,7 +87,6 @@ def search():
     """Handles searching for sermons by keyword."""
     query = request.args.get("q", "").strip()
 
-    # If no query is provided, show the search page instead of results
     if not query:
         return render_template("search.html")
 
@@ -80,12 +97,18 @@ def search():
 
     for sermon in sermons:
         snippets = extract_relevant_snippets(sermon["transcript"], query)
-        results.append({
-            "id": sermon["id"],
-            "title": sermon["title"],
-            "mp3_file": sermon["mp3_file"],
-            "snippets": [highlight_search_terms(s, query) for s in snippets]  # Highlight search term
-        })
+
+        # Ensure only relevant snippets are shown
+        if snippets and snippets[0] != "(No exact match found)":
+            highlighted_snippets = [highlight_search_terms(snippet, query) for snippet in snippets]  # Apply highlighting
+
+            results.append({
+                "id": sermon["id"],
+                "title": sermon["title"],
+                "mp3_file": sermon["mp3_file"],
+                "snippets": highlighted_snippets  # Store highlighted snippets
+            })
+
 
     return render_template("results.html", query=query, results=results)
 
