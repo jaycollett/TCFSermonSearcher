@@ -1,52 +1,89 @@
 {% extends "layout.html" %}
 {% block content %}
 <style>
-  .sermon-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 20px;
-    max-width: 1200px;
-    margin: auto;
-  }
-  .sermon-card {
-    background: white;
-    padding: 15px;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-  }
-  .sermon-card h5 {
-    font-size: 1.2rem;
-    margin-bottom: 10px;
-  }
-  .sermon-card p {
-    font-size: 0.95rem;
-    color: #555;
-  }
-  .audio-container {
-    margin-top: auto;
-  }
+    .sermon-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 30px;
+        max-width: 1200px;
+        margin: 30px auto;
+    }
+
+    .sermon-card {
+        background: white;
+        padding: 25px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .sermon-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .sermon-card h5 {
+        font-size: 1.5rem;
+        margin-bottom: 15px;
+        font-family: 'Merriweather', serif;
+        color: #333;
+    }
+
+    .sermon-card h5 a {
+        text-decoration: none;
+        color: #007bff;
+        transition: color 0.3s ease;
+    }
+
+    .sermon-card h5 a:hover {
+        text-decoration: underline;
+        color: #0056b3;
+    }
+
+    .sermon-card p {
+        font-size: 1.1rem;
+        color: #444;
+        line-height: 1.6;
+        margin-bottom: 20px;
+    }
+
+    .audio-container {
+        margin-top: auto;
+    }
+
+    .audio-player {
+        width: 100%;
+    }
+
+    h2.sermon-index-title {
+        text-align: center;
+        margin-bottom: 40px;
+        font-family: 'Merriweather', serif;
+        font-size: 2.8rem;
+        color: #333;
+    }
 </style>
 
-<h2 class="text-center mb-4">📂 Sermon Index</h2>
+<h2 class="sermon-index-title">📂 Sermon Index</h2>
 
 <div class="sermon-grid">
-  {% for sermon in sermons %}
-    <div class="sermon-card">
-      <h5>
-        <a href="{{ url_for('sermon_detail', sermon_id=sermon['id']) }}">
-          {{ sermon['title'] }}
-        </a>
-      </h5>
-      <p>{{ sermon['snippet'] }}...</p>
-      <div class="audio-container">
-        <audio controls>
-          <source src="{{ url_for('audiofiles', filename=sermon['mp3_file']) }}" type="audio/mpeg">
-        </audio>
-      </div>
-    </div>
-  {% endfor %}
+    {% for sermon in sermons %}
+        <div class="sermon-card">
+            <h5>
+                <a href="{{ url_for('sermon_detail', sermon_id=sermon['id']) }}">
+                    {{ sermon['title'] }}
+                </a>
+            </h5>
+            <p>{{ sermon['snippet'] }}...</p>
+            <div class="audio-container">
+                <audio controls class="audio-player">
+                    <source src="{{ url_for('audiofiles', filename=sermon['mp3_file']) }}" type="audio/mpeg">
+                </audio>
+            </div>
+        </div>
+    {% endfor %}
 </div>
 {% endblock %}
