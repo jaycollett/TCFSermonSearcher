@@ -22,11 +22,13 @@ def close_connection(exception):
     if db is not None:
         db.close()
 
+
 def extract_relevant_snippets(transcript, query, max_snippets=3):
     """Extract up to max_snippets sentences that contain the search term."""
     sentences = re.split(r'(?<=[.!?])\s+', transcript)  # Split transcript into sentences
-    matched_sentences = [s for s in sentences if query.lower() in s.lower()]
+    matched_sentences = [s for s in sentences if re.search(rf'\b{re.escape(query)}\b', s, re.IGNORECASE)]
     return matched_sentences[:max_snippets] if matched_sentences else ["(No exact match found)"]
+
 
 def format_text_into_paragraphs(text, min_sentences=3, max_sentences=6):
     """Breaks long text into readable paragraphs by grouping sentences."""
@@ -42,6 +44,7 @@ def format_text_into_paragraphs(text, min_sentences=3, max_sentences=6):
 
     return ''.join(f"<p>{p}</p>" for p in paragraphs)  # Wrap each in <p> tags
 
+
 def highlight_search_terms(text, query):
     """Wraps search terms in a highlight span tag."""
     if not query or query.strip() == "":
@@ -54,10 +57,12 @@ def highlight_search_terms(text, query):
 
     return text
 
+
 @app.route("/")
 def index():
     """Render the static homepage."""
     return render_template("index.html")
+
 
 @app.route("/search", methods=["GET"])
 def search():
@@ -79,10 +84,11 @@ def search():
             "id": sermon["id"],
             "title": sermon["title"],
             "mp3_file": sermon["mp3_file"],
-            "snippets": snippets  
+            "snippets": [highlight_search_terms(s, query) for s in snippets]  # Highlight search term
         })
 
     return render_template("results.html", query=query, results=results)
+
 
 @app.route("/sermon/<int:sermon_id>")
 def sermon_detail(sermon_id):
@@ -104,6 +110,7 @@ def sermon_detail(sermon_id):
 
     return render_template("sermon.html", sermon=sermon, formatted_transcript=highlighted_transcript, query=query)
 
+
 @app.route("/sermons")
 def sermon_index():
     """Lists all available sermon MP3 files with snippets."""
@@ -113,7 +120,7 @@ def sermon_index():
 
     sermon_list = []
     for sermon in sermons:
-        snippet = " ".join(sermon["transcript"].split()[:100])  # First ~100 words
+        snippet = extract_relevant_snippets(sermon["transcript"], "", max_snippets=1)[0]  # First relevant sentence
         sermon_list.append({
             "id": sermon["id"],
             "title": sermon["title"],
