@@ -1,17 +1,98 @@
 {% extends "layout.html" %}
 {% block content %}
-<h2>Search Results for "{{ query }}"</h2>
+<style>
+  .highlight {
+    background-color: yellow;
+    font-weight: bold;
+    padding: 2px 4px;
+    border-radius: 3px;
+  }
+  .card {
+    border: none;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease-in-out;
+  }
+  .card:hover {
+    transform: translateY(-5px);
+  }
+  .card-body {
+    background: #ffffff;
+    border-radius: 8px;
+    padding: 20px;
+  }
+  h5 a {
+    color: #007bff;
+    text-decoration: none;
+  }
+  h5 a:hover {
+    text-decoration: underline;
+  }
+  .snippet {
+    font-size: 0.95rem;
+    color: #333;
+  }
+  /* 🔹 NEW: Clean grey Back to Search button */
+  .back-button {
+    background: #6c757d; /* Neutral grey */
+    color: white;
+    font-weight: bold;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    transition: background 0.3s, transform 0.2s;
+    display: flex;
+    align-items: center;
+  }
+  .back-button:hover {
+    background: #5a6268; /* Darker grey on hover */
+    transform: scale(1.05);
+  }
+  .back-button img {
+    width: 18px;
+    height: 18px;
+    margin-right: 8px;
+  }
+</style>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h2>Search Results for "<span class="text-primary">{{ query }}</span>"</h2>
+  <a href="{{ url_for('search') }}" class="btn btn-secondary">⬅ Back to Search</a>
+</div>
+
 {% if results %}
-  <div class="list-group">
-    {% for row in results %}
-      <a href="{{ url_for('audiofiles', filename=row['mp3_file']) }}" class="list-group-item list-group-item-action">
-        <h5 class="mb-1">{{ row['title'] }}</h5>
-        <p class="mb-1">{{ row['transcript'][:200] }}...</p>
-        <small>Listen to sermon</small>
-      </a>
-    {% endfor %}
+  <div class="container">
+    <div class="row">
+      {% for row in results %}
+        <div class="col-md-12 mb-3">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">
+                <a href="{{ url_for('sermon_detail', sermon_id=row['id'], q=query) }}">
+                  {{ row['title'] }}
+                </a>
+              </h5>              
+              
+              {% for snippet in row['snippets'] %}
+                <p class="snippet">
+                  {{ snippet | replace(query, '<span class="highlight">' + query + '</span>') | safe }}
+                </p>
+              {% endfor %}
+              
+              <div class="d-flex justify-content-between align-items-center">
+                <audio controls style="width: 100%;">
+                  <source src="{{ url_for('audiofiles', filename=row['mp3_file']) }}" type="audio/mpeg">
+                  Your browser does not support the audio element.
+                </audio>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
   </div>
 {% else %}
-  <p>No results found.</p>
+  <div class="alert alert-warning text-center">
+    <strong>No results found.</strong> Try a different search term.
+  </div>
 {% endif %}
 {% endblock %}

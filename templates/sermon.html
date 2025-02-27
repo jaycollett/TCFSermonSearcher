@@ -1,0 +1,53 @@
+{% extends "layout.html" %}
+{% block content %}
+<style>
+  /* 🔹 Sticky audio player */
+  .sticky-audio {
+    position: sticky;
+    top: 70px;
+    background: white;
+    padding: 10px;
+    z-index: 1000;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  /* 🔹 Improved paragraph readability */
+  .sermon-text {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: #333;
+    max-width: 800px;
+    margin: auto;
+  }
+  .sermon-text p {
+    margin-bottom: 20px; /* 🔹 Adds spacing between paragraphs */
+  }
+
+  /* 🔹 Search Term Highlighting */
+  .highlight {
+    background-color: yellow;
+    font-weight: bold;
+    padding: 2px 4px;
+    border-radius: 3px;
+  }
+</style>
+
+<!-- 🔹 Back to Search Button -->
+<div class="mb-3">
+    <a href="{{ url_for('search') }}" class="btn btn-secondary">⬅ Back to Search</a>
+  </div>  
+
+<!-- 🔹 Sticky Audio Player -->
+<div class="sticky-audio">
+  <h3>{{ sermon['title'] }}</h3>
+  <audio controls style="width: 100%;">
+    <source src="{{ url_for('audiofiles', filename=sermon['mp3_file']) }}" type="audio/mpeg">
+    Your browser does not support the audio element.
+  </audio>
+</div>
+
+<!-- 🔹 Display Formatted & Highlighted Sermon Text -->
+<div class="sermon-text mt-4">
+  {{ formatted_transcript | safe }}
+</div>
+{% endblock %}

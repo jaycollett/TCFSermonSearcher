@@ -1,0 +1,32 @@
+{% extends "layout.html" %}
+{% block content %}
+<style>
+  .search-container {
+    max-width: 600px;
+    margin: auto;
+    text-align: center;
+    padding-top: 50px;
+  }
+  .search-box {
+    width: 100%;
+    padding: 10px;
+    font-size: 18px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+  }
+  .search-button {
+    margin-top: 10px;
+    padding: 10px 20px;
+    font-size: 18px;
+  }
+</style>
+
+<div class="search-container">
+  <h1>🔍 Search Sermons</h1>
+  <p>Enter a keyword or phrase to find sermons.</p>
+  <form action="{{ url_for('search') }}" method="get">
+    <input type="text" name="q" class="search-box" placeholder="Type your search term..." required>
+    <button type="submit" class="btn btn-primary search-button">Search</button>
+  </form>
+</div>
+{% endblock %}
