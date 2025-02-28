@@ -1,7 +1,7 @@
 # TCFSermonSearcher
 
 ## Overview
-TCFSermonSearcher is a web application built with Python and Flask to help users quickly find past sermons using keyword-based searches. This tool enhances sermon accessibility, allowing users to search for specific messages based on words, phrases, and sentences.
+TCFSermonSearcher is a web application built with Python and Flask to help users quickly find past sermons using keyword-based searches. This tool enhances sermon accessibility, allowing users to search for specific messages based on words, phrases, and full sentences.
 
 ## Features
 
@@ -9,9 +9,9 @@ TCFSermonSearcher is a web application built with Python and Flask to help users
 - **User-Friendly Interface** – Simple and intuitive design for easy navigation.
 - **Fast & Efficient** – Optimized search functionality for quick results.
 
-## Installation
+## Running with Docker
 
-To set up TCFSermonSearcher locally, follow these steps:
+The recommended way to run TCFSermonSearcher is via Docker. Follow these steps:
 
 1. **Clone the Repository**
    ```sh
@@ -21,34 +21,21 @@ To set up TCFSermonSearcher locally, follow these steps:
    ```sh
    cd TCFSermonSearcher
    ```
-3. **Create and Activate a Virtual Environment**
+3. **Build the Docker Image**
    ```sh
-   python -m venv venv
-   source venv/bin/activate  # On Windows use: venv\Scripts\activate
+   docker build -t tcfs-sermon-searcher .
    ```
-4. **Install Dependencies**
+4. **Run the Application in a Docker Container**
    ```sh
-   pip install -r requirements.txt
+   docker run -d -p 5000:5000 --name tcfs-sermon-searcher tcfs-sermon-searcher
    ```
-5. **Configure Environment Variables**
-   - Create a `.env` file in the root directory.
-   - Add necessary configuration settings based on your environment.
-6. **Run Database Migrations (if applicable)**
-   ```sh
-   flask db upgrade
-   ```
-7. **Start the Application**
-   ```sh
-   flask run
-   ```
-8. **Access the Application**
+5. **Access the Application**
    - Open your browser and go to: `http://localhost:5000`
 
 ## Usage
 
 1. Enter a keyword or phrase in the search bar.
-2. Apply filters if needed (date, speaker, sermon series, etc.).
-3. View and access the relevant sermon content.
+2. View and access the relevant sermon content.
 
 ## Contributing
 
