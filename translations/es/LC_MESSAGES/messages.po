@@ -116,10 +116,10 @@ msgstr "Español"
 
 #: templates/layout.html:107
 msgid ""
-"📖 Sermon Search | Written by: Jay Collett | Version: 0.1.7-alpha | Date: "
+"📖 Sermon Search | Written by: Jay Collett | Version: 0.1.11-alpha | Date: "
 "February 27, 2025"
 msgstr ""
-"📖 Búsqueda de Sermones | Escrito por: Jay Collett | Versión: 0.1.7-alpha "
+"📖 Búsqueda de Sermones | Escrito por: Jay Collett | Versión: 0.1.11-alpha "
 "| Fecha: 27 de febrero de 2025"
 
 #: templates/results.html:91
