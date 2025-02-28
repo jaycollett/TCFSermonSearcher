@@ -1,7 +1,7 @@
 # TCFSermonSearcher
 
 ## Overview
-TCFSermonSearcher is a web application built with Python and Flask to help users quickly find past sermons using keyword-based searches. This tool enhances sermon accessibility, allowing users to search for specific messages based on words, phrases, and filters like date, speaker, or series.
+TCFSermonSearcher is a web application built with Python and Flask to help users quickly find past sermons using keyword-based searches. This tool enhances sermon accessibility, allowing users to search for specific messages based on words, phrases, and sentences.
 
 ## Features
 
