@@ -21,13 +21,13 @@ jobs:
       - name: Check out the repo
         uses: actions/checkout@v4.2.2
 
-      # Download and extract the MP3 archive into /app/audiofiles
+      # Download and extract the MP3 archive into ./audiofiles (same level as Dockerfile)
       - name: Download MP3 files from hosted site
         run: |
-          mkdir -p app/audiofiles
-          curl -L https://filer.collett.us/audiofiles.tar.gz -o mp3files.tar.gz
-          tar -xzf mp3files.tar.gz -C app/audiofiles
-          rm mp3files.tar.gz
+          mkdir -p audiofiles
+          curl -L https://filer.collett.us/audiofiles.tar.gz -o audiofiles.tar.gz
+          tar -xzf audiofiles.tar.gz -C audiofiles
+          rm audiofiles.tar.gz
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3.8.0
