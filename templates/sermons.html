@@ -73,15 +73,20 @@
     {% for sermon in sermons %}
         <div class="sermon-card">
             <h5>
-                <a href="{{ url_for('sermon_detail', sermon_id=sermon['id']) }}">
+                <a href="{{ url_for('sermon_detail', sermon_id=sermon['id'], q=request.args.get('q', '')) }}">
                     {{ sermon['title'] }}
                 </a>
             </h5>
             <p>{{ sermon['snippet'] }}...</p>
             <div class="audio-container">
+                {% if sermon['mp3_file'] %}
                 <audio controls class="audio-player">
                     <source src="{{ url_for('audiofiles', filename=sermon['mp3_file']) }}" type="audio/mpeg">
+                    Your browser does not support the audio element.
                 </audio>
+                {% else %}
+                    <p>{{ _("Audio not available.") }}</p>
+                {% endif %}
             </div>
         </div>
     {% endfor %}

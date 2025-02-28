@@ -149,9 +149,13 @@ def sermon_detail(sermon_id):
 
 @app.route("/sermons")
 def sermon_index():
-    """Lists all available sermon MP3 files with snippets."""
+    """Lists all available sermon MP3 files with snippets, filtered by language."""
     db = get_db()
-    cur = db.execute("SELECT id, title, mp3_file, transcript FROM sermons ORDER BY title ASC")
+    language = request.cookies.get("language", "en") # Get the language from the cookie.
+    cur = db.execute(
+        "SELECT id, title, mp3_file, transcript FROM sermons WHERE language = ? ORDER BY title ASC",
+        (language,) # Pass the language as a parameter.
+    )
     sermons = cur.fetchall()
     sermon_list = []
     for sermon in sermons:
