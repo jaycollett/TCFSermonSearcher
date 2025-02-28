@@ -10,12 +10,7 @@ jobs:
       - name: Free Disk Space (Ubuntu)
         uses: jlumbroso/free-disk-space@main
         with:
-          # this might remove tools that are actually needed,
-          # if set to "true" but frees about 6 GB
           tool-cache: true
-          
-          # all of these default to true, but feel free to set to
-          # "false" if necessary for your workflow
           android: true
           dotnet: true
           haskell: true
@@ -25,6 +20,12 @@ jobs:
 
       - name: Check out the repo
         uses: actions/checkout@v4.2.2
+
+      - name: Set up Git LFS
+        run: git lfs install
+
+      - name: Download Git LFS files
+        run: git lfs pull
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3.8.0
@@ -36,7 +37,6 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # Convert repository name and tag name to lowercase using Bash parameter expansion
       - name: Set lowercase repository and tag name
         run: |
           echo "REPO_NAME_LC=${REPO_NAME,,}" >> $GITHUB_ENV
@@ -51,4 +51,3 @@ jobs:
           context: .
           push: true
           tags: ghcr.io/jaycollett/${{ env.REPO_NAME_LC }}:${{ env.TAG_NAME_LC }}, ghcr.io/jaycollett/${{ env.REPO_NAME_LC }}:latest
-            
