@@ -65,11 +65,11 @@
 </style>
 
 <div class="search-container">
-    <h1>🔍 Search Sermons</h1>
-    <p>Enter a keyword or phrase to find sermons.</p>
+    <h1>{{ _("🔍 Search Sermons") }}</h1>
+    <p>{{ _("Enter a keyword or phrase to find sermons.") }}</p>
     <form action="{{ url_for('search') }}" method="get">
-        <input type="text" name="q" class="search-box" placeholder="Type your search term..." required>
-        <button type="submit" class="search-button">Search</button>
+        <input type="text" name="q" class="search-box" placeholder="{{ _('Type your search term...') }}" required>
+        <button type="submit" class="search-button">{{ _("Search") }}</button>
     </form>
 </div>
 {% endblock %}

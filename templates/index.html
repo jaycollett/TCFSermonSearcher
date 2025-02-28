@@ -99,27 +99,22 @@
 <div class="hero">
     <div class="hero-overlay"></div>
     <div class="hero-content text-center">
-        <h1 class="display-4">Welcome to Sermon Search</h1>
-        <p class="lead">Find and revisit past sermons with ease.</p>
-        <a href="{{ url_for('search') }}" class="btn btn-primary btn-lg">Start Searching</a>
+        <h1 class="display-4">{{ _("Welcome to Sermon Search") }}</h1>
+        <p class="lead">{{ _("Find and revisit past sermons with ease.") }}</p>
+        <a href="{{ url_for('search') }}" class="btn btn-primary btn-lg">{{ _("Start Searching") }}</a>
     </div>
 </div>
 
 <div class="content-section">
-    <h2>The Inspiration Behind This Project</h2>
+    <h2>{{ _("The Inspiration Behind This Project") }}</h2>
     <p>
-        This project was born from a light-hearted moment during a <strong>Craw/LaSage homegroup</strong> meeting.
-        As we shared together, <strong>Brian Craw</strong> mentioned how amazing it would be to
-        easily search through past sermons to find something he remembered from one of the past sermons.
+        {{ _("This project was born from a light-hearted moment during a <strong>Craw/LaSage homegroup</strong> meeting. As we shared together, <strong>Brian Craw</strong> mentioned how amazing it would be to easily search through past sermons to find something he remembered from one of the past sermons.") | safe }}
     </p>
     <p>
-        With my proclivity for technology, I took this idea and developed a solution—<strong>Sermon Search</strong>.
-        This web application automatically transcribes sermons and makes them searchable,
-        allowing anyone to quickly search through past sermons from TCF.
+        {{ _("With my proclivity for technology, I took this idea and developed a solution—<strong>Sermon Search</strong>. This web application automatically transcribes sermons and makes them searchable, allowing anyone to quickly search through past sermons from TCF.") | safe }}
     </p>
     <p>
-        I hope this tool helps deepen your connection with the teachings and makes it easier
-        to reflect on past messages. Enjoy exploring, and may these sermons continue to bless you!
+        {{ _("I hope this tool helps deepen your connection with the teachings and makes it easier to reflect on past messages. Enjoy exploring, and may these sermons continue to bless you!") }}
     </p>
 </div>
 {% endblock %}

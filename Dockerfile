@@ -10,7 +10,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Upgrade pip and install Flask
-RUN pip3 install --upgrade pip && pip3 install Flask
+RUN pip3 install --upgrade pip && pip3 install Flask Flask-Babel
 
 # Set the working directory inside the container
 WORKDIR /app
@@ -20,6 +20,10 @@ COPY app.py /app/
 COPY sermons.db /app/
 COPY templates /app/templates
 COPY audiofiles /app/audiofiles
+COPY translations /app/translations
+
+# Compile translations using pybabel
+RUN pybabel compile -d translations
 
 # Expose port 5000 (Flask default)
 EXPOSE 5000

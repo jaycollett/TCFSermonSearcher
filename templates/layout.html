@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ language }}">
 <head>
     <meta charset="UTF-8">
-    <title>Sermon Search - TCF</title>
+    <title>{{ _("TCF - Sermon Search") }}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Searchable sermon transcripts from TCF. Find past sermons easily.">
+    <meta name="description" content="{{ _('Searchable sermon transcripts from TCF. Find past sermons easily.') }}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -17,15 +17,13 @@
             display: flex;
             flex-direction: column;
             min-height: 100vh;
-            transition: background-color 0.3s ease; /* Smooth background transition */
+            transition: background-color 0.3s ease;
         }
-
         .content-wrapper {
             flex: 1;
             padding: 30px;
-            transition: padding 0.3s ease; /* Smooth padding transition */
+            transition: padding 0.3s ease;
         }
-
         .footer {
             background-color: #343a40;
             color: white;
@@ -33,59 +31,69 @@
             padding: 25px 10px;
             font-size: 0.9rem;
             width: 100%;
-            transition: background-color 0.3s ease; /* Smooth background transition */
+            transition: background-color 0.3s ease;
         }
-
         .navbar {
             background-color: #ffffff;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             padding: 15px 20px;
-            border-radius: 0 0 10px 10px; /* Rounded bottom corners */
-            transition: box-shadow 0.3s ease; /* Smooth shadow transition */
+            border-radius: 0 0 10px 10px;
+            transition: box-shadow 0.3s ease;
         }
-
         .navbar-brand {
             font-family: 'Merriweather', serif;
             font-weight: 700;
             color: #333;
-            transition: color 0.3s ease; /* Smooth color transition */
+            transition: color 0.3s ease;
         }
-
         .navbar-nav .nav-link {
             color: #333;
-            transition: color 0.3s ease, transform 0.2s ease; /* Smooth color and transform transitions */
+            transition: color 0.3s ease, transform 0.2s ease;
         }
-
         .navbar-nav .nav-link:hover {
             color: #555;
-            transform: translateY(-2px); /* Slight lift on hover */
+            transform: translateY(-2px);
         }
-
         .navbar-toggler-icon {
             background-color: #333;
         }
-
-        /* Subtle box shadow on hover for interactive elements */
         .navbar-nav .nav-link, .btn {
             transition: box-shadow 0.3s ease;
         }
-
         .navbar-nav .nav-link:hover, .btn:hover {
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        /* Language dropdown styling */
+        .language-dropdown {
+            background-color: #ffffff;
+            border: 1px solid #ccc;
+            color: #333;
+            padding: 5px 10px;
+            border-radius: 3px;
+            margin-left: 10px;
         }
     </style>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
         <div class="container">
-            <a class="navbar-brand" href="{{ url_for('index') }}">Sermon Search - TCF</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <a class="navbar-brand" href="{{ url_for('index') }}">{{ _("Sermon Search - TCF") }}</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="{{ _('Toggle navigation') }}">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('search') }}">🔍 Search</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('sermon_index') }}">📂 Sermon Index</a></li>
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('search') }}">🔍 {{ _("Search") }}</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('sermon_index') }}">📂 {{ _("Sermon Index") }}</a></li>
+                    <li class="nav-item">
+                        <form action="{{ url_for('set_language') }}" method="post" id="languageForm">
+                            <select name="language" class="language-dropdown" onchange="document.getElementById('languageForm').submit()">
+                                <option value="en" {% if language == 'en' %}selected{% endif %}>{{ _("English") }}</option>
+                                <option value="es" {% if language == 'es' %}selected{% endif %}>{{ _("Spanish") }}</option>
+                            </select>
+                        </form>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -96,7 +104,7 @@
     </div>
 
     <footer class="footer">
-        <p>📖 Sermon Search | Written by: Jay Collett | Version: 0.1.7-alpha | Date: February 27, 2025</p>
+        <p>{{ _("📖 Sermon Search | Written by: Jay Collett | Version: 0.1.7-alpha | Date: February 27, 2025") }}</p>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
