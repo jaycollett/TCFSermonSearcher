@@ -19,7 +19,7 @@ WORKDIR /app
 COPY app.py /app/
 COPY sermons.db /app/
 COPY templates /app/templates
-COPY audiofiles /app/audiofiles
+#COPY audiofiles /app/audiofiles we are going to move away from embedded audio files for space conerns. Docker must have a mounted volume for audio files now
 COPY translations /app/translations
 
 # Compile translations using pybabel

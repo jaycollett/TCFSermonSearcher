@@ -104,9 +104,15 @@
     </div>
 
     <footer class="footer">
-        <p>{{ _("📖 Sermon Search | Written by: Jay Collett | Version: 0.1.7-alpha | Date: February 27, 2025") }}</p>
+        <p>{{ _("📖 Sermon Search | Written by: Jay Collett | Version: 0.1.11-alpha | Date: February 27, 2025") }}</p>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Add this script to automatically submit the form on language change
+        document.querySelector('.language-dropdown').addEventListener('change', function() {
+            this.form.submit();
+        });
+    </script>
 </body>
 </html>

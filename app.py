@@ -86,11 +86,11 @@ def index():
 
 @app.route("/set_language", methods=["POST"])
 def set_language():
-    """Update the language cookie based on the user's selection."""
+    """Update the language cookie and redirect to the home page."""
     selected_lang = request.form.get("language")
     if selected_lang not in ["en", "es"]:
         selected_lang = "en"
-    resp = make_response(redirect(request.referrer or url_for("index")))
+    resp = make_response(redirect(url_for("index"))) # Unconditionally redirect to index
     # Set the language cookie to expire in one year.
     resp.set_cookie("language", selected_lang, max_age=365*24*60*60)
     return resp

@@ -103,7 +103,7 @@ msgstr ""
 
 #: templates/layout.html:107
 msgid ""
-"📖 Sermon Search | Written by: Jay Collett | Version: 0.1.7-alpha | Date: "
+"📖 Sermon Search | Written by: Jay Collett | Version: 0.1.11-alpha | Date: "
 "February 27, 2025"
 msgstr ""
 
