@@ -75,16 +75,16 @@
 
 <div class="mb-3">
     <a href="{{ url_for('search', q=request.args.get('q', '')) }}" class="back-button">
-        <span>⬅</span> Back to Search
+        <span>⬅</span> {{ _("Back to Search") }}
     </a>
 </div>
 
 <div class="sticky-audio">
-    <h3>{{ sermon['title'] }}</h3>
-    {% if sermon['mp3_file'] %}
+    <h3>{{ sermon['sermon_title'] }}</h3>
+    {% if sermon['audiofilename'] %}
     <audio controls style="width: 100%;">
-        <source src="{{ url_for('audiofiles', filename=sermon['mp3_file']) }}" type="audio/mpeg">
-        Your browser does not support the audio element.
+        <source src="{{ url_for('audiofiles', filename=sermon['audiofilename']) }}" type="audio/mpeg">
+        {{ _("Your browser does not support the audio element.") }}
     </audio>
     {% else %}
     <p>{{ _("Audio not available.") }}</p>
@@ -94,4 +94,5 @@
 <div class="sermon-text mt-4">
     {{ formatted_transcript | safe }}
 </div>
+
 {% endblock %}
