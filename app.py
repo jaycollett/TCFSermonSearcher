@@ -166,18 +166,33 @@ def get_client_ip():
     return request.remote_addr  # Fallback if header is missing
 
 def extract_relevant_snippets(transcript, query, max_snippets=3, context_words=8):
-    """Extract snippets of text surrounding the search query."""
+    """Extract up to `max_snippets` of text surrounding the search query."""
     matched_snippets = []
     escaped_query = re.escape(query)
-    matches = re.finditer(escaped_query, transcript, re.IGNORECASE)
+    
+    # Find all occurrences of the query in the text
+    matches = list(re.finditer(escaped_query, transcript, re.IGNORECASE))
+
+    if not matches:
+        return ["(No exact match found)"]
+
+    last_end = 0  # Track the last snippet end position to avoid excessive overlap
     for match in matches:
         start = max(0, match.start() - context_words * 5)
         end = min(len(transcript), match.end() + context_words * 5)
-        snippet = transcript[start:end]
+
+        # Avoid extracting overlapping snippets
+        if start < last_end:
+            continue
+
+        snippet = transcript[start:end].strip()
         matched_snippets.append(snippet)
+        last_end = end  # Update last snippet position
+
         if len(matched_snippets) >= max_snippets:
             break
-    return matched_snippets if matched_snippets else ["(No exact match found)"]
+
+    return matched_snippets
 
 def format_text_into_paragraphs(text, min_sentences=3, max_sentences=6):
     """Breaks long text into readable paragraphs by grouping sentences."""
@@ -192,7 +207,25 @@ def format_text_into_paragraphs(text, min_sentences=3, max_sentences=6):
     return ''.join(f"<p>{p}</p>" for p in paragraphs)
 
 def highlight_search_terms(text, query):
-    """Wraps search terms in a highlight span tag."""
+    """Wraps search terms in a highlight span tag while preserving original case and ensuring case-insensitive matching."""
+    if not query or query.strip() == "":
+        return text
+
+    escaped_query = re.escape(query)
+    
+    def replace_match(match):
+        return f'<span class="highlight">{match.group()}</span>'
+
+    # Perform case-insensitive substitution while keeping the original case
+    regex = re.compile(rf'\b{escaped_query}\b', re.IGNORECASE)
+
+    highlighted_text = regex.sub(replace_match, text)
+    return highlighted_text
+
+
+
+
+
 def inject_language():
     language = request.cookies.get('language', 'en')
     return dict(language=language)
@@ -267,12 +300,16 @@ def search():
             sermons = cur.fetchall()
 
         for sermon in sermons:
+            snippets = extract_relevant_snippets(sermon["transcription"], query)
+            if not snippets or snippets == ["(No exact match found)"]:
+                snippets = [sermon["transcription"][:200]]  # Fallback to first 200 chars
+            
             results.append({
                 "sermon_guid": sermon["sermon_guid"],
                 "sermon_title": sermon["sermon_title"],
                 "audiofilename": sermon["audiofilename"],
-                "snippets": [sermon["transcription"][:200]]  # Basic snippet extraction
-            })
+                "snippets": snippets
+        })
 
         app.logger.debug(f"Total results found: {len(results)}")
 
@@ -280,7 +317,10 @@ def search():
         app.logger.error(f"Error during search: {str(e)}", exc_info=True)
         return render_template("error.html", message=_("An error occurred while processing your search. Please try again."))
 
-    return render_template("results.html", query=query, results=results)
+    return render_template("results.html", 
+                            query=query, 
+                            results=results,
+                            highlight_search_terms=highlight_search_terms)  # Pass the function
 
 
 @app.route("/sermon/<sermon_guid>")
