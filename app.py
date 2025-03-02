@@ -222,13 +222,12 @@ def highlight_search_terms(text, query):
     highlighted_text = regex.sub(replace_match, text)
     return highlighted_text
 
-
-
-
-
+@app.context_processor
 def inject_language():
     language = request.cookies.get('language', 'en')
     return dict(language=language)
+
+
 
 @app.route("/")
 def index():
@@ -344,11 +343,33 @@ def sermon_detail(sermon_guid):
 
 @app.route("/sermons")
 def sermon_index():
+    """Retrieve sermons and display the first 3-4 sentences of each transcription as a snippet."""
     db = get_db()
     language = request.cookies.get("language", "en")
-    cur = db.execute("SELECT sermon_guid, sermon_title, audiofilename FROM sermons WHERE language = ? ORDER BY sermon_title ASC", (language,))
+    
+    cur = db.execute("SELECT sermon_guid, sermon_title, audiofilename, transcription FROM sermons WHERE language = ? ORDER BY sermon_title ASC", (language,))
     sermons = cur.fetchall()
-    return render_template("sermons.html", sermons=sermons)
+
+    def extract_first_sentences(text, min_sentences=3, max_sentences=4):
+        """Extracts the first few sentences from the transcription."""
+        if not text:
+            return "(No transcription available)"
+        
+        sentences = re.split(r'(?<=[.!?])\s+', text)  # Splits at sentence endings
+        snippet = " ".join(sentences[:random.randint(min_sentences, max_sentences)])  # Get first 3-4 sentences
+        return snippet
+
+    # Process sermons and add snippets
+    processed_sermons = []
+    for sermon in sermons:
+        processed_sermons.append({
+            "sermon_guid": sermon["sermon_guid"],
+            "sermon_title": sermon["sermon_title"],
+            "audiofilename": sermon["audiofilename"],
+            "snippet": extract_first_sentences(sermon["transcription"])  # Extract snippet
+        })
+
+    return render_template("sermons.html", sermons=processed_sermons)
 
 @app.route("/audiofiles/<path:filename>")
 def audiofiles(filename):

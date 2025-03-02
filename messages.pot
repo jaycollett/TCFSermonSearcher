@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-02-27 22:48-0500\n"
+"POT-Creation-Date: 2025-03-02 14:01-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,15 +17,15 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.10.3\n"
 
-#: app.py:84
+#: app.py:233
 msgid "Welcome to Sermon Search!"
 msgstr ""
 
-#: app.py:133
+#: app.py:316
 msgid "An error occurred while processing your search. Please try again."
 msgstr ""
 
-#: app.py:143
+#: app.py:332
 msgid "Sermon not found"
 msgstr ""
 
@@ -103,8 +103,8 @@ msgstr ""
 
 #: templates/layout.html:107
 msgid ""
-"📖 Sermon Search | Written by: Jay Collett | Version: 0.1.11-alpha | Date: "
-"February 27, 2025"
+"📖 Sermon Search | Written by: Jay Collett | Version: 0.1.11-alpha | Date:"
+" February 27, 2025"
 msgstr ""
 
 #: templates/results.html:91
@@ -115,15 +115,21 @@ msgstr ""
 msgid "Back to Search"
 msgstr ""
 
-#: templates/results.html:117
+#: templates/results.html:124 templates/sermon.html:87
+#: templates/sermons.html:84
 msgid "Your browser does not support the audio element."
 msgstr ""
 
-#: templates/results.html:128
+#: templates/results.html:127 templates/sermon.html:90
+#: templates/sermons.html:87
+msgid "Audio not available."
+msgstr ""
+
+#: templates/results.html:138
 msgid "No results found."
 msgstr ""
 
-#: templates/results.html:128
+#: templates/results.html:138
 msgid "Try a different search term."
 msgstr ""
 
@@ -137,6 +143,10 @@ msgstr ""
 
 #: templates/search.html:71
 msgid "Type your search term..."
+msgstr ""
+
+#: templates/sermon.html:78
+msgid "Back to Search Results"
 msgstr ""
 
 #: templates/sermons.html:70

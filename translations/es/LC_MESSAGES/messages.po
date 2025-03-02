@@ -154,6 +154,10 @@ msgstr "Introduce una palabra clave o frase para encontrar sermones."
 msgid "Type your search term..."
 msgstr "Escribe tu término de búsqueda..."
 
+#: templates/sermon.html:78
+msgid "Back to Search Results"
+msgstr "Volver a los Resultados de Búsqueda"
+
 #: templates/sermons.html:70
 msgid "📂 Sermon Index"
-msgstr "Índice de Sermones"
+msgstr "📂 Índice de Sermones"
