@@ -26,5 +26,7 @@ RUN pybabel compile -d translations
 # Expose port 5000 (Flask default)
 EXPOSE 5000
 
+ENV SERMON_API_TOKEN="58cb3ced-c710-4bd2-9d6b-81aef1757ee1"
+
 # Set the default command to run your Flask app
 CMD ["python3", "app.py"]
