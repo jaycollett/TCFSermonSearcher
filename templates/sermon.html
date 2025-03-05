@@ -80,7 +80,12 @@
 </div>
 
 <div class="sticky-audio">
-    <h3>{{ sermon['sermon_title'] }}</h3>
+    <div class="d-flex justify-content-between align-items-center">
+        <h3 class="mb-0">{{ sermon['sermon_title'] }}</h3>
+        {% if sermon['categories'] %}
+        <span style="font-style: italic; font-size: 0.8rem;">{{ sermon['categories'] }}</span>
+        {% endif %}
+    </div>
     {% if sermon['audiofilename'] %}
     <audio controls style="width: 100%;">
         <source src="{{ url_for('audiofiles', filename=sermon['audiofilename']) }}" type="audio/mpeg">
@@ -90,6 +95,7 @@
     <p>{{ _("Audio not available.") }}</p>
     {% endif %}
 </div>
+
 
 <div class="sermon-text mt-4">
     {{ formatted_transcript | safe }}
