@@ -56,11 +56,12 @@ def init_db():
                     sermon_title TEXT NOT NULL,
                     transcription TEXT NOT NULL,
                     audiofilename TEXT,
-                    sermon_guid VARCHAR(40) UNIQUE,
-                    language VARCHAR(2) DEFAULT 'en',
+                    sermon_guid VARCHAR(40) NOT NULL,
+                    language VARCHAR(2) NOT NULL DEFAULT 'en',
                     categories TEXT,
                     insert_date DATETIME DEFAULT CURRENT_TIMESTAMP,
-                    church NVARCHAR(10)
+                    church NVARCHAR(10),
+                    UNIQUE (sermon_guid, language)  -- Ensure unique constraint
                 )
             ''')
             conn.commit()
