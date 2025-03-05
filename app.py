@@ -446,13 +446,19 @@ def upload_sermon():
             cursor.execute('''
                 INSERT INTO sermons (sermon_title, transcription, audiofilename, sermon_guid, language, categories, church)
                 VALUES (?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT(sermon_guid, language) 
+                DO UPDATE SET
+                    sermon_title = excluded.sermon_title,
+                    transcription = excluded.transcription,
+                    audiofilename = excluded.audiofilename,
+                    categories = excluded.categories,
+                    church = excluded.church
             ''', (sermon_title, transcription, audio_filename, sermon_guid, language, categories, church))
             conn.commit()
     except sqlite3.IntegrityError:
-        return jsonify({"error": "Sermon GUID must be unique."}), 400
+        return jsonify({"error": "Database error occurred."}), 400
 
     return jsonify({"message": "Sermon uploaded successfully", "guid": sermon_guid}), 200
-
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
