@@ -325,10 +325,23 @@ def search():
 
 @app.route("/sermon/<sermon_guid>")
 def sermon_detail(sermon_guid):
-    """Retrieve and display a sermon with formatted transcription and highlights."""
+    """Retrieve and display a sermon with the correct language version."""
     db = get_db()
-    cur = db.execute("SELECT * FROM sermons WHERE sermon_guid = ?", (sermon_guid,))
+    language = request.cookies.get("language", "en")  # Get user-selected language
+
+    cur = db.execute(
+        "SELECT * FROM sermons WHERE sermon_guid = ? AND language = ?",
+        (sermon_guid, language),
+    )
     sermon = cur.fetchone()
+
+    # Fallback to English if the selected language version is unavailable
+    if not sermon:
+        cur = db.execute(
+            "SELECT * FROM sermons WHERE sermon_guid = ? AND language = 'en'",
+            (sermon_guid,),
+        )
+        sermon = cur.fetchone()
 
     if not sermon:
         return _("Sermon not found"), 404
@@ -339,7 +352,12 @@ def sermon_detail(sermon_guid):
     formatted_transcript = format_text_into_paragraphs(sermon["transcription"])
     highlighted_transcript = highlight_search_terms(formatted_transcript, query)
 
-    return render_template("sermon.html", sermon=sermon, formatted_transcript=highlighted_transcript, query=query)
+    return render_template(
+        "sermon.html",
+        sermon=sermon,
+        formatted_transcript=highlighted_transcript,
+        query=query,
+    )
 
 
 @app.route("/sermons")
