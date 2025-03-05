@@ -419,7 +419,7 @@ def upload_sermon():
     if not all([audiofile, transcription, sermon_guid, sermon_title, language, categories, church]):
         return jsonify({"error": "Missing required fields"}), 400
 
-    audio_filename = f"{sermon_guid}.mp3"
+    audio_filename = f"{sermon_guid}_{language}.mp3"
     audiofile.save(os.path.join("/data/audiofiles", audio_filename))
 
     try:
