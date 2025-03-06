@@ -6,113 +6,143 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="{{ _('Searchable sermon transcripts from TCF. Find past sermons easily.') }}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Open+Sans:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap" rel="stylesheet">
     <style>
+        /* General Styles */
         body {
-            padding-top: 80px;
-            background-color: #f8f9fa;
-            font-family: 'Open Sans', sans-serif;
+            background-color: #222;
+            color: white;
+            font-family: 'Arial', sans-serif;
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
-            min-height: 100vh;
-            transition: background-color 0.3s ease;
+        }
+        .container {
+            max-width: 1200px;
+            margin-top: 20px;
         }
         .content-wrapper {
             flex: 1;
             padding: 30px;
-            transition: padding 0.3s ease;
         }
         .footer {
             background-color: #343a40;
             color: white;
             text-align: center;
-            padding: 25px 10px;
+            padding: 15px;
             font-size: 0.9rem;
-            width: 100%;
-            transition: background-color 0.3s ease;
         }
+
+        /* Navbar Styling */
         .navbar {
-            background-color: #ffffff;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            padding: 15px 20px;
+            background-color: #f8f9fa;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+            padding: 15px 25px;
             border-radius: 0 0 10px 10px;
-            transition: box-shadow 0.3s ease;
         }
         .navbar-brand {
             font-family: 'Merriweather', serif;
+            font-size: 1.8rem;
             font-weight: 700;
-            color: #333;
+            color: #222;
             transition: color 0.3s ease;
         }
+        .navbar-brand:hover {
+            color: #007bff;
+        }
         .navbar-nav .nav-link {
-            color: #333;
+            color: #333 !important;
+            font-size: 1.1rem;
+            padding: 8px 15px;
             transition: color 0.3s ease, transform 0.2s ease;
         }
         .navbar-nav .nav-link:hover {
-            color: #555;
+            color: #007bff;
             transform: translateY(-2px);
         }
-        .navbar-toggler-icon {
-            background-color: #333;
-        }
-        .navbar-nav .nav-link, .btn {
-            transition: box-shadow 0.3s ease;
-        }
-        .navbar-nav .nav-link:hover, .btn:hover {
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-        /* Language dropdown styling */
-        .language-dropdown {
-            background-color: #ffffff;
-            border: 1px solid #ccc;
+
+        /* Styled Language Dropdown */
+        .dropdown-toggle {
+            background: none;
+            border: none;
             color: #333;
-            padding: 5px 10px;
-            border-radius: 3px;
-            margin-left: 10px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            padding: 8px 15px;
+            transition: color 0.3s ease, transform 0.2s ease;
+        }
+        .dropdown-toggle:hover {
+            color: #007bff;
+            transform: translateY(-2px);
+        }
+        .dropdown-menu {
+            border-radius: 6px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+        }
+        .dropdown-item {
+            font-size: 1rem;
+            padding: 8px 12px;
+            transition: background-color 0.2s ease;
+        }
+        .dropdown-item:hover {
+            background-color: #f0f0f0;
         }
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top">
         <div class="container">
-            <a class="navbar-brand" href="{{ url_for('index') }}">{{ _("Sermon Search - TCF") }}</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
-                    aria-controls="navbarNav" aria-expanded="false" aria-label="{{ _('Toggle navigation') }}">
+            <a class="navbar-brand" href="{{ url_for('index') }}">{{ _("Sermon Search") }}</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto align-items-center">
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('search') }}">🔍 {{ _("Search") }}</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('sermon_index') }}">📂 {{ _("Sermon Index") }}</a></li>
                     <li class="nav-item">
-                        <form action="{{ url_for('set_language') }}" method="post" id="languageForm">
-                            <select name="language" class="language-dropdown" onchange="document.getElementById('languageForm').submit()">
-                                <option value="en" {% if language == 'en' %}selected{% endif %}>{{ _("English") }}</option>
-                                <option value="es" {% if language == 'es' %}selected{% endif %}>{{ _("Spanish") }}</option>
-                            </select>
-                        </form>
+                        <a class="nav-link" href="{{ url_for('search') }}">🔍 {{ _("Search") }}</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('sermon_index') }}">📂 {{ _("Sermon Index") }}</a>
+                    </li>
+                    <!-- Language Dropdown -->
+                    <li class="nav-item dropdown">
+                        <button class="btn dropdown-toggle" type="button" id="languageDropdown" data-bs-toggle="dropdown">
+                            {% if language == "es" %}
+                                {{ _("Spanish") }}
+                            {% else %}
+                                {{ _("English") }} <!-- Defaults to English -->
+                            {% endif %}
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="languageDropdown">
+                            <li>
+                                <form action="{{ url_for('set_language') }}" method="post" id="languageForm-en">
+                                    <input type="hidden" name="language" value="en">
+                                    <button type="submit" class="dropdown-item {% if language == 'en' %}active{% endif %}">{{ _("English") }}</button>
+                                </form>
+                            </li>
+                            <li>
+                                <form action="{{ url_for('set_language') }}" method="post" id="languageForm-es">
+                                    <input type="hidden" name="language" value="es">
+                                    <button type="submit" class="dropdown-item {% if language == 'es' %}active{% endif %}">{{ _("Spanish") }}</button>
+                                </form>
+                            </li>
+                        </ul>
                     </li>
                 </ul>
             </div>
         </div>
     </nav>
 
+    <!-- Page Content -->
     <div class="container content-wrapper">
         {% block content %}{% endblock %}
     </div>
 
+    <!-- Footer -->
     <footer class="footer">
         <p>{{ _("📖 Sermon Search | Written by: Jay Collett | Version: 0.2.0 | Date: March 4, 2025") }}</p>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // Add this script to automatically submit the form on language change
-        document.querySelector('.language-dropdown').addEventListener('change', function() {
-            this.form.submit();
-        });
-    </script>
 </body>
 </html>

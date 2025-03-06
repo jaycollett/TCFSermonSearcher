@@ -183,33 +183,49 @@ def get_all_categories(language):
 
 
 def extract_relevant_snippets(transcript, query, max_snippets=3, context_words=8):
-    """Extract up to `max_snippets` of text surrounding the search query."""
+    """Extract up to `max_snippets` of text surrounding the search query without cutting words in half."""
     matched_snippets = []
     escaped_query = re.escape(query)
     
-    # Find all occurrences of the query in the text
+    # Find all occurrences of the query in the transcript (case-insensitive)
     matches = list(re.finditer(escaped_query, transcript, re.IGNORECASE))
-
     if not matches:
         return ["(No exact match found)"]
-
-    last_end = 0  # Track the last snippet end position to avoid excessive overlap
+    
+    last_end = 0  # Track the last snippet's end to avoid overlaps
+    
     for match in matches:
-        start = max(0, match.start() - context_words * 5)
-        end = min(len(transcript), match.end() + context_words * 5)
-
-        # Avoid extracting overlapping snippets
+        # Calculate raw boundaries using context_words multiplier
+        raw_start = max(0, match.start() - context_words * 5)
+        raw_end = min(len(transcript), match.end() + context_words * 5)
+        
+        # Adjust start: if not at beginning, move back to the previous space to avoid cutting a word.
+        if raw_start > 0:
+            adjusted_start = transcript.rfind(" ", 0, raw_start)
+            start = adjusted_start + 1 if adjusted_start != -1 else raw_start
+        else:
+            start = raw_start
+        
+        # Adjust end: if not at end, move forward to the next space.
+        if raw_end < len(transcript):
+            adjusted_end = transcript.find(" ", raw_end)
+            end = adjusted_end if adjusted_end != -1 else raw_end
+        else:
+            end = raw_end
+        
+        # Avoid overlapping snippets
         if start < last_end:
             continue
 
         snippet = transcript[start:end].strip()
         matched_snippets.append(snippet)
-        last_end = end  # Update last snippet position
-
+        last_end = end
+        
         if len(matched_snippets) >= max_snippets:
             break
 
     return matched_snippets
+
 
 def format_text_into_paragraphs(text, min_sentences=3, max_sentences=6):
     """Breaks long text into readable paragraphs by grouping sentences."""
@@ -229,21 +245,17 @@ def highlight_search_terms(text, query):
         return text
 
     escaped_query = re.escape(query)
-    
-    def replace_match(match):
-        return f'<span class="highlight">{match.group()}</span>'
+    # Use a capturing group without relying on word boundaries for more flexibility.
+    regex = re.compile(rf'({escaped_query})', re.IGNORECASE)
 
-    # Perform case-insensitive substitution while keeping the original case
-    regex = re.compile(rf'\b{escaped_query}\b', re.IGNORECASE)
-
-    highlighted_text = regex.sub(replace_match, text)
+    highlighted_text = regex.sub(r'<span class="highlight">\1</span>', text)
     return highlighted_text
+
 
 @app.context_processor
 def inject_language():
     language = request.cookies.get('language', 'en')
     return dict(language=language)
-
 
 
 @app.route("/")

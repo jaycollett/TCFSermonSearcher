@@ -4,15 +4,11 @@
   /* Full-Screen Background */
   .results-wrapper {
     background: #222;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
+    min-height: 100vh;
     display: flex;
     align-items: flex-start;
     justify-content: center;
-    padding-top: 6vh;
+    padding-top: 3vh;
     overflow-y: auto;
   }
 
@@ -27,7 +23,7 @@
   /* Sticky Header (White Background) */
   .sticky-header {
     position: sticky;
-    top: 0;
+    top: 15px;  /* Default space when not scrolled */
     z-index: 1000;
     background: #fff;
     padding: 15px;
@@ -35,14 +31,35 @@
     box-shadow: 0 3px 8px rgba(0,0,0,0.15);
     border-radius: 12px;
     color: black;
+    margin-bottom: 5px;
+    transition: all 0.3s ease;
   }
-
+  .sticky-header.fixed {
+    position: fixed;
+    top: 90px; /* Fixed below the navbar */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 95%;
+    max-width: 1200px;
+    margin-bottom: 0;
+  }
+  .sticky-header .header-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
   .sticky-header h4 {
     font-size: 1.5rem;
     font-weight: 600;
-    text-align: center;
-    margin-top: 15px;
-    margin-bottom: 15px;
+    margin: 0;
+  }
+  .sticky-header .back-link {
+    font-size: 0.9rem;
+    text-decoration: none;
+    color: #007bff;
+  }
+  .sticky-header .back-link:hover {
+    text-decoration: underline;
   }
 
   /* Filter Section */
@@ -61,7 +78,6 @@
     gap: 8px;
     justify-content: center;
   }
-
   .filter-box {
     display: inline-block;
     padding: 6px 12px;
@@ -84,7 +100,7 @@
     color: white;
   }
 
-  /* Search Result Cards - Now With Lighter Shadow */
+  /* Search Result Cards - Lighter Shadow */
   .card {
     border: 1px solid #e0e0e0;
     border-radius: 10px;
@@ -92,7 +108,8 @@
     background-color: #fff;
     overflow: hidden;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-    box-shadow: 0px 3px 8px rgba(255, 255, 255, 0.1); /* Softer, lighter shadow */
+    box-shadow: 0px 3px 8px rgba(255, 255, 255, 0.1);
+    cursor: pointer;
   }
   .card:hover {
     transform: translateY(-3px);
@@ -121,22 +138,39 @@
     font-size: 0.85rem;
     color: #555;
     margin-left: 15px;
+    white-space: nowrap;
   }
 
-  /* Full-Width Audio Player */
-  .audio-container {
-    width: 100%;
-    margin-top: 15px;
+  /* Snippet Styling */
+  .snippet {
+    font-size: 1rem;
+    color: #444;
+    margin-top: 10px;
   }
 
-  audio {
-    width: 100%;
+  /* Audio Info Text Instead of Audio Player */
+  .audio-info {
+    text-align: right;
+    margin-top: 10px;
+  }
+  .audio-info small {
+    font-style: italic;
+    color: #555;
   }
 
   /* Results Background */
   .results-background {
     background: #222;
     padding: 20px 0;
+  }
+
+  /* Highlight Styling */
+  .highlight {
+    background-color: rgba(0,123,255,0.15);
+    color: #007bff;
+    font-weight: bold;
+    padding: 0 3px;
+    border-radius: 3px;
   }
 
   /* Responsive Adjustments */
@@ -155,29 +189,32 @@
 <div class="results-wrapper">
   <div class="results-container">
     
-    <!-- Sticky Header with Filters -->
-    <div class="sticky-header">
+    <!-- Sticky Header with Filters and Back Button -->
+    <div class="sticky-header" id="sticky-header">
       <form action="{{ url_for('search') }}" method="get" id="results-form">
         <input type="hidden" name="q" value="{{ query_val }}">
-        <div class="filter-title">{{ _("Filter by Categories (optional)") }}</div>
+        <div class="filter-title">{{ _("Category Filters") }}</div>
         <div class="filter-group" id="results-filter-group">
           {% for cat in all_categories %}
             <a href="javascript:void(0)" class="filter-box {% if cat in selected_categories %}active{% endif %}" data-filter="{{ cat }}">{{ cat }}</a>
           {% endfor %}
         </div>
-        <h4>Search Results for "<span class="text-primary">{{ query_val }}</span>"</h4>
+        <div class="header-flex" style="margin-top: 15px; display: flex; justify-content: space-between; align-items: center;">
+          <h4 style="margin: 0;">Search Results for "<span class="text-primary">{{ query_val }}</span>"</h4>
+          <a href="{{ url_for('search') }}" class="back-link" style="font-size: 0.9rem; text-decoration: none; color: #007bff;">{{ _("Back to Search") }}</a>
+        </div>
       </form>
     </div>
 
-    <!-- Background to Fill Space Between Results -->
+    <!-- Results List -->
     <div class="results-background">
       {% if results %}
       <div class="mt-4">
         {% for row in results %}
-        <div class="card">
+        <div class="card" data-href="{{ url_for('sermon_detail', sermon_guid=row['sermon_guid'], q=query_val, categories=selected_categories) }}">
           <div class="card-body">
             <h5 class="card-title">
-              <a href="{{ url_for('sermon_detail', sermon_guid=row['sermon_guid'], q=query_val, categories=selected_categories) }}">
+              <a href="{{ url_for('sermon_detail', sermon_guid=row['sermon_guid'], q=query_val, categories=selected_categories) }}" onclick="event.stopPropagation();">
                 {{ row['sermon_title'] }}
               </a>
               {% if row['categories'] %}
@@ -187,29 +224,65 @@
               {% endif %}
             </h5>
             {% if row['snippets'] %}
-            <p class="snippet">{{ highlight_search_terms(row['snippets'][0], query_val) | safe }}...</p>
+              {% for snippet in row['snippets'] %}
+                <p class="snippet">...{{ highlight_search_terms(snippet, query_val) | safe }}...</p>
+              {% endfor %}
             {% endif %}
-            <!-- Full-Width Audio Player -->
-            {% if row['audiofilename'] %}
-            <div class="audio-container">
-              <audio controls>
-                <source src="{{ url_for('audiofiles', filename=row['audiofilename']) }}" type="audio/mpeg">
-                Your browser does not support the audio element.
-              </audio>
+            <!-- Audio Info Text -->
+            <div class="audio-info">
+              <small><em>{{ _("English, Spanish Audio Available") }}</em></small>
             </div>
-            {% endif %}
           </div>
         </div>
         {% endfor %}
       </div>
       {% else %}
       <div class="alert alert-warning text-center mt-4">
-        <strong>No results found.</strong> Try a different search term.
+        <strong>{{ _("No results found.") }}</strong> {{ _("Try a different search term.") }}
       </div>
       {% endif %}
     </div>
   </div>
 </div>
+
+<!-- JavaScript: Make the Entire Card Clickable -->
+<script>
+  document.querySelectorAll('.card').forEach(card => {
+    card.addEventListener('click', function(e) {
+      // Prevent navigation if a link was clicked inside the card
+      if (!e.target.closest('a')) {
+        window.location = card.getAttribute('data-href');
+      }
+    });
+  });
+</script>
+
+<!-- JavaScript: Sticky Header Positioning -->
+<script>
+  var lastScrollY = 0;
+  window.addEventListener('scroll', function() {
+    var stickyHeader = document.getElementById('sticky-header');
+    var navbarHeight = document.querySelector('.navbar').offsetHeight;
+    var currentScrollY = window.scrollY;
+
+    // Desktop fixed behavior
+    if (currentScrollY > 10) {
+      stickyHeader.classList.add('fixed');
+    } else {
+      stickyHeader.classList.remove('fixed');
+    }
+
+    // Mobile: hide on scroll down, show on scroll up
+    if (window.innerWidth <= 768) {
+      if (currentScrollY > lastScrollY) {
+        stickyHeader.classList.add('hide');
+      } else {
+        stickyHeader.classList.remove('hide');
+      }
+    }
+    lastScrollY = currentScrollY;
+  });
+</script>
 
 <!-- JavaScript: Filters Update Instantly -->
 <script>
@@ -220,14 +293,12 @@
       let selected = query.getAll("categories");
 
       if (selected.includes(category)) {
-        selected = selected.filter(c => c !== category); // Remove if already selected
+        selected = selected.filter(c => c !== category);
       } else {
-        selected.push(category); // Add new selection
+        selected.push(category);
       }
-
       query.delete("categories");
       selected.forEach(c => query.append("categories", c));
-
       window.location.search = query.toString();
     });
   });
