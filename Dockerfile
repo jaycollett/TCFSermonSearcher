@@ -19,6 +19,7 @@ WORKDIR /app
 COPY app.py /app/
 COPY templates /app/templates
 COPY translations /app/translations
+COPY static/ static/
 
 # Compile translations using pybabel
 RUN pybabel compile -d translations

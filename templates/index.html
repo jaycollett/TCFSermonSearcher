@@ -113,6 +113,21 @@
             padding: 20px;
         }
     }
+
+    /* Signature Styling */
+    .signature {
+        display: block;
+        width: 150px; /* Adjust as needed */
+        margin-top: 20px; /* Space from the last paragraph */
+    }
+
+    .signature-wrapper {
+        display: flex;
+        justify-content: flex-start; /* Aligns to the left */
+        margin-top: 30px; /* Adjust spacing */
+    }
+
+
 </style>
 
 <!-- Hero Section -->
@@ -149,6 +164,12 @@
     <p>
         {{ _("This wouldn’t be possible without the dedication and hard work of those who have faithfully prepared and delivered these sermons—ensuring that God’s message is shared with clarity, truth, and love. Enjoy exploring, it's my prayer that this resource be a blessing to you.") }}
     </p>
+
+    <!-- Signature Image -->
+    <div class="signature-wrapper">
+        <img src="{{ url_for('static', filename='images/signature_web.png') }}" alt="Signature" class="signature">
+    </div>
 </div>
+
 
 {% endblock %}
