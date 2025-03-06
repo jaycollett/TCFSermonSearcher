@@ -330,6 +330,15 @@ def robots():
             Sitemap: https://sermonsearch.collett.us/sitemap.xml
             """, 200, {'Content-Type': 'text/plain'}
 
+def sanitize_search_term(term):
+    term = term.strip()
+    term = re.sub(r'[^\w\s\-]', '', term)
+    # Always use prefix matching for single tokens
+    words = term.split()
+    if len(words) == 1:
+        return f'{term}*'
+    return f'"{term}"'
+
 
 @app.route("/search", methods=["GET"])
 def search():
@@ -344,9 +353,8 @@ def search():
     if not query:
         return render_template("search.html", all_categories=all_categories, selected_categories=selected_categories)
 
-    words = query.split()
-    fts_query = query + '*' if len(words) == 1 and 2 <= len(query) <= 5 else query  # Enables prefix search
-
+    # Sanitize the search term for FTS
+    sanitized_term = sanitize_search_term(query)
     results = []
     try:
         db = get_db()
@@ -356,25 +364,36 @@ def search():
         filter_params = []
         if selected_categories:
             conditions = []
+            # Use the base table alias (s) for filtering on unindexed columns in the join query.
             for cat in selected_categories:
-                conditions.append("categories LIKE ?")
+                conditions.append("s.categories LIKE ?")
                 filter_params.append(f"%{cat}%")
             filter_clause = " AND (" + " OR ".join(conditions) + ")"
 
-        # First, try FTS5 prefix searching (note we now also select categories)
-        fts_sql = ("SELECT sermon_guid, sermon_title, audiofilename, transcription, categories "
-                   "FROM sermons_fts WHERE sermons_fts MATCH ? AND language = ?"
-                   f"{filter_clause} LIMIT 25")
-        params = [fts_query, language] + filter_params
+        # Build the FTS query string to search in specific columns.
+        fts_query_str = f"sermon_title:{sanitized_term} OR transcription:{sanitized_term}"
+
+        # Query using a join between the base table and the FTS virtual table.
+        fts_sql = (
+            "SELECT s.sermon_guid, s.sermon_title, s.audiofilename, s.transcription, s.categories "
+            "FROM sermons s "
+            "JOIN sermons_fts ON s.id = sermons_fts.rowid "
+            "WHERE sermons_fts MATCH ? AND s.language = ? "
+            f"{filter_clause} LIMIT 25"
+        )
+        params = [fts_query_str, language] + filter_params
         cur = db.execute(fts_sql, params)
         sermons = cur.fetchall()
 
-        # If FTS5 finds nothing, fallback to LIKE for substring match
+        # Fallback: if no FTS results, do a LIKE search on the base table.
         if not sermons:
             like_query = f"%{query}%"
-            fallback_sql = ("SELECT sermon_guid, sermon_title, audiofilename, transcription, categories "
-                            "FROM sermons WHERE transcription LIKE ? AND language = ?"
-                            f"{filter_clause} LIMIT 25")
+            fallback_sql = (
+                "SELECT s.sermon_guid, s.sermon_title, s.audiofilename, s.transcription, s.categories "
+                "FROM sermons s "
+                "WHERE s.transcription LIKE ? AND s.language = ? "
+                f"{filter_clause} LIMIT 25"
+            )
             params = [like_query, language] + filter_params
             cur = db.execute(fallback_sql, params)
             sermons = cur.fetchall()
@@ -382,8 +401,7 @@ def search():
         for sermon in sermons:
             snippets = extract_relevant_snippets(sermon["transcription"], query)
             if not snippets or snippets == ["(No exact match found)"]:
-                snippets = [sermon["transcription"][:200]]  # Fallback to first 200 chars
-
+                snippets = [sermon["transcription"][:200]]  # Fallback snippet
             results.append({
                 "sermon_guid": sermon["sermon_guid"],
                 "sermon_title": sermon["sermon_title"],
@@ -404,6 +422,10 @@ def search():
                            highlight_search_terms=highlight_search_terms,
                            all_categories=all_categories,
                            selected_categories=selected_categories)
+
+
+
+
 
 @app.route("/sermon/<sermon_guid>")
 def sermon_detail(sermon_guid):
