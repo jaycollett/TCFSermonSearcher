@@ -89,7 +89,7 @@ def init_db():
                 CREATE VIRTUAL TABLE IF NOT EXISTS sermons_fts USING fts5(
                     sermon_guid, sermon_title, transcription, 
                     audiofilename UNINDEXED, language UNINDEXED, 
-                    categories UNINDEXED, church UNINDEXED,
+                    categories, church UNINDEXED,
                     content='sermons', content_rowid='id',
                     tokenize='unicode61',  
                     prefix='2,3'
@@ -165,6 +165,22 @@ def get_client_ip():
     if request.headers.get('X-Forwarded-For'):
         return request.headers.get('X-Forwarded-For').split(',')[0]  # First IP in the list is the real client IP
     return request.remote_addr  # Fallback if header is missing
+
+def get_all_categories(language):
+    """Return a sorted list of distinct category values for the given language."""
+    db = get_db()
+    cur = db.execute("SELECT categories FROM sermons WHERE language = ?", (language,))
+    rows = cur.fetchall()
+    cats_set = set()
+    for row in rows:
+        if row["categories"]:
+            # Split on comma, strip whitespace, and add non-empty values.
+            for cat in row["categories"].split(","):
+                trimmed = cat.strip()
+                if trimmed:
+                    cats_set.add(trimmed)
+    return sorted(list(cats_set))
+
 
 def extract_relevant_snippets(transcript, query, max_snippets=3, context_words=8):
     """Extract up to `max_snippets` of text surrounding the search query."""
@@ -268,48 +284,64 @@ def robots():
 
 @app.route("/search", methods=["GET"])
 def search():
-    """Handles searching for sermons using Full-Text Search (FTS5) and filters results by language."""
     query = request.args.get("q", "").strip()
-    if not query:
-        return render_template("search.html")
+    language = request.cookies.get("language", "en")
+    # Get filter selections (may be an empty list)
+    selected_categories = request.args.getlist("categories")
+    # Get the full list of distinct categories for the current language
+    all_categories = get_all_categories(language)
 
-    app.logger.info(f"Search query received: {query}")
+    # If no query is entered, simply render the search page with filters
+    if not query:
+        return render_template("search.html", all_categories=all_categories, selected_categories=selected_categories)
 
     words = query.split()
     fts_query = query + '*' if len(words) == 1 and 2 <= len(query) <= 5 else query  # Enables prefix search
 
     results = []
     try:
-        language = request.cookies.get("language", "en")
         db = get_db()
 
-        # First, try FTS5 prefix searching
-        cur = db.execute(
-            "SELECT sermon_guid, sermon_title, audiofilename, transcription FROM sermons_fts WHERE sermons_fts MATCH ? AND language = ? LIMIT 25",
-            (fts_query, language)
-        )
+        # Build extra SQL conditions if filters were selected.
+        filter_clause = ""
+        filter_params = []
+        if selected_categories:
+            conditions = []
+            for cat in selected_categories:
+                conditions.append("categories LIKE ?")
+                filter_params.append(f"%{cat}%")
+            filter_clause = " AND (" + " OR ".join(conditions) + ")"
+
+        # First, try FTS5 prefix searching (note we now also select categories)
+        fts_sql = ("SELECT sermon_guid, sermon_title, audiofilename, transcription, categories "
+                   "FROM sermons_fts WHERE sermons_fts MATCH ? AND language = ?"
+                   f"{filter_clause} LIMIT 25")
+        params = [fts_query, language] + filter_params
+        cur = db.execute(fts_sql, params)
         sermons = cur.fetchall()
 
         # If FTS5 finds nothing, fallback to LIKE for substring match
         if not sermons:
             like_query = f"%{query}%"
-            cur = db.execute(
-                "SELECT sermon_guid, sermon_title, audiofilename, transcription FROM sermons WHERE transcription LIKE ? AND language = ? LIMIT 25",
-                (like_query, language)
-            )
+            fallback_sql = ("SELECT sermon_guid, sermon_title, audiofilename, transcription, categories "
+                            "FROM sermons WHERE transcription LIKE ? AND language = ?"
+                            f"{filter_clause} LIMIT 25")
+            params = [like_query, language] + filter_params
+            cur = db.execute(fallback_sql, params)
             sermons = cur.fetchall()
 
         for sermon in sermons:
             snippets = extract_relevant_snippets(sermon["transcription"], query)
             if not snippets or snippets == ["(No exact match found)"]:
                 snippets = [sermon["transcription"][:200]]  # Fallback to first 200 chars
-            
+
             results.append({
                 "sermon_guid": sermon["sermon_guid"],
                 "sermon_title": sermon["sermon_title"],
                 "audiofilename": sermon["audiofilename"],
+                "categories": sermon["categories"],
                 "snippets": snippets
-        })
+            })
 
         app.logger.debug(f"Total results found: {len(results)}")
 
@@ -318,16 +350,19 @@ def search():
         return render_template("error.html", message=_("An error occurred while processing your search. Please try again."))
 
     return render_template("results.html", 
-                            query=query, 
-                            results=results,
-                            highlight_search_terms=highlight_search_terms)  # Pass the function
-
+                           query=query, 
+                           results=results,
+                           highlight_search_terms=highlight_search_terms,
+                           all_categories=all_categories,
+                           selected_categories=selected_categories)
 
 @app.route("/sermon/<sermon_guid>")
 def sermon_detail(sermon_guid):
     """Retrieve and display a sermon with the correct language version."""
     db = get_db()
     language = request.cookies.get("language", "en")  # Get user-selected language
+    query = request.args.get("q", "").strip()
+    selected_categories = request.args.getlist("categories")
 
     cur = db.execute(
         "SELECT * FROM sermons WHERE sermon_guid = ? AND language = ?",
@@ -346,8 +381,6 @@ def sermon_detail(sermon_guid):
     if not sermon:
         return _("Sermon not found"), 404
 
-    query = request.args.get("q", "").strip()
-
     # Format and highlight transcription
     formatted_transcript = format_text_into_paragraphs(sermon["transcription"])
     highlighted_transcript = highlight_search_terms(formatted_transcript, query)
@@ -357,6 +390,7 @@ def sermon_detail(sermon_guid):
         sermon=sermon,
         formatted_transcript=highlighted_transcript,
         query=query,
+        selected_categories=selected_categories
     )
 
 

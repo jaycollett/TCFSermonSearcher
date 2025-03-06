@@ -1,75 +1,222 @@
 {% extends "layout.html" %}
 {% block content %}
 <style>
+  /* Full-Screen Background Fix */
+  .search-wrapper {
+    background: #222;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: flex-start; /* Moves box toward the top */
+    justify-content: center;
+    padding-top: 8vh; /* Moves search box down a bit */
+  }
+
+  /* Centered White Search Box */
+  .search-container {
+    max-width: 700px;
+    padding: 40px;
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+    transition: transform 0.3s ease;
+    text-align: center;
+  }
+  .search-container:hover {
+    transform: translateY(-3px);
+  }
+
+  /* Search Title */
+  .search-container h1 {
+    font-size: 2.5rem;
+    color: #333;
+    font-family: 'Merriweather', serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+  }
+  .search-container h1::before {
+    content: "🔍";
+    font-size: 2rem;
+  }
+  .search-container p {
+    font-size: 1.1rem;
+    color: #666;
+    margin-bottom: 25px;
+  }
+
+  /* Search Box */
+  .search-box {
+    width: 100%;
+    padding: 14px 18px;
+    font-size: 18px;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+  .search-box:focus {
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0 0 10px rgba(0,123,255,0.3);
+  }
+
+  /* Search Button */
+  .search-button {
+    margin-top: 20px;
+    padding: 14px 30px;
+    font-size: 18px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+  }
+  .search-button:hover {
+    background-color: #0056b3;
+    transform: translateY(-3px);
+    box-shadow: 0 5px 12px rgba(0,0,0,0.15);
+  }
+  .search-button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
+
+  /* Filter Section */
+  .filter-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #555;
+    text-align: center;
+    margin-top: 18px;
+    margin-bottom: 8px;
+  }
+
+  /* New Filter Buttons */
+  .filter-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+  }
+  .filter-box {
+    display: inline-block;
+    padding: 8px 14px;
+    background: rgba(0,123,255,0.15);
+    border-radius: 20px;
+    font-size: 1rem;
+    color: #007bff;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    cursor: pointer;
+  }
+  .filter-box:hover {
+    background-color: #007bff;
+    color: #fff;
+    transform: scale(1.05);
+  }
+  .filter-box.active {
+    background-color: #007bff;
+    color: white;
+  }
+
+  /* Tooltip */
+  .tooltip {
+    display: none;
+    font-size: 0.85rem;
+    color: red;
+    margin-top: 5px;
+  }
+
+  /* Responsive Adjustments */
+  @media (max-width: 768px) {
     .search-container {
-        max-width: 600px;
-        margin: 80px auto;
-        text-align: center;
-        padding: 40px;
-        background-color: #f9f9f9;
-        border-radius: 10px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        transition: box-shadow 0.3s ease, transform 0.2s ease;
+      padding: 30px;
+      max-width: 90%;
     }
-
-    .search-container:hover {
-        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
-        transform: translateY(-5px);
-    }
-
     .search-container h1 {
-        font-size: 2.5rem;
-        margin-bottom: 15px;
-        color: #333;
-        font-family: 'Merriweather', serif;
+      font-size: 2rem;
     }
-
-    .search-container p {
-        font-size: 1.1rem;
-        color: #555;
-        margin-bottom: 30px;
-    }
-
-    .search-box {
-        width: 100%;
-        padding: 12px 15px;
-        font-size: 18px;
-        border: 2px solid #ddd;
-        border-radius: 8px;
-        transition: border-color 0.3s ease, box-shadow 0.3s ease;
-    }
-
-    .search-box:focus {
-        border-color: #007bff;
-        outline: none;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-
-    .search-button {
-        margin-top: 20px;
-        padding: 12px 25px;
-        font-size: 18px;
-        background-color: #007bff;
-        color: white;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
-    }
-
-    .search-button:hover {
-        background-color: #0056b3;
-        transform: translateY(-3px);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    }
+  }
 </style>
 
-<div class="search-container">
-    <h1>{{ _("🔍 Search Sermons") }}</h1>
-    <p>{{ _("Enter a keyword or phrase to find sermons.") }}</p>
-    <form action="{{ url_for('search') }}" method="get">
-        <input type="text" name="q" class="search-box" placeholder="{{ _('Type your search term...') }}" required>
-        <button type="submit" class="search-button">{{ _("Search") }}</button>
+{% set query_val = request.args.get('q', '') %}
+{% set selected_categories = request.args.getlist("categories") %}
+
+<div class="search-wrapper">
+  <div class="search-container">
+    <h1>{{ _("Search Sermons") }}</h1>
+    <p>{{ _("Find past sermons by keyword or topic.") }}</p>
+    <form action="{{ url_for('search') }}" method="get" id="search-form">
+      
+      <input type="text" id="search-input" name="q" class="search-box" placeholder="{{ _('Type a keyword...') }}" required minlength="3" value="{{ query_val }}">
+      <div id="tooltip" class="tooltip">{{ _("Please enter a search term.") }}</div>
+
+      <div class="filter-title">{{ _("Filter by Categories (optional)") }}</div>
+      <div class="filter-group" id="filter-group">
+        {% for cat in all_categories %}
+          <a href="javascript:void(0)" class="filter-box {% if cat in selected_categories %}active{% endif %}" data-filter="{{ cat }}">{{ cat }}</a>
+        {% endfor %}
+      </div>
+
+      <!-- Hidden container to store selected filters -->
+      <div id="hidden-filters">
+        {% for cat in selected_categories %}
+        <input type="hidden" name="categories" value="{{ cat }}">
+        {% endfor %}
+      </div>
+
+      <button type="submit" id="search-button" class="search-button" disabled>{{ _("Search Sermons") }}</button>
     </form>
+  </div>
 </div>
+
+<script>
+  const searchInput = document.getElementById('search-input');
+  const searchButton = document.getElementById('search-button');
+  const tooltip = document.getElementById('tooltip');
+
+  // Enable the button only if search input has 3+ characters
+  searchInput.addEventListener('input', function () {
+    if (searchInput.value.trim().length >= 3) {
+      searchButton.removeAttribute('disabled');
+      tooltip.style.display = 'none';
+    } else {
+      searchButton.setAttribute('disabled', 'true');
+    }
+  });
+
+  // Handle category filters
+  document.querySelectorAll('.filter-box').forEach(function(el) {
+    el.addEventListener('click', function() {
+      el.classList.toggle('active');
+      updateHiddenFilters();
+    });
+  });
+
+  function updateHiddenFilters() {
+    const container = document.getElementById('hidden-filters');
+    container.innerHTML = '';
+    document.querySelectorAll('.filter-box.active').forEach(function(el) {
+      const input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = 'categories';
+      input.value = el.getAttribute('data-filter');
+      container.appendChild(input);
+    });
+  }
+
+  // Prevent form submission if only filters are selected but no search term
+  document.getElementById('search-form').addEventListener('submit', function(event) {
+    if (searchInput.value.trim().length < 3) {
+      tooltip.style.display = 'block';
+      event.preventDefault();
+    }
+  });
+</script>
 {% endblock %}

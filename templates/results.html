@@ -1,141 +1,236 @@
 {% extends "layout.html" %}
 {% block content %}
 <style>
-    .highlight {
-        background-color: yellow;
-        font-weight: bold;
-        padding: 2px 4px;
-        border-radius: 3px;
-    }
+  /* Full-Screen Background */
+  .results-wrapper {
+    background: #222;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 6vh;
+    overflow-y: auto;
+  }
 
-    .card {
-        border: 1px solid #e0e0e0;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-        border-radius: 10px;
-        overflow: hidden;
-        margin-bottom: 20px;
-    }
+  /* Wider Search Results */
+  .results-container {
+    max-width: 1200px;
+    width: 95%;
+    padding: 40px;
+    background-color: transparent;
+  }
 
-    .card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
-    }
+  /* Sticky Header (White Background) */
+  .sticky-header {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: #fff;
+    padding: 15px;
+    border-bottom: 2px solid #ddd;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+    border-radius: 12px;
+    color: black;
+  }
 
-    .card-body {
-        background: #ffffff;
-        padding: 25px;
-        border-radius: 10px;
-    }
+  .sticky-header h4 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    text-align: center;
+    margin-top: 15px;
+    margin-bottom: 15px;
+  }
 
-    .card-title a {
-        color: #007bff;
-        text-decoration: none;
-        transition: color 0.3s ease;
-    }
+  /* Filter Section */
+  .filter-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #333;
+    text-align: center;
+    margin-bottom: 10px;
+  }
 
-    .card-title a:hover {
-        text-decoration: underline;
-        color: #0056b3;
-    }
+  /* Filter Pills */
+  .filter-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+  }
 
-    .snippet {
-        font-size: 1rem;
-        color: #444;
-        line-height: 1.6;
-        margin-bottom: 15px;
-    }
+  .filter-box {
+    display: inline-block;
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    background: rgba(0,123,255,0.15);
+    border-radius: 20px;
+    color: #007bff;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    cursor: pointer;
+  }
+  .filter-box:hover {
+    background-color: #007bff;
+    color: #fff;
+    transform: scale(1.05);
+  }
+  .filter-box.active {
+    background-color: #007bff;
+    color: white;
+  }
 
-    .back-button {
-        background: #6c757d;
-        color: white;
-        font-weight: bold;
-        border: none;
-        padding: 12px 20px;
-        border-radius: 8px;
-        transition: background 0.3s, transform 0.2s, box-shadow 0.3s ease;
-        display: inline-flex;
-        align-items: center;
-        text-decoration: none;
-    }
+  /* Search Result Cards - Now With Lighter Shadow */
+  .card {
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    background-color: #fff;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0px 3px 8px rgba(255, 255, 255, 0.1); /* Softer, lighter shadow */
+  }
+  .card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0px 6px 12px rgba(255, 255, 255, 0.2);
+  }
+  .card-body {
+    padding: 20px;
+  }
+  .card-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .card-title a {
+    color: #007bff;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.25rem;
+  }
+  .card-title a:hover {
+    text-decoration: underline;
+    color: #0056b3;
+  }
+  .card-title span {
+    font-style: italic;
+    font-size: 0.85rem;
+    color: #555;
+    margin-left: 15px;
+  }
 
-    .back-button:hover {
-        background: #5a6268;
-        transform: scale(1.05);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    }
+  /* Full-Width Audio Player */
+  .audio-container {
+    width: 100%;
+    margin-top: 15px;
+  }
 
-    .back-button img {
-        width: 20px;
-        height: 20px;
-        margin-right: 10px;
-    }
+  audio {
+    width: 100%;
+  }
 
-    .audio-container {
-        margin-top: 20px;
-    }
+  /* Results Background */
+  .results-background {
+    background: #222;
+    padding: 20px 0;
+  }
 
-    .audio-player {
-        width: 100%;
+  /* Responsive Adjustments */
+  @media (max-width: 768px) {
+    .results-container {
+      width: 95%;
+      padding: 30px;
     }
-
-    .alert-warning {
-        padding: 20px;
-        border-radius: 10px;
-        margin-top: 20px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
+  }
 </style>
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>{{ _("Search Results for") }} "<span class="text-primary">{{ query }}</span>"</h2>
-    <a href="{{ url_for('search') }}" class="back-button">
-        <span>⬅</span> {{ _("Back to Search") }}
-    </a>
+{% set query_val = request.args.get('q', '') %}
+{% set selected_categories = request.args.getlist('categories') %}
+
+<!-- Full-Screen Background -->
+<div class="results-wrapper">
+  <div class="results-container">
+    
+    <!-- Sticky Header with Filters -->
+    <div class="sticky-header">
+      <form action="{{ url_for('search') }}" method="get" id="results-form">
+        <input type="hidden" name="q" value="{{ query_val }}">
+        <div class="filter-title">{{ _("Filter by Categories (optional)") }}</div>
+        <div class="filter-group" id="results-filter-group">
+          {% for cat in all_categories %}
+            <a href="javascript:void(0)" class="filter-box {% if cat in selected_categories %}active{% endif %}" data-filter="{{ cat }}">{{ cat }}</a>
+          {% endfor %}
+        </div>
+        <h4>Search Results for "<span class="text-primary">{{ query_val }}</span>"</h4>
+      </form>
+    </div>
+
+    <!-- Background to Fill Space Between Results -->
+    <div class="results-background">
+      {% if results %}
+      <div class="mt-4">
+        {% for row in results %}
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">
+              <a href="{{ url_for('sermon_detail', sermon_guid=row['sermon_guid'], q=query_val, categories=selected_categories) }}">
+                {{ row['sermon_title'] }}
+              </a>
+              {% if row['categories'] %}
+                <span>{{ row['categories'] }}</span>
+              {% else %}
+                <span class="text-muted">No categories</span>
+              {% endif %}
+            </h5>
+            {% if row['snippets'] %}
+            <p class="snippet">{{ highlight_search_terms(row['snippets'][0], query_val) | safe }}...</p>
+            {% endif %}
+            <!-- Full-Width Audio Player -->
+            {% if row['audiofilename'] %}
+            <div class="audio-container">
+              <audio controls>
+                <source src="{{ url_for('audiofiles', filename=row['audiofilename']) }}" type="audio/mpeg">
+                Your browser does not support the audio element.
+              </audio>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="alert alert-warning text-center mt-4">
+        <strong>No results found.</strong> Try a different search term.
+      </div>
+      {% endif %}
+    </div>
+  </div>
 </div>
 
-{% if results %}
-    <div class="container">
-        <div class="row">
-            {% for row in results %}
-                <div class="col-md-12 mb-3">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">
-                                <a href="{{ url_for('sermon_detail', sermon_guid=row['sermon_guid'], q=query) }}">
-                                    {{ row['sermon_title'] }}
-                                </a>
-                            </h5>
+<!-- JavaScript: Filters Update Instantly -->
+<script>
+  document.querySelectorAll('.filter-box').forEach(filter => {
+    filter.addEventListener('click', function() {
+      let query = new URLSearchParams(window.location.search);
+      let category = this.getAttribute('data-filter');
+      let selected = query.getAll("categories");
 
-                            {% if row['snippets'] %}
-                                <div class="snippet-container">
-                                    {% for snippet in row['snippets'] %}
-                                        <p class="snippet">
-                                            {{ highlight_search_terms(snippet, query) | safe }}...
-                                        </p>
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
+      if (selected.includes(category)) {
+        selected = selected.filter(c => c !== category); // Remove if already selected
+      } else {
+        selected.push(category); // Add new selection
+      }
 
-                            <div class="d-flex justify-content-between align-items-center">
-                                {% if row['audiofilename'] %}
-                                    <audio controls style="width: 100%;">
-                                        <source src="{{ url_for('audiofiles', filename=row['audiofilename']) }}" type="audio/mpeg">
-                                        {{ _("Your browser does not support the audio element.") }}
-                                    </audio>
-                                {% else %}
-                                    <p>{{ _("Audio not available.") }}</p>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            {% endfor %}
-        </div>
-    </div>
-{% else %}
-    <div class="alert alert-warning text-center">
-        <strong>{{ _("No results found.") }}</strong> {{ _("Try a different search term.") }}
-    </div>
-{% endif %}
+      query.delete("categories");
+      selected.forEach(c => query.append("categories", c));
+
+      window.location.search = query.toString();
+    });
+  });
+</script>
+
 {% endblock %}
