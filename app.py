@@ -183,32 +183,6 @@ def get_all_categories(language):
     return sorted(list(cats_set))
 
 
-def sanitize_search_term(term, use_prefix=True):
-    # Remove unwanted characters; adjust the regex as needed
-    term = term.strip()
-    # Allow only alphanumerics, spaces, and hyphens (for example)
-    term = re.sub(r'[^\w\s\-]', '', term)
-    
-    # Define a set of words that might cause issues
-    reserved_words = {"model", "and", "or", "not"}
-    
-    words = term.split()
-    if len(words) == 1:
-        # If the word is in the reserved list, treat it as a literal phrase
-        if term.lower() in reserved_words:
-            sanitized = f'"{term}"'
-        elif use_prefix and 2 <= len(term) <= 5:
-            # For short, single-word queries, enable prefix search
-            sanitized = f'{term}*'
-        else:
-            # Otherwise, wrap it in quotes to avoid interpretation as operators
-            sanitized = f'"{term}"'
-    else:
-        # For multi-word queries, wrap the whole thing in quotes
-        sanitized = f'"{term}"'
-    
-    return sanitized
-
 def extract_relevant_snippets(transcript, query, max_snippets=3, context_words=8):
     """Extract up to `max_snippets` of text surrounding the search query without cutting words in half."""
     matched_snippets = []
@@ -371,9 +345,7 @@ def search():
         return render_template("search.html", all_categories=all_categories, selected_categories=selected_categories)
 
     words = query.split()
-    
-    # Sanitize the search term once for consistency
-    sanitized_term = sanitize_search_term(query)
+    fts_query = query + '*' if len(words) == 1 and 2 <= len(query) <= 5 else query  # Enables prefix search
 
     results = []
     try:
@@ -390,13 +362,10 @@ def search():
             filter_clause = " AND (" + " OR ".join(conditions) + ")"
 
         # First, try FTS5 prefix searching (note we now also select categories)
-        fts_sql = (
-            "SELECT sermon_guid, sermon_title, audiofilename, transcription, categories "
-            "FROM sermons_fts "
-            "WHERE (sermon_title MATCH ? OR transcription MATCH ?) AND language = ?"
-            f"{filter_clause} LIMIT 25"
-        )
-        params = [sanitized_term, sanitized_term, language] + filter_params
+        fts_sql = ("SELECT sermon_guid, sermon_title, audiofilename, transcription, categories "
+                   "FROM sermons_fts WHERE sermons_fts MATCH ? AND language = ?"
+                   f"{filter_clause} LIMIT 25")
+        params = [fts_query, language] + filter_params
         cur = db.execute(fts_sql, params)
         sermons = cur.fetchall()
 
