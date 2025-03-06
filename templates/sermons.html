@@ -77,16 +77,6 @@
                 </a>
             </h5>
             <p>{{ sermon['snippet'] }}...</p>
-            <div class="audio-container">
-                {% if sermon['audiofilename'] %}
-                <audio controls class="audio-player">
-                    <source src="{{ url_for('audiofiles', filename=sermon['audiofilename']) }}" type="audio/mpeg">
-                    {{ _("Your browser does not support the audio element.") }}
-                </audio>
-                {% else %}
-                    <p>{{ _("Audio not available.") }}</p>
-                {% endif %}
-            </div>
         </div>
     {% endfor %}
 </div>

@@ -4,7 +4,7 @@
     /* 🔹 Sticky audio player */
     .sticky-audio {
         position: sticky;
-        top: 70px;
+        top: 90px;
         background: white;
         padding: 20px;
         z-index: 1000;
@@ -13,14 +13,50 @@
         margin-bottom: 30px;
     }
 
+    .sticky-audio .header-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px; /* Increased space below the header */
+    }
+
     .sticky-audio h3 {
         font-size: 1.8rem;
-        margin-bottom: 15px;
+        margin: 0;
         color: #333;
         font-family: 'Merriweather', serif;
     }
 
-    /* 🔹 Improved paragraph readability */
+    .sticky-audio .category-text {
+        font-style: italic;
+        font-size: 0.85rem;
+        color: #555;
+    }
+
+    /* 🔹 Back to Search Button - Now smaller and at bottom of sticky area */
+    .back-container {
+        text-align: left;
+        margin-top: 6px;
+    }
+    .back-button {
+        background: #6c757d;
+        color: white;
+        font-weight: bold;
+        border: none;
+        padding: 6px 10px;  /* Reduced padding for a smaller button */
+        border-radius: 6px;
+        transition: background 0.3s, transform 0.2s, box-shadow 0.3s ease;
+        display: inline-block;
+        text-decoration: none;
+        font-size: 0.7rem;  /* Smaller font size */
+    }
+    .back-button:hover {
+        background: #5a6268;
+        transform: scale(1.05);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    /* 🔹 Sermon Transcript Styling */
     .sermon-text {
         font-size: 1.15rem;
         line-height: 1.8;
@@ -33,72 +69,57 @@
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         transition: box-shadow 0.3s ease, transform 0.2s ease;
     }
-
     .sermon-text:hover {
         box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
         transform: translateY(-5px);
     }
-
     .sermon-text p {
         margin-bottom: 25px;
     }
 
     /* 🔹 Search Term Highlighting */
     .highlight {
-        background-color: yellow;
+        background-color: rgba(0,123,255,0.15);
+        color: #007bff;
         font-weight: bold;
         padding: 2px 4px;
         border-radius: 3px;
     }
-
-    /* 🔹 Back to Search Button */
-    .back-button {
-        background: #6c757d;
-        color: white;
-        font-weight: bold;
-        border: none;
-        padding: 12px 20px;
-        border-radius: 8px;
-        transition: background 0.3s, transform 0.2s, box-shadow 0.3s ease;
-        display: inline-flex;
-        align-items: center;
-        text-decoration: none;
-        margin-bottom: 20px;
-    }
-
-    .back-button:hover {
-        background: #5a6268;
-        transform: scale(1.05);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    }
 </style>
 
-<div class="mb-3">
-    <a href="{{ url_for('search', q=request.args.get('q', '')) }}" class="back-button">
-        <span>⬅</span> {{ _("Back to Search Results") }}
-    </a>
-</div>
-
+<!-- Back to Search is now inside the sticky audio area -->
 <div class="sticky-audio">
-    <div class="d-flex justify-content-between align-items-center">
+    <div class="header-container">
         <h3 class="mb-0">{{ sermon['sermon_title'] }}</h3>
         {% if sermon['categories'] %}
-        <span style="font-style: italic; font-size: 0.8rem;">{{ sermon['categories'] }}</span>
+            <span class="category-text">{{ sermon['categories'] }}</span>
         {% endif %}
     </div>
     {% if sermon['audiofilename'] %}
-    <audio controls style="width: 100%;">
-        <source src="{{ url_for('audiofiles', filename=sermon['audiofilename']) }}" type="audio/mpeg">
-        {{ _("Your browser does not support the audio element.") }}
-    </audio>
+        <audio controls style="width: 100%;">
+            <source src="{{ url_for('audiofiles', filename=sermon['audiofilename']) }}" type="audio/mpeg">
+            {{ _("Your browser does not support the audio element.") }}
+        </audio>
     {% else %}
-    <p>{{ _("Audio not available.") }}</p>
+        <p>{{ _("Audio not available.") }}</p>
     {% endif %}
+    <div class="back-container">
+        <a href="{{ url_for('search', q=request.args.get('q', ''), categories=request.args.getlist('categories')) }}" class="back-button">
+            ⬅ {{ _("Back to Search Results") }}
+        </a>
+    </div>
 </div>
-
 
 <div class="sermon-text mt-4">
     {{ formatted_transcript | safe }}
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('audio').forEach(function(player) {
+            player.volume = 0.5; // Set audio volume to 50%
+        });
+    });
+</script>
 
 {% endblock %}

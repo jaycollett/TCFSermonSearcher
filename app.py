@@ -227,17 +227,39 @@ def extract_relevant_snippets(transcript, query, max_snippets=3, context_words=8
     return matched_snippets
 
 
-def format_text_into_paragraphs(text, min_sentences=3, max_sentences=6):
-    """Breaks long text into readable paragraphs by grouping sentences."""
-    sentences = re.split(r'(?<=[.!?])\s+', text)
-    paragraphs = []
-    i = 0
-    while i < len(sentences):
-        num_sentences = random.randint(min_sentences, max_sentences)
-        paragraph = ' '.join(sentences[i:i + num_sentences])
-        paragraphs.append(paragraph.strip())
-        i += num_sentences
-    return ''.join(f"<p>{p}</p>" for p in paragraphs)
+def format_text_into_paragraphs(text, min_length=665):
+    """
+    Breaks long text into readable paragraphs.
+    If double newlines exist, uses them as paragraph breaks.
+    Otherwise, splits the text by sentence endings and combines sentences until each paragraph
+    reaches at least min_length characters (if possible).
+    """
+    # Use existing paragraph breaks if available
+    if "\n\n" in text:
+        paragraphs = [p.strip() for p in text.split("\n\n") if p.strip()]
+        return ''.join(f"<p>{p}</p>" for p in paragraphs)
+    else:
+        # Split by sentence-ending punctuation
+        sentences = re.split(r'(?<=[.!?])\s+', text)
+        paragraphs = []
+        current_para = ""
+        for sentence in sentences:
+            # If current paragraph is empty, start with the sentence; otherwise, append it.
+            if current_para:
+                candidate = current_para + " " + sentence
+            else:
+                candidate = sentence
+            # If candidate paragraph is still too short, continue adding sentences
+            if len(candidate) < min_length:
+                current_para = candidate
+            else:
+                paragraphs.append(candidate.strip())
+                current_para = ""
+        # Append any remaining text as a paragraph
+        if current_para:
+            paragraphs.append(current_para.strip())
+        return ''.join(f"<p>{p}</p>" for p in paragraphs)
+
 
 def highlight_search_terms(text, query):
     """Wraps search terms in a highlight span tag while preserving original case and ensuring case-insensitive matching."""
@@ -250,6 +272,20 @@ def highlight_search_terms(text, query):
 
     highlighted_text = regex.sub(r'<span class="highlight">\1</span>', text)
     return highlighted_text
+
+@app.template_filter('truncate_text')
+def truncate_text_filter(s, max_length=300):
+    """Truncate string s to max_length without cutting off words in the middle."""
+    if not s:
+        return ''
+    if len(s) <= max_length:
+        return s
+    cutoff = s[:max_length]
+    last_space = cutoff.rfind(' ')
+    if last_space != -1:
+        return cutoff[:last_space] + '...'
+    else:
+        return cutoff + '...'
 
 
 @app.context_processor
