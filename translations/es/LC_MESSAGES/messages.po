@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-02-27 22:44-0500\n"
-"PO-Revision-Date: 2025-02-27 22:29-0500\n"
+"POT-Creation-Date: 2025-03-06 15:39-0500\n"
+"PO-Revision-Date: 2025-03-06 15:39-0500\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: es\n"
 "Language-Team: es <LL@li.org>\n"
@@ -18,145 +18,141 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.10.3\n"
 
-#: app.py:84
+#: app.py:300
 msgid "Welcome to Sermon Search!"
-msgstr "¡Bienvenido a la Búsqueda de Sermones!"
+msgstr "¡Bienvenido a Búsqueda de Sermones!"
 
-#: app.py:133
+#: app.py:399
 msgid "An error occurred while processing your search. Please try again."
 msgstr "Ocurrió un error al procesar tu búsqueda. Por favor, inténtalo de nuevo."
 
-#: app.py:143
+#: app.py:431
 msgid "Sermon not found"
 msgstr "Sermón no encontrado"
 
-#: templates/index.html:102
+#: templates/index.html:122
 msgid "Welcome to Sermon Search"
-msgstr "¡Bienvenido a la Búsqueda de Sermones!"
+msgstr "Bienvenido a Búsqueda de Sermones"
 
-#: templates/index.html:103
-msgid "Find and revisit past sermons with ease."
-msgstr "Encuentra y revisita con facilidad los sermones pasados."
+#: templates/index.html:123
+msgid "Easily find and revisit past sermons by searching key topics, phrases, scripture or category."
+msgstr "Encuentra y revisita sermones pasados fácilmente buscando por temas clave, frases, escrituras o categorías."
 
-#: templates/index.html:104
+#: templates/index.html:124
 msgid "Start Searching"
-msgstr "Comienza a buscar"
+msgstr "Comenzar búsqueda"
 
-#: templates/index.html:109
+#: templates/index.html:130
 msgid "The Inspiration Behind This Project"
-msgstr "La inspiración detrás de este proyecto"
+msgstr "La Inspiración Detrás de Este Proyecto"
 
-#: templates/index.html:111
-msgid ""
-"This project was born from a light-hearted moment during a "
-"<strong>Craw/LaSage homegroup</strong> meeting. As we shared together, "
-"<strong>Brian Craw</strong> mentioned how amazing it would be to easily "
-"search through past sermons to find something he remembered from one of "
-"the past sermons."
-msgstr ""
-"Este proyecto nació de un momento distendido durante una reunión de "
-"<strong>homegroup Craw/LaSage</strong>. Mientras compartíamos, "
-"<strong>Brian Craw</strong> comentó lo increíble que sería poder buscar "
-"fácilmente entre sermones pasados para encontrar algo que recordara de "
-"alguno de ellos."
+#: templates/index.html:132
+msgid "This project was born from a light-hearted moment during a <span class='highlight'>Craw/LaSage homegroup</span> meeting."
+msgstr "Este proyecto nació de un momento espontáneo durante una reunión del grupo de hogar <span class='highlight'>Craw/LaSage</span>."
 
-#: templates/index.html:114
-msgid ""
-"With my proclivity for technology, I took this idea and developed a "
-"solution—<strong>Sermon Search</strong>. This web application "
-"automatically transcribes sermons and makes them searchable, allowing "
-"anyone to quickly search through past sermons from TCF."
-msgstr ""
-"Con mi inclinación por la tecnología, tomé esta idea y desarrollé una "
-"solución—<strong>Sermon Search</strong>. Esta aplicación web transcribe "
-"automáticamente los sermones y los hace buscables, permitiendo a "
-"cualquiera buscar rápidamente entre los sermones pasados de TCF."
+#: templates/index.html:135
+msgid "During the meeting, we were discussing how difficult it can be to find something specific in our old sermon notes. That’s when it hit me—how incredible would it be if we could quickly search for a sermon based on our own notes or key takeaways?"
+msgstr "Durante la reunión, estábamos hablando de lo difícil que puede ser encontrar algo específico en nuestras notas de sermones antiguas. Fue entonces cuando pensé: ¿qué tan increíble sería poder buscar un sermón rápidamente basado en nuestras propias notas o aprendizajes clave?"
 
-#: templates/index.html:117
-msgid ""
-"I hope this tool helps deepen your connection with the teachings and "
-"makes it easier to reflect on past messages. Enjoy exploring, and may "
-"these sermons continue to bless you!"
-msgstr ""
-"Espero que esta herramienta ayude a profundizar tu conexión con las "
-"enseñanzas y facilite la reflexión sobre los mensajes pasados. ¡Disfruta "
-"explorando y que estos sermones sigan bendiciéndote!"
+#: templates/index.html:136
+msgid "What started as a passing thought turned into a mission."
+msgstr "Lo que comenzó como una simple idea se convirtió en una misión."
+
+#: templates/index.html:140
+msgid "These sermons hold spiritual wisdom—guidance, truth, and encouragement that can uplift and transform lives. It's been incredibly fulfilling to help make them even more accessible to everyone."
+msgstr "Estos sermones contienen sabiduría espiritual—guía, verdad y aliento que pueden elevar y transformar vidas. Ha sido increíblemente gratificante ayudar a hacerlos más accesibles para todos."
+
+#: templates/index.html:144
+msgid "Leveraging my experience in technology, I developed a solution—<span class='highlight'>Sermon Search</span>—where past sermons are automatically transcribed, indexed, and even translated."
+msgstr "Aprovechando mi experiencia en tecnología, desarrollé una solución—<span class='highlight'>Búsqueda de Sermones</span>—donde los sermones pasados se transcriben, indexan e incluso traducen automáticamente."
+
+#: templates/index.html:147
+msgid "Whether you're revisiting a past message, searching for biblical references, or exploring specific topics, you can now do so in the language that feels most familiar to you."
+msgstr "Ya sea que estés revisitando un mensaje pasado, buscando referencias bíblicas o explorando temas específicos, ahora puedes hacerlo en el idioma que te resulte más familiar."
+
+#: templates/index.html:150
+msgid "This wouldn’t be possible without the dedication and hard work of those who have faithfully prepared and delivered these sermons—ensuring that God’s message is shared with clarity, truth, and love. Enjoy exploring, it's my prayer that this resource be a blessing to you."
+msgstr "Esto no sería posible sin la dedicación y el arduo trabajo de quienes han preparado y entregado estos sermones con fidelidad—asegurando que el mensaje de Dios se comparta con claridad, verdad y amor. Disfruta explorando, y oro para que este recurso sea de bendición para ti."
 
 #: templates/layout.html:5
 msgid "TCF - Sermon Search"
-msgstr "TCF - Buscador de Sermones"
+msgstr "TCF - Búsqueda de Sermones"
 
 #: templates/layout.html:7
 msgid "Searchable sermon transcripts from TCF. Find past sermons easily."
-msgstr "Transcripciones de sermones de TCF. Encuentra sermones pasados fácilmente."
+msgstr "Transcripciones de sermones de TCF con búsqueda. Encuentra sermones pasados fácilmente."
 
-#: templates/layout.html:80
-msgid "TCF - Sermon Search"
-msgstr "TCF - Buscador de Sermones"
+#: templates/layout.html:95
+msgid "Sermon Search"
+msgstr "Búsqueda de Sermones"
 
-#: templates/layout.html:82
-msgid "Toggle navigation"
-msgstr "Alternar navegación"
-
-#: templates/layout.html:87 templates/search.html:72
+#: templates/layout.html:102
 msgid "Search"
 msgstr "Buscar"
 
-#: templates/layout.html:88
+#: templates/layout.html:105
 msgid "Sermon Index"
 msgstr "Índice de Sermones"
 
-#: templates/layout.html:92
-msgid "English"
-msgstr "Inglés"
-
-#: templates/layout.html:93
+#: templates/layout.html:111 templates/layout.html:126
 msgid "Spanish"
 msgstr "Español"
 
-#: templates/layout.html:107
-msgid ""
-"📖 Sermon Search | Written by: Jay Collett | Version: 0.2.0 | Date: "
-"March 4, 2025"
-msgstr ""
-"📖 Búsqueda de Sermones | Escrito por: Jay Collett | Versión: 0.2.0 "
-"| Fecha: 4 de Marzo de 2025"
+#: templates/layout.html:113 templates/layout.html:120
+msgid "English"
+msgstr "Inglés"
 
-#: templates/results.html:91
-msgid "Search Results for"
-msgstr "Resultados de búsqueda para"
+#: templates/layout.html:143
+msgid "📖 Sermon Search | Written by: Jay Collett | Version: 0.2.3 | Date: March 6, 2025"
+msgstr "📖 Búsqueda de Sermones | Escrito por: Jay Collett | Versión: 0.2.3 | Fecha: 6 de marzo de 2025"
 
-#: templates/results.html:93
+#: templates/results.html:196
+msgid "Category Filters"
+msgstr "Filtros de Categoría"
+
+#: templates/results.html:204
 msgid "Back to Search"
-msgstr "Volver a la búsqueda"
+msgstr "Regresar a la Búsqueda"
 
-#: templates/results.html:117
-msgid "Your browser does not support the audio element."
-msgstr "Tu navegador no soporta el elemento de audio."
+#: templates/results.html:233
+msgid "English, Spanish Audio Available"
+msgstr "Audio disponible en inglés y español"
 
-#: templates/results.html:128
+#: templates/results.html:241
 msgid "No results found."
 msgstr "No se encontraron resultados."
 
-#: templates/results.html:128
+#: templates/results.html:241
 msgid "Try a different search term."
-msgstr "Intenta con otro término de búsqueda."
+msgstr "Prueba con un término de búsqueda diferente."
 
-#: templates/search.html:68
-msgid "🔍 Search Sermons"
-msgstr "🔍 Buscar Sermones"
+#: templates/search.html:153 templates/search.html:174
+msgid "Search Sermons"
+msgstr "Buscar Sermones"
 
-#: templates/search.html:69
-msgid "Enter a keyword or phrase to find sermons."
-msgstr "Introduce una palabra clave o frase para encontrar sermones."
+#: templates/search.html:154
+msgid "Find past sermons by keyword or topic."
+msgstr "Encuentra sermones pasados por palabra clave o tema."
 
-#: templates/search.html:71
-msgid "Type your search term..."
-msgstr "Escribe tu término de búsqueda..."
+#: templates/search.html:157 templates/search.html:158
+msgid "Enter a search term or phrase..."
+msgstr "Introduce un término o frase de búsqueda..."
 
-#: templates/sermon.html:78
+#: templates/search.html:160
+msgid "Category Filters (optional)"
+msgstr "Filtros de Categoría (opcional)"
+
+#: templates/sermon.html:101
+msgid "Your browser does not support the audio element."
+msgstr "Tu navegador no es compatible con el elemento de audio."
+
+#: templates/sermon.html:104
+msgid "Audio not available."
+msgstr "Audio no disponible."
+
+#: templates/sermon.html:108
 msgid "Back to Search Results"
-msgstr "Volver a los Resultados de Búsqueda"
+msgstr "Regresar a Resultados de Búsqueda"
 
 #: templates/sermons.html:70
 msgid "📂 Sermon Index"

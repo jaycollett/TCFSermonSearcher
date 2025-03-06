@@ -22,6 +22,7 @@ logging.basicConfig(level=logging.DEBUG)
 # Babel configuration
 app.config['BABEL_DEFAULT_LOCALE'] = 'en'
 app.config['BABEL_SUPPORTED_LOCALES'] = ['en', 'es']
+app.config['BABEL_TRANSLATION_DIRECTORIES'] = 'translations'
 
 def get_locale():
     return request.cookies.get('language', 'en')
