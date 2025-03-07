@@ -41,13 +41,18 @@ def init_db():
 
     app.logger.info("Initializing database...")
 
-    # Check if the database file exists, if not, create it
     if not os.path.exists(DATABASE):
         app.logger.info(f"Database file '{DATABASE}' does not exist. Creating it.")
         open(DATABASE, 'w').close()
 
     with sqlite3.connect(DATABASE) as conn:
         cursor = conn.cursor()
+
+        # Enable WAL mode if not already enabled
+        cursor.execute('PRAGMA journal_mode;')
+        journal_mode = cursor.fetchone()[0]
+        if journal_mode.lower() != 'wal':
+            cursor.execute('PRAGMA journal_mode=WAL;')
 
         try:
             app.logger.info("Creating sermons table...")
@@ -60,11 +65,17 @@ def init_db():
                     sermon_guid VARCHAR(40) NOT NULL,
                     language VARCHAR(2) NOT NULL DEFAULT 'en',
                     categories TEXT,
+                    ai_summary TEXT,
+                    ai_identified_books TEXT,
                     insert_date DATETIME DEFAULT CURRENT_TIMESTAMP,
                     church NVARCHAR(10),
-                    UNIQUE (sermon_guid, language)  -- Ensure unique constraint
+                    UNIQUE (sermon_guid, language)
                 )
             ''')
+            cursor.execute('CREATE INDEX IF NOT EXISTS idx_sermon_guid ON sermons (sermon_guid)')
+            cursor.execute('CREATE INDEX IF NOT EXISTS idx_sermons_language ON sermons(language);')
+            cursor.execute('CREATE INDEX IF NOT EXISTS idx_sermons_categories ON sermons(categories);')
+            cursor.execute('CREATE INDEX IF NOT EXISTS idx_sermons_ai_identified_books ON sermons(ai_identified_books);')
             conn.commit()
             app.logger.info("Sermons table created successfully.")
         except sqlite3.Error as e:
@@ -76,7 +87,7 @@ def init_db():
                 CREATE TABLE IF NOT EXISTS ip_bans (
                     ip_address TEXT PRIMARY KEY,
                     failed_attempts INTEGER DEFAULT 0,
-                    banned_until INTEGER 
+                    banned_until INTEGER
                 )
             ''')
             conn.commit()
@@ -97,29 +108,23 @@ def init_db():
                 )
             ''')
             conn.commit()
-
             app.logger.info("sermons_fts table created successfully.")
         except sqlite3.Error as e:
             app.logger.error(f"Error creating sermons_fts table: {e}")
 
         try:
             app.logger.info("Creating triggers...")
-            cursor.execute('''
-                CREATE TRIGGER IF NOT EXISTS sermons_ai AFTER INSERT ON sermons
-                BEGIN
-                    INSERT INTO sermons_fts(rowid, sermon_guid, sermon_title, transcription, audiofilename, language, categories, church)
-                    VALUES (new.id, new.sermon_guid, new.sermon_title, new.transcription, new.audiofilename, new.language, new.categories, new.church);
+            cursor.executescript('''
+                CREATE TRIGGER IF NOT EXISTS sermons_ai AFTER INSERT ON sermons BEGIN
+                    INSERT INTO sermons_fts(rowid, sermon_guid, sermon_title, transcription, audiofilename, categories, language, church)
+                    VALUES (new.id, new.sermon_guid, new.sermon_title, new.transcription, new.audiofilename, new.categories, new.language, new.church);
                 END;
-            ''')
-            cursor.execute('''
-                CREATE TRIGGER IF NOT EXISTS sermons_ad AFTER DELETE ON sermons
-                BEGIN
+
+                CREATE TRIGGER IF NOT EXISTS sermons_ad AFTER DELETE ON sermons BEGIN
                     DELETE FROM sermons_fts WHERE rowid = old.id;
                 END;
-            ''')
-            cursor.execute('''
-                CREATE TRIGGER IF NOT EXISTS sermons_au AFTER UPDATE ON sermons
-                BEGIN
+
+                CREATE TRIGGER IF NOT EXISTS sermons_au AFTER UPDATE ON sermons BEGIN
                     DELETE FROM sermons_fts WHERE rowid = old.id;
                     INSERT INTO sermons_fts(rowid, sermon_guid, sermon_title, transcription, audiofilename, language, categories, church)
                     VALUES (new.id, new.sermon_guid, new.sermon_title, new.transcription, new.audiofilename, new.language, new.categories, new.church);
@@ -275,8 +280,7 @@ def highlight_search_terms(text, query):
     return highlighted_text
 
 @app.template_filter('truncate_text')
-def truncate_text_filter(s, max_length=300):
-    """Truncate string s to max_length without cutting off words in the middle."""
+def truncate_text_filter(s, max_length=165):
     if not s:
         return ''
     if len(s) <= max_length:
@@ -471,7 +475,7 @@ def sermon_index():
     db = get_db()
     language = request.cookies.get("language", "en")
     
-    cur = db.execute("SELECT sermon_guid, sermon_title, audiofilename, transcription FROM sermons WHERE language = ? ORDER BY sermon_title ASC", (language,))
+    cur = db.execute("SELECT sermon_guid, sermon_title, audiofilename, transcription, categories FROM sermons WHERE language = ? ORDER BY sermon_title ASC", (language,))
     sermons = cur.fetchall()
 
     def extract_first_sentences(text, min_sentences=3, max_sentences=4):
@@ -490,7 +494,8 @@ def sermon_index():
             "sermon_guid": sermon["sermon_guid"],
             "sermon_title": sermon["sermon_title"],
             "audiofilename": sermon["audiofilename"],
-            "snippet": extract_first_sentences(sermon["transcription"])  # Extract snippet
+            "snippet": extract_first_sentences(sermon["transcription"]),
+            "categories": sermon["categories"] or "Uncategorized"
         })
 
     return render_template("sermons.html", sermons=processed_sermons)

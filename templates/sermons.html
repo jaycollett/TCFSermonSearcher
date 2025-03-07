@@ -16,8 +16,9 @@
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         display: flex;
         flex-direction: column;
-        justify-content: space-between;
         transition: transform 0.3s ease, box-shadow 0.3s ease;
+        height: 360px;
+        overflow: hidden;
     }
 
     .sermon-card:hover {
@@ -30,6 +31,7 @@
         margin-bottom: 15px;
         font-family: 'Merriweather', serif;
         color: #333;
+        flex-shrink: 0;
     }
 
     .sermon-card h5 a {
@@ -43,19 +45,22 @@
         color: #0056b3;
     }
 
-    .sermon-card p {
+    .sermon-snippet {
         font-size: 1.1rem;
         color: #444;
         line-height: 1.6;
-        margin-bottom: 20px;
+        overflow: hidden;
+        flex-grow: 1;
     }
 
-    .audio-container {
+    .sermon-categories {
         margin-top: auto;
-    }
-
-    .audio-player {
-        width: 100%;
+        text-align: center;
+        font-size: 0.75rem;
+        color: #666;
+        padding: 2px 0;
+        border-top: 1px solid #eee;
+        flex-shrink: 0;
     }
 
     h2.sermon-index-title {
@@ -72,11 +77,12 @@
     {% for sermon in sermons %}
         <div class="sermon-card">
             <h5>
-                <a href="{{ url_for('sermon_detail', sermon_guid=sermon['sermon_guid'], q=request.args.get('q', '')) }}">
+                <a href="{{ url_for('sermon_detail', sermon_guid=sermon['sermon_guid']) }}">
                     {{ sermon['sermon_title'] }}
                 </a>
             </h5>
-            <p>{{ sermon['snippet'] }}...</p>
+            <p class="sermon-snippet">{{ sermon['snippet']|truncate_text(250) }}</p>
+            <div class="sermon-categories">{{ sermon['categories'] }}</div>
         </div>
     {% endfor %}
 </div>
