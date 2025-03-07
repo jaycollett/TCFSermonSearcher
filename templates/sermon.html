@@ -114,6 +114,102 @@
     {{ formatted_transcript | safe }}
 </div>
 
+{% if ai_content %}
+<div class="ai-content-container">
+    <h2 class="ai-header">{{ _("AI-Generated Sermon Insights") }}</h2>
+
+    <div class="ai-content-list">
+        <div class="ai-content-block">
+            <h3>{{ _("Summary") }}</h3>
+            <p>{{ ai_content["ai_summary_es"] if language == "es" else ai_content["ai_summary"] }}</p>
+        </div>
+
+        <div class="ai-content-block">
+            <h3>{{ _("Bible References") }}</h3>
+            <p>{{ ai_content["bible_books_es"] if language == "es" else ai_content["bible_books"] }}</p>
+        </div>
+
+        <div class="ai-content-block">
+            <h3>{{ _("Sermon Style") }}</h3>
+            <p>{{ ai_content["sermon_style_es"] if language == "es" else ai_content["sermon_style"] }}</p>
+        </div>
+
+        <div class="ai-content-block">
+            <h3>{{ _("Topics") }}</h3>
+            <p>{{ ai_content["topics_es"] if language == "es" else ai_content["topics"] }}</p>
+        </div>
+
+        {% if language == "en" %}
+        <div class="ai-content-block">
+            <h3>{{ _("Key Quotes") }}</h3>
+            <p>{{ ai_content["key_quotes"] }}</p>
+        </div>
+
+        <div class="ai-content-block">
+            <h3>{{ _("Sentiment") }}</h3>
+            <p>{{ ai_content["sentiment"] }}</p>
+        </div>
+        {% else %}
+        <div class="ai-content-block">
+            <h3>{{ _("Citas Claves") }}</h3>
+            <p>{{ ai_content["key_quotes_es"] }}</p>
+        </div>
+
+        <div class="ai-content-block">
+            <h3>{{ _("Sentimiento") }}</h3>
+            <p>{{ ai_content["sentiment_es"] }}</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+
+<style>
+    .ai-content-container {
+        max-width: 1200px; /* Matches sermon text width */
+        margin: 40px auto;
+        padding: 20px;
+        background: #f5f5f5;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .ai-header {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 15px;
+        text-align: center;
+    }
+
+    .ai-content-list {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .ai-content-block {
+        background: white;
+        padding: 15px;
+        border-radius: 6px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .ai-content-block h3 {
+        font-size: 1.1rem;
+        margin-bottom: 8px;
+        color: #444;
+        font-weight: bold;
+    }
+
+    .ai-content-block p {
+        font-size: 1rem;
+        color: #222;
+        line-height: 1.6;
+    }
+</style>
+
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         document.querySelectorAll('audio').forEach(function(player) {

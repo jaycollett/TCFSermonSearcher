@@ -46,7 +46,7 @@ def get_db():
         db.row_factory = sqlite3.Row
     return db
 
-def ensure_column_exists(conn, table, column, column_def):
+
     """
     Check if a column exists in the table.
     If not, alter the table to add the column using the given definition.
@@ -57,6 +57,21 @@ def ensure_column_exists(conn, table, column, column_def):
         conn.execute(f"ALTER TABLE {table} ADD COLUMN {column} {column_def}")
         conn.commit()
         app.logger.info(f"Added missing column '{column}' to '{table}'.")
+
+def drop_column_if_exists(conn, table, column):
+    """
+    Drops a column from the table if it exists.
+    Note: Requires SQLite 3.35.0 or later.
+    """
+    cursor = conn.execute(f"PRAGMA table_info({table})")
+    columns = [row["name"] for row in cursor.fetchall()]
+    if column in columns:
+        try:
+            conn.execute(f"ALTER TABLE {table} DROP COLUMN {column}")
+            conn.commit()
+            app.logger.info(f"Dropped column '{column}' from table '{table}'.")
+        except sqlite3.Error as e:
+            app.logger.error(f"Error dropping column '{column}' from table '{table}': {e}")
 
 def init_db():
     """Ensure the database exists and initialize tables."""
@@ -87,22 +102,23 @@ def init_db():
                     sermon_guid VARCHAR(40) NOT NULL,
                     language VARCHAR(2) NOT NULL DEFAULT 'en',
                     categories TEXT,
-                    ai_summary TEXT,
-                    ai_identified_books TEXT,
                     insert_date DATETIME DEFAULT CURRENT_TIMESTAMP,
                     church NVARCHAR(10),
                     UNIQUE (sermon_guid, language)
                 )
             ''')
+            conn.commit()
+
+            # Drop the unwanted columns if they exist.
+            drop_column_if_exists(conn, "sermons", "ai_summary")
+            drop_column_if_exists(conn, "sermons", "ai_identified_books")
+
             cursor.execute('CREATE INDEX IF NOT EXISTS idx_sermon_guid ON sermons (sermon_guid)')
             cursor.execute('CREATE INDEX IF NOT EXISTS idx_sermons_language ON sermons(language);')
             cursor.execute('CREATE INDEX IF NOT EXISTS idx_sermons_categories ON sermons(categories);')
             cursor.execute('CREATE INDEX IF NOT EXISTS idx_sermons_ai_identified_books ON sermons(ai_identified_books);')
             conn.commit()
 
-            # Ensure new columns are added if they are missing from an older schema.
-            ensure_column_exists(conn, "sermons", "ai_summary", "TEXT")
-            ensure_column_exists(conn, "sermons", "ai_identified_books", "TEXT")
 
             app.logger.info("Sermons table created successfully.")
         except sqlite3.Error as e:
@@ -133,36 +149,7 @@ def init_db():
             app.logger.info("Creating ip_bans table...")
             cursor.execute('''
                 CREATE TABLE IF NOT EXISTS ip_bans (
-                    ip_address TEXT PRIMARY KEY,@app.route("/stats")
-def stats():
-    db = get_db()
-    row = db.execute("SELECT * FROM stats_for_nerds WHERE id = 1").fetchone()
-    if row:
-        context = {
-            "total_sermons": row["total_sermons"],
-            "average_words_per_sermon": row["average_words_per_sermon"],
-            "largest_sermon_title": row["largest_sermon_title"],
-            "largest_sermon_word_count": row["largest_sermon_word_count"],
-            "shortest_sermon_title": row["shortest_sermon_title"],
-            "shortest_sermon_word_count": row["shortest_sermon_word_count"],
-            "top_ten_words": json.loads(row["top_ten_words"]) if row["top_ten_words"] else [],
-            "most_common_category": row["most_common_category"],
-            "updated_at": row["updated_at"],
-        }
-    else:
-        # If no stats record exists, use numeric defaults so the round filter works.
-        context = {
-            "total_sermons": 0,
-            "average_words_per_sermon": 0,
-            "largest_sermon_title": "No data",
-            "largest_sermon_word_count": 0,
-            "shortest_sermon_title": "No data",
-            "shortest_sermon_word_count": 0,
-            "top_ten_words": [],
-            "most_common_category": "N/A",
-            "updated_at": "N/A",
-        }
-    return render_template("stats.html", **context)
+                    ip_address TEXT PRIMARY KEY,
                     failed_attempts INTEGER DEFAULT 0,
                     banned_until INTEGER
                 )
@@ -171,6 +158,35 @@ def stats():
             app.logger.info("ip_bans table created successfully.")
         except sqlite3.Error as e:
             app.logger.error(f"Error creating ip_bans table: {e}")
+
+        try:
+                app.logger.info("Creating ai_sermon_content table...")
+                cursor.execute('''
+                    CREATE TABLE IF NOT EXISTS ai_sermon_content (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        sermon_guid VARCHAR(40) NOT NULL,
+                        ai_summary TEXT,
+                        ai_summary_es TEXT,
+                        bible_books TEXT,
+                        bible_books_es TEXT,
+                        created_at DATETIME,
+                        key_quotes TEXT,
+                        key_quotes_es TEXT,
+                        sentiment TEXT,
+                        sentiment_es TEXT,
+                        sermon_style TEXT,
+                        sermon_style_es TEXT,
+                        status VARCHAR(50),
+                        topics TEXT,
+                        topics_es TEXT,
+                        updated_at DATETIME,
+                        FOREIGN KEY (sermon_guid) REFERENCES sermons(sermon_guid)
+                    )
+                ''')
+                conn.commit()
+                app.logger.info("ai_sermon_content table created successfully.")
+        except sqlite3.Error as e:
+            app.logger.error(f"Error creating ai_sermon_content table: {e}")
 
         try:
             app.logger.info("Creating sermons_fts table...")
@@ -507,7 +523,7 @@ def search():
 
 @app.route("/sermon/<sermon_guid>")
 def sermon_detail(sermon_guid):
-    """Retrieve and display a sermon with the correct language version."""
+    """Retrieve and display a sermon along with AI-generated content based on the correct language version."""
     db = get_db()
     language = request.cookies.get("language", "en")  # Get user-selected language
     query = request.args.get("q", "").strip()
@@ -530,6 +546,13 @@ def sermon_detail(sermon_guid):
     if not sermon:
         return _("Sermon not found"), 404
 
+    # Fetch AI-generated sermon content
+    cur = db.execute(
+        "SELECT * FROM ai_sermon_content WHERE sermon_guid = ?",
+        (sermon_guid,)
+    )
+    ai_content = cur.fetchone()
+
     # Format and highlight transcription
     formatted_transcript = format_text_into_paragraphs(sermon["transcription"])
     highlighted_transcript = highlight_search_terms(formatted_transcript, query)
@@ -537,10 +560,13 @@ def sermon_detail(sermon_guid):
     return render_template(
         "sermon.html",
         sermon=sermon,
+        ai_content=ai_content,  # Pass AI-generated content
+        language=language,
         formatted_transcript=highlighted_transcript,
         query=query,
         selected_categories=selected_categories
     )
+
 
 @app.route("/stats")
 @app.route("/stats")
@@ -618,6 +644,12 @@ def audiofiles(filename):
 
 @app.route("/api/update_stats", methods=["POST"])
 def update_stats():
+
+    #
+    #
+    # TODO: We should make the sermon title on the stats for nerds a link to the sermon.
+    #
+
     # Validate IP ban and API token (similar to upload_sermon)
     ip = get_client_ip()  # Get actual client IP
     db = get_db()
@@ -739,6 +771,89 @@ def update_stats():
 
     return "ok", 200
 
+@app.route("/api/ai_sermon_content", methods=["POST"])
+def upload_ai_sermon_content():
+    # Optional: Validate the API token similar to your other endpoints.
+    api_token = request.headers.get("X-API-Token")
+    if not api_token or api_token != os.environ.get("SERMON_API_TOKEN", ""):
+        return jsonify({"error": "Unauthorized"}), 401
+
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "Invalid JSON payload"}), 400
+
+    # List of required fields based on your JSON structure.
+    required_fields = [
+        "sermon_guid",
+        "ai_summary",
+        "ai_summary_es",
+        "bible_books",
+        "bible_books_es",
+        "created_at",
+        "key_quotes",
+        "key_quotes_es",
+        "sentiment",
+        "sentiment_es",
+        "sermon_style",
+        "sermon_style_es",
+        "status",
+        "topics",
+        "topics_es",
+        "updated_at"
+    ]
+
+    # Validate that all required fields are present.
+    for field in required_fields:
+        if field not in data or data[field] is None:
+            return jsonify({"error": f"Missing field: {field}"}), 400
+
+    # Validate that sermon_guid is a valid UUID.
+    try:
+        uuid.UUID(data["sermon_guid"])
+    except ValueError:
+        return jsonify({"error": "Invalid sermon_guid format. Must be a valid UUID."}), 400
+
+    # Validate datetime fields: expecting the format YYYY-MM-DD HH:MM:SS.
+    for dt_field in ["created_at", "updated_at"]:
+        try:
+            datetime.datetime.strptime(data[dt_field], "%Y-%m-%d %H:%M:%S")
+        except ValueError:
+            return jsonify({"error": f"Invalid datetime format for {dt_field}. Expected YYYY-MM-DD HH:MM:SS"}), 400
+
+    # Insert the validated data into the ai_sermon_content table.
+    db = get_db()
+    try:
+        cursor = db.cursor()
+        cursor.execute('''
+            INSERT INTO ai_sermon_content (
+                sermon_guid, ai_summary, ai_summary_es, bible_books, bible_books_es, 
+                created_at, key_quotes, key_quotes_es, sentiment, sentiment_es, 
+                sermon_style, sermon_style_es, status, topics, topics_es, updated_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (
+            data["sermon_guid"],
+            data["ai_summary"],
+            data["ai_summary_es"],
+            data["bible_books"],
+            data["bible_books_es"],
+            data["created_at"],
+            data["key_quotes"],
+            data["key_quotes_es"],
+            data["sentiment"],
+            data["sentiment_es"],
+            data["sermon_style"],
+            data["sermon_style_es"],
+            data["status"],
+            data["topics"],
+            data["topics_es"],
+            data["updated_at"]
+        ))
+        db.commit()
+    except sqlite3.Error as e:
+        app.logger.error(f"Database error: {e}")
+        return jsonify({"error": "Database error occurred."}), 500
+
+    return jsonify({"message": "ok"}), 200
 
 
 @app.route("/upload_sermon", methods=["POST"])  # for backwards compatibility until the orchestrator is updated.
