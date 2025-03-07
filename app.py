@@ -468,6 +468,10 @@ def sermon_detail(sermon_guid):
         selected_categories=selected_categories
     )
 
+@app.route("/stats")
+def stats():
+    return render_template("stats.html")
+
 
 @app.route("/sermons")
 def sermon_index():
