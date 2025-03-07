@@ -4,9 +4,19 @@ import logging
 import random
 import sqlite3
 import uuid
+import json
 import datetime
+import nltk
+nltk.download('stopwords', quiet=True)
+from nltk.corpus import stopwords
 from flask import Flask, g, render_template, request, send_from_directory, redirect, url_for, make_response, jsonify
 from flask_babel import Babel, gettext as _
+from collections import Counter
+# For generating the bar chart without a display (headless)
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
+from wordcloud import WordCloud, STOPWORDS
 
 app = Flask(__name__)
 DATABASE = "/data/sermons.db"
@@ -36,9 +46,20 @@ def get_db():
         db.row_factory = sqlite3.Row
     return db
 
+def ensure_column_exists(conn, table, column, column_def):
+    """
+    Check if a column exists in the table.
+    If not, alter the table to add the column using the given definition.
+    """
+    cursor = conn.execute(f"PRAGMA table_info({table})")
+    columns = [row["name"] for row in cursor.fetchall()]
+    if column not in columns:
+        conn.execute(f"ALTER TABLE {table} ADD COLUMN {column} {column_def}")
+        conn.commit()
+        app.logger.info(f"Added missing column '{column}' to '{table}'.")
+
 def init_db():
     """Ensure the database exists and initialize tables."""
-
     app.logger.info("Initializing database...")
 
     if not os.path.exists(DATABASE):
@@ -46,6 +67,7 @@ def init_db():
         open(DATABASE, 'w').close()
 
     with sqlite3.connect(DATABASE) as conn:
+        conn.row_factory = sqlite3.Row
         cursor = conn.cursor()
 
         # Enable WAL mode if not already enabled
@@ -77,15 +99,70 @@ def init_db():
             cursor.execute('CREATE INDEX IF NOT EXISTS idx_sermons_categories ON sermons(categories);')
             cursor.execute('CREATE INDEX IF NOT EXISTS idx_sermons_ai_identified_books ON sermons(ai_identified_books);')
             conn.commit()
+
+            # Ensure new columns are added if they are missing from an older schema.
+            ensure_column_exists(conn, "sermons", "ai_summary", "TEXT")
+            ensure_column_exists(conn, "sermons", "ai_identified_books", "TEXT")
+
             app.logger.info("Sermons table created successfully.")
         except sqlite3.Error as e:
             app.logger.error(f"Error creating sermons table: {e}")
 
         try:
+            app.logger.info("Creating stats_for_nerds table...")
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS stats_for_nerds (
+                    id INTEGER PRIMARY KEY,
+                    total_sermons INTEGER,
+                    average_words_per_sermon INTEGER,
+                    largest_sermon_title TEXT,
+                    largest_sermon_word_count INTEGER,
+                    shortest_sermon_title TEXT,
+                    shortest_sermon_word_count INTEGER,
+                    top_ten_words TEXT,
+                    most_common_category TEXT,
+                    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+                )
+            ''')
+            conn.commit()
+            app.logger.info("stats_for_nerds table created successfully.")
+        except sqlite3.Error as e:
+            app.logger.error(f"Error creating stats_for_nerds table: {e}")
+
+        try:
             app.logger.info("Creating ip_bans table...")
             cursor.execute('''
                 CREATE TABLE IF NOT EXISTS ip_bans (
-                    ip_address TEXT PRIMARY KEY,
+                    ip_address TEXT PRIMARY KEY,@app.route("/stats")
+def stats():
+    db = get_db()
+    row = db.execute("SELECT * FROM stats_for_nerds WHERE id = 1").fetchone()
+    if row:
+        context = {
+            "total_sermons": row["total_sermons"],
+            "average_words_per_sermon": row["average_words_per_sermon"],
+            "largest_sermon_title": row["largest_sermon_title"],
+            "largest_sermon_word_count": row["largest_sermon_word_count"],
+            "shortest_sermon_title": row["shortest_sermon_title"],
+            "shortest_sermon_word_count": row["shortest_sermon_word_count"],
+            "top_ten_words": json.loads(row["top_ten_words"]) if row["top_ten_words"] else [],
+            "most_common_category": row["most_common_category"],
+            "updated_at": row["updated_at"],
+        }
+    else:
+        # If no stats record exists, use numeric defaults so the round filter works.
+        context = {
+            "total_sermons": 0,
+            "average_words_per_sermon": 0,
+            "largest_sermon_title": "No data",
+            "largest_sermon_word_count": 0,
+            "shortest_sermon_title": "No data",
+            "shortest_sermon_word_count": 0,
+            "top_ten_words": [],
+            "most_common_category": "N/A",
+            "updated_at": "N/A",
+        }
+    return render_template("stats.html", **context)
                     failed_attempts INTEGER DEFAULT 0,
                     banned_until INTEGER
                 )
@@ -428,9 +505,6 @@ def search():
                            selected_categories=selected_categories)
 
 
-
-
-
 @app.route("/sermon/<sermon_guid>")
 def sermon_detail(sermon_guid):
     """Retrieve and display a sermon with the correct language version."""
@@ -469,9 +543,36 @@ def sermon_detail(sermon_guid):
     )
 
 @app.route("/stats")
+@app.route("/stats")
 def stats():
-    return render_template("stats.html")
-
+    db = get_db()
+    row = db.execute("SELECT * FROM stats_for_nerds WHERE id = 1").fetchone()
+    if row:
+        context = {
+            "total_sermons": row["total_sermons"],
+            "average_words_per_sermon": row["average_words_per_sermon"],
+            "largest_sermon_title": row["largest_sermon_title"],
+            "largest_sermon_word_count": row["largest_sermon_word_count"],
+            "shortest_sermon_title": row["shortest_sermon_title"],
+            "shortest_sermon_word_count": row["shortest_sermon_word_count"],
+            "top_ten_words": json.loads(row["top_ten_words"]) if row["top_ten_words"] else [],
+            "most_common_category": row["most_common_category"],
+            "updated_at": row["updated_at"],
+        }
+    else:
+        # If no stats record exists, use numeric defaults so the round filter works.
+        context = {
+            "total_sermons": 0,
+            "average_words_per_sermon": 0,
+            "largest_sermon_title": "No data",
+            "largest_sermon_word_count": 0,
+            "shortest_sermon_title": "No data",
+            "shortest_sermon_word_count": 0,
+            "top_ten_words": [],
+            "most_common_category": "N/A",
+            "updated_at": "N/A",
+        }
+    return render_template("stats.html", **context)
 
 @app.route("/sermons")
 def sermon_index():
@@ -509,7 +610,139 @@ def audiofiles(filename):
     """Serve audio files from /data/audiofiles directory."""
     return send_from_directory(AUDIOFILES_DIR, filename)
 
-@app.route("/upload_sermon", methods=["POST"])
+#
+#
+# API ENDPOINTS
+#
+#
+
+@app.route("/api/update_stats", methods=["POST"])
+def update_stats():
+    # Validate IP ban and API token (similar to upload_sermon)
+    ip = get_client_ip()  # Get actual client IP
+    db = get_db()
+    
+    if is_ip_banned(ip):
+        return jsonify({"error": "Too many failed attempts. Try again later."}), 403
+
+    api_token = request.headers.get("X-API-Token")
+    if not api_token or api_token != os.environ.get("SERMON_API_TOKEN", ""):
+        cur = db.execute("SELECT failed_attempts FROM ip_bans WHERE ip_address = ?", (ip,))
+        row = cur.fetchone()
+        attempts = row["failed_attempts"] + 1 if row else 1
+        if attempts >= 3:
+            banned_until = int(datetime.datetime.utcnow().timestamp()) + 86400  # 24 hours from now
+            db.execute("REPLACE INTO ip_bans (ip_address, failed_attempts, banned_until) VALUES (?, ?, ?)", 
+                       (ip, attempts, banned_until))
+        else:
+            db.execute("REPLACE INTO ip_bans (ip_address, failed_attempts, banned_until) VALUES (?, ?, NULL)", 
+                       (ip, attempts))
+        db.commit()
+        return jsonify({"error": "Unauthorized"}), 401
+
+    # Retrieve all sermons
+    sermons = db.execute("SELECT sermon_title, transcription, categories FROM sermons where language = 'en'").fetchall()
+    total_sermons = len(sermons)
+    
+    if total_sermons == 0:
+        return jsonify({"error": "No sermons found"}), 404
+
+    total_words = 0
+    sermon_stats = []
+    for sermon in sermons:
+        text = sermon["transcription"]
+        word_count = len(text.split())
+        total_words += word_count
+        sermon_stats.append({
+            "sermon_title": sermon["sermon_title"],
+            "word_count": word_count,
+            "categories": sermon["categories"] if sermon["categories"] else ""
+        })
+
+    average_words = total_words / total_sermons
+
+    # Find the sermon with the most and fewest words
+    largest_sermon = max(sermon_stats, key=lambda x: x["word_count"])
+    shortest_sermon = min(sermon_stats, key=lambda x: x["word_count"])
+
+    # Compute the top ten most used words across all sermons using NLTK stopwords.
+    all_text = " ".join([sermon["transcription"] for sermon in sermons])
+    all_text_clean = re.sub(r'[^\w\s]', '', all_text.lower())
+    words = all_text_clean.split()
+    stop_words = set(stopwords.words('english'))
+    filtered_words = [w for w in words if w not in stop_words]
+    counter = Counter(filtered_words)
+    top_ten_list = [{"word": word, "count": count} for word, count in counter.most_common(10)]
+    top_ten_words = json.dumps(top_ten_list)
+
+    # Build a word cloud image from the full transcription text.
+    static_images_dir = os.path.join(app.root_path, "static", "images")
+    if not os.path.exists(static_images_dir):
+        os.makedirs(static_images_dir)
+    word_cloud_path = os.path.join(static_images_dir, "data_cloud.png")
+    combined_stopwords = STOPWORDS.union(stop_words)
+    wc = WordCloud(width=800, height=400, background_color="white", stopwords=combined_stopwords).generate(all_text)
+    wc.to_file(word_cloud_path)
+
+    # Compute top ten bi-grams from the filtered words.
+    bigrams = zip(filtered_words, filtered_words[1:])
+    bigram_list = [' '.join(bigram) for bigram in bigrams]
+    bigram_counter = Counter(bigram_list)
+    top_ten_bigrams = bigram_counter.most_common(10)
+
+    # Generate a bar chart for the top 10 bi-grams.
+    if top_ten_bigrams:
+        bigrams_labels, bigrams_counts = zip(*top_ten_bigrams)
+        plt.figure(figsize=(10, 6))
+        plt.bar(bigrams_labels, bigrams_counts, color='skyblue')
+        plt.xlabel('Bi-grams')
+        plt.ylabel('Count')
+        plt.title('Top 10 Bi-grams')
+        plt.xticks(rotation=45, ha='right')
+        plt.tight_layout()
+        bigram_chart_path = os.path.join(static_images_dir, "bigram_chart.png")
+        plt.savefig(bigram_chart_path)
+        plt.close()
+
+    # Compute the most common category from sermons' categories.
+    category_counter = Counter()
+    for sermon in sermons:
+        cats = sermon["categories"]
+        if cats:
+            for cat in cats.split(","):
+                cat = cat.strip()
+                if cat:
+                    category_counter[cat] += 1
+    most_common_category = category_counter.most_common(1)[0][0] if category_counter else None
+
+    now = datetime.datetime.utcnow().isoformat()
+
+    # Update the stats_for_nerds table: Delete any previous record and insert new stats.
+    db.execute("DELETE FROM stats_for_nerds")
+    db.execute('''
+         INSERT INTO stats_for_nerds 
+         (id, total_sermons, average_words_per_sermon, largest_sermon_title, largest_sermon_word_count,
+          shortest_sermon_title, shortest_sermon_word_count, top_ten_words, most_common_category, updated_at)
+         VALUES (1, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ''', (
+         total_sermons,
+         average_words,
+         largest_sermon["sermon_title"],
+         largest_sermon["word_count"],
+         shortest_sermon["sermon_title"],
+         shortest_sermon["word_count"],
+         top_ten_words,
+         most_common_category,
+         now
+    ))
+    db.commit()
+
+    return "ok", 200
+
+
+
+@app.route("/upload_sermon", methods=["POST"])  # for backwards compatibility until the orchestrator is updated.
+@app.route("/api/upload_sermon", methods=["POST"])
 def upload_sermon():
     """API Endpoint to upload sermon audio, transcription, and metadata with IP ban logic."""
     ip = get_client_ip()  # Get actual client IP
@@ -573,6 +806,13 @@ def upload_sermon():
         return jsonify({"error": "Database error occurred."}), 400
 
     return jsonify({"message": "Sermon uploaded successfully", "guid": sermon_guid}), 200
+
+
+#
+#
+# Main Init
+#
+#
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)

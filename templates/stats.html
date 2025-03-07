@@ -1,8 +1,133 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<div class="container mt-5">
-  <h1>{{ _("Stats for Nerds") }}</h1>
-  <p>{{ _("This page is under construction. More detailed statistics will be available soon.") }}</p>
+<style>
+    /* Stats Container */
+    .stats-container {
+        max-width: 900px;
+        margin: 80px auto 40px auto;
+        padding: 40px;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.1);
+        color: #333;
+    }
+    .stats-container h2 {
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 30px;
+        font-size: 2rem;
+        text-align: center;
+    }
+    .stats-container .card {
+        margin-bottom: 20px;
+    }
+    .stats-container .card h5 {
+        font-weight: 600;
+    }
+    .list-group-item {
+        border: none;
+        padding: 10px 15px;
+    }
+    .badge {
+        font-size: 0.9rem;
+    }
+    .last-updated {
+        text-align: right;
+        font-size: 0.85rem;
+        color: #666;
+        margin-top: 20px;
+    }
+</style>
+
+<div class="stats-container">
+    <h2>Stats for nerds</h2>
+    
+    <!-- Total Sermons & Average Words per Sermon on the same horizontal line -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+              <div class="card-body">
+                <h5 class="card-title">Total Sermons</h5>
+                <p class="card-text">{{ "{:,}".format(total_sermons) }}</p>
+              </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+              <div class="card-body">
+                <h5 class="card-title">Average Words per Sermon</h5>
+                <p class="card-text">{{ "{:,.0f}".format(average_words_per_sermon) }}</p>
+              </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Largest Sermon -->
+    <div class="card mb-3">
+        <div class="card-body">
+        <h5 class="card-title">Largest Sermon</h5>
+        <p class="card-text">{{ largest_sermon_title }}</p>
+        <p class="card-text">
+            <span style="font-size: 0.85rem;">
+            <strong>Word Count:</strong> {{ "{:,}".format(largest_sermon_word_count) }}
+            </span>
+        </p>
+        </div>
+    </div>
+    
+    <!-- Shortest Sermon -->
+    <div class="card mb-3">
+        <div class="card-body">
+        <h5 class="card-title">Shortest Sermon</h5>
+        <p class="card-text">{{ shortest_sermon_title }}</p>
+        <p class="card-text">
+            <span style="font-size: 0.85rem;">
+            <strong>Word Count:</strong> {{ "{:,}".format(shortest_sermon_word_count) }}
+            </span>
+        </p>
+        </div>
+    </div>
+  
+    <!-- Most Common Category -->
+    <div class="card mb-3">
+      <div class="card-body">
+         <h5 class="card-title">Most Common Category</h5>
+         <p class="card-text">{{ most_common_category }}</p>
+      </div>
+    </div>
+
+    <!-- Top Ten Words -->
+    <div class="card mb-3">
+      <div class="card-body">
+         <h5 class="card-title">Top Ten Words</h5>
+         <ul class="list-group list-group-flush">
+           {% for item in top_ten_words %}
+             <li class="list-group-item d-flex justify-content-between align-items-center">
+                {{ item.word }}
+                <span class="badge bg-primary rounded-pill">{{ "{:,}".format(item.count) }}</span>
+             </li>
+           {% endfor %}
+         </ul>
+      </div>
+    </div>
+
+    <!-- Word Cloud Image -->
+    <div class="card mb-3">
+      <div class="card-body text-center">
+         <h5 class="card-title">Word Cloud</h5>
+         <img src="{{ url_for('static', filename='images/data_cloud.png') }}" alt="Word Cloud" class="img-fluid">
+      </div>
+    </div>
+
+    <!-- Top 10 Bi-grams Bar Chart -->
+    <div class="card mb-3">
+      <div class="card-body text-center">
+         <img src="{{ url_for('static', filename='images/bigram_chart.png') }}" alt="Bi-gram Chart" class="img-fluid">
+      </div>
+    </div>
+
+    <!-- Last Updated -->
+    <p class="last-updated"><small>Last updated: {{ updated_at }}</small></p>
 </div>
 {% endblock %}
