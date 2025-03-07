@@ -103,8 +103,8 @@ msgid "English"
 msgstr "Inglés"
 
 #: templates/layout.html:143
-msgid "📖 Sermon Search | Written by: Jay Collett | Version: 0.2.7 | Date: March 6, 2025"
-msgstr "📖 Búsqueda de Sermones | Escrito por: Jay Collett | Versión: 0.2.7 | Fecha: 6 de marzo de 2025"
+msgid "📖 Sermon Search | Written by: Jay Collett | Version: 0.2.8 | Date: March 6, 2025"
+msgstr "📖 Búsqueda de Sermones | Escrito por: Jay Collett | Versión: 0.2.8 | Fecha: 6 de marzo de 2025"
 
 #: templates/results.html:196
 msgid "Category Filters"
