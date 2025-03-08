@@ -6,6 +6,7 @@ import sqlite3
 import uuid
 import json
 import datetime
+import random
 import nltk
 nltk.download('stopwords', quiet=True)
 from nltk.corpus import stopwords
@@ -553,9 +554,23 @@ def sermon_detail(sermon_guid):
     )
     ai_content = cur.fetchone()
 
-    # Format and highlight transcription
+    # Format and highlight sermon text
     formatted_transcript = format_text_into_paragraphs(sermon["transcription"])
     highlighted_transcript = highlight_search_terms(formatted_transcript, query)
+
+    # Insert AI-generated pull quotes into the paragraphs where they appear
+    if ai_content and ai_content["key_quotes"]:
+        ai_quotes = ai_content["key_quotes"].split(" | ")  # Split quotes into a list
+        paragraphs = highlighted_transcript.split("</p>")  # Split sermon into paragraphs
+
+        for quote in ai_quotes:
+            for i, paragraph in enumerate(paragraphs):
+                if quote.strip() in paragraph:  # Check if the paragraph contains the quote
+                    quote_html = f'<div class="pull-quote">{quote.strip()}</div>'
+                    paragraphs[i] = paragraph.replace(quote.strip(), quote_html)  # Replace quote with styled version
+                    break  # Only insert once per quote
+
+        highlighted_transcript = "</p>".join(paragraphs)  # Rebuild transcript with injected quotes
 
     return render_template(
         "sermon.html",
@@ -566,7 +581,6 @@ def sermon_detail(sermon_guid):
         query=query,
         selected_categories=selected_categories
     )
-
 
 @app.route("/stats")
 @app.route("/stats")
@@ -820,12 +834,12 @@ def upload_ai_sermon_content():
         except ValueError:
             return jsonify({"error": f"Invalid datetime format for {dt_field}. Expected YYYY-MM-DD HH:MM:SS"}), 400
 
-    # Insert the validated data into the ai_sermon_content table.
+    # Insert or overwrite the data into the ai_sermon_content table.
     db = get_db()
     try:
         cursor = db.cursor()
         cursor.execute('''
-            INSERT INTO ai_sermon_content (
+            INSERT OR REPLACE INTO ai_sermon_content (
                 sermon_guid, ai_summary, ai_summary_es, bible_books, bible_books_es, 
                 created_at, key_quotes, key_quotes_es, sentiment, sentiment_es, 
                 sermon_style, sermon_style_es, status, topics, topics_es, updated_at
@@ -854,7 +868,6 @@ def upload_ai_sermon_content():
         return jsonify({"error": "Database error occurred."}), 500
 
     return jsonify({"message": "ok"}), 200
-
 
 @app.route("/upload_sermon", methods=["POST"])  # for backwards compatibility until the orchestrator is updated.
 @app.route("/api/upload_sermon", methods=["POST"])
