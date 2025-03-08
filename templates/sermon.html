@@ -116,9 +116,12 @@
 
 {% if ai_content %}
 <div class="ai-content-container">
-    <h2 class="ai-header">{{ _("AI-Generated Sermon Insights") }}</h2>
+    <div id="toggle-insights" class="ai-header">
+        <span class="toggle-icon">➕</span> 
+        {{ _("AI-Generated Sermon Insights") }}
+    </div>
 
-    <div class="ai-content-list">
+    <div class="ai-content-list" id="ai-content">
         <div class="ai-content-block">
             <h3>{{ _("Summary") }}</h3>
             <p>{{ ai_content["ai_summary_es"] if language == "es" else ai_content["ai_summary"] }}</p>
@@ -142,7 +145,9 @@
         {% if language == "en" %}
         <div class="ai-content-block">
             <h3>{{ _("Key Quotes") }}</h3>
-            <p>{{ ai_content["key_quotes"] }}</p>
+            <p class="quotes">
+                {{ ai_content["key_quotes"] | replace(" | ", "<br>") | safe }}
+            </p>
         </div>
 
         <div class="ai-content-block">
@@ -152,7 +157,9 @@
         {% else %}
         <div class="ai-content-block">
             <h3>{{ _("Citas Claves") }}</h3>
-            <p>{{ ai_content["key_quotes_es"] }}</p>
+            <p class="quotes">
+                {{ ai_content["key_quotes_es"] | replace(" | ", "<br>") | safe }}
+            </p>
         </div>
 
         <div class="ai-content-block">
@@ -165,49 +172,103 @@
 {% endif %}
 
 <style>
+    /* AI Content Section Styling */
     .ai-content-container {
         max-width: 1200px; /* Matches sermon text width */
-        margin: 40px auto;
-        padding: 20px;
-        background: #f5f5f5;
+        margin: 30px auto;
+        padding: 15px;
+        background: #ffffff;
         border-radius: 8px;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
     .ai-header {
-        font-size: 1.5rem;
+        font-size: 1.4rem;
         font-weight: bold;
-        color: #333;
-        margin-bottom: 15px;
-        text-align: center;
+        color: #222;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-bottom: 1px solid #ddd;
+        padding: 12px 0;
+        transition: background 0.3s ease-in-out;
+    }
+
+    .ai-header:hover {
+        background: #f0f0f0;
+    }
+
+    .toggle-icon {
+        font-size: 1.4rem;
+        margin-right: 10px;
+        transition: transform 0.3s ease-in-out;
     }
 
     .ai-content-list {
-        display: flex;
+        display: none;
         flex-direction: column;
-        gap: 15px;
+        gap: 10px;
+        padding-top: 10px;
+        opacity: 0;
+        height: 0;
+        overflow: hidden;
+        transition: opacity 0.3s ease-in-out, height 0.3s ease-in-out;
     }
 
     .ai-content-block {
-        background: white;
-        padding: 15px;
+        background: #f9f9f9;
+        padding: 12px;
         border-radius: 6px;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
     }
 
     .ai-content-block h3 {
         font-size: 1.1rem;
-        margin-bottom: 8px;
-        color: #444;
+        margin-bottom: 5px;
+        color: #333;
         font-weight: bold;
     }
 
     .ai-content-block p {
-        font-size: 1rem;
+        font-size: 0.95rem;
         color: #222;
-        line-height: 1.6;
+        line-height: 1.5;
+        margin-bottom: 0;
+    }
+
+    .quotes {
+        font-style: italic;
+        color: #555;
+        padding-left: 10px;
     }
 </style>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const toggleInsights = document.getElementById("toggle-insights");
+        const aiContent = document.getElementById("ai-content");
+        const toggleIcon = toggleInsights.querySelector(".toggle-icon");
+
+        toggleInsights.addEventListener("click", function () {
+            if (aiContent.style.height === "0px" || aiContent.style.display === "none") {
+                aiContent.style.display = "flex";
+                aiContent.style.height = aiContent.scrollHeight + "px";
+                aiContent.style.opacity = "1";
+                toggleIcon.textContent = "➖"; // Change icon to minus when expanded
+            } else {
+                aiContent.style.height = "0px";
+                aiContent.style.opacity = "0";
+                setTimeout(() => {
+                    aiContent.style.display = "none";
+                }, 300);
+                toggleIcon.textContent = "➕"; // Change icon back to plus when collapsed
+            }
+        });
+    });
+</script>
+
+
 
 
 <script>
