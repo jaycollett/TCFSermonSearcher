@@ -159,7 +159,7 @@
         {{ _("AI-Generated Sermon Insights") }}
     </div>
 
-    <div class="ai-content-list" id="ai-content">
+    <div class="ai-content-list" id="ai-content" style="display: none; height: 0; opacity: 0;">
         <div class="ai-content-block">
             <h3>{{ _("Summary") }}</h3>
             <p>{{ ai_content["ai_summary_es"] if language == "es" else ai_content["ai_summary"] }}</p>

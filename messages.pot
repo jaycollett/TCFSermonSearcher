@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-03-06 15:39-0500\n"
+"POT-Creation-Date: 2025-03-08 17:45-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,43 +17,43 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.10.3\n"
 
-#: app.py:300
+#: app.py:398
 msgid "Welcome to Sermon Search!"
 msgstr ""
 
-#: app.py:399
+#: app.py:515
 msgid "An error occurred while processing your search. Please try again."
 msgstr ""
 
-#: app.py:431
+#: app.py:548
 msgid "Sermon not found"
 msgstr ""
 
-#: templates/index.html:122
+#: templates/index.html:137
 msgid "Welcome to Sermon Search"
 msgstr ""
 
-#: templates/index.html:123
+#: templates/index.html:138
 msgid ""
 "Easily find and revisit past sermons by searching key topics, phrases, "
 "scripture or category."
 msgstr ""
 
-#: templates/index.html:124
+#: templates/index.html:139
 msgid "Start Searching"
 msgstr ""
 
-#: templates/index.html:130
+#: templates/index.html:145
 msgid "The Inspiration Behind This Project"
 msgstr ""
 
-#: templates/index.html:132
+#: templates/index.html:147
 msgid ""
 "This project was born from a light-hearted moment during a <span "
 "class='highlight'>Craw/LaSage homegroup</span> meeting."
 msgstr ""
 
-#: templates/index.html:135
+#: templates/index.html:150
 msgid ""
 "During the meeting, we were discussing how difficult it can be to find "
 "something specific in our old sermon notes. That’s when it hit me—how "
@@ -61,32 +61,32 @@ msgid ""
 "our own notes or key takeaways?"
 msgstr ""
 
-#: templates/index.html:136
+#: templates/index.html:151
 msgid "What started as a passing thought turned into a mission."
 msgstr ""
 
-#: templates/index.html:140
+#: templates/index.html:155
 msgid ""
 "These sermons hold spiritual wisdom—guidance, truth, and encouragement "
 "that can uplift and transform lives. It's been incredibly fulfilling to "
 "help make them even more accessible to everyone."
 msgstr ""
 
-#: templates/index.html:144
+#: templates/index.html:159
 msgid ""
 "Leveraging my experience in technology, I developed a solution—<span "
 "class='highlight'>Sermon Search</span>—where past sermons are "
 "automatically transcribed, indexed, and even translated."
 msgstr ""
 
-#: templates/index.html:147
+#: templates/index.html:162
 msgid ""
 "Whether you're revisiting a past message, searching for biblical "
 "references, or exploring specific topics, you can now do so in the "
 "language that feels most familiar to you."
 msgstr ""
 
-#: templates/index.html:150
+#: templates/index.html:165
 msgid ""
 "This wouldn’t be possible without the dedication and hard work of those "
 "who have faithfully prepared and delivered these sermons—ensuring that "
@@ -102,30 +102,34 @@ msgstr ""
 msgid "Searchable sermon transcripts from TCF. Find past sermons easily."
 msgstr ""
 
-#: templates/layout.html:95
+#: templates/layout.html:123
 msgid "Sermon Search"
 msgstr ""
 
-#: templates/layout.html:102
+#: templates/layout.html:130
 msgid "Search"
 msgstr ""
 
-#: templates/layout.html:105
+#: templates/layout.html:133
 msgid "Sermon Index"
 msgstr ""
 
-#: templates/layout.html:111 templates/layout.html:126
+#: templates/layout.html:139 templates/layout.html:154
 msgid "Spanish"
 msgstr ""
 
-#: templates/layout.html:113 templates/layout.html:120
+#: templates/layout.html:141 templates/layout.html:148
 msgid "English"
 msgstr ""
 
-#: templates/layout.html:143
+#: templates/layout.html:171
 msgid ""
-"📖 Sermon Search | Written by: Jay Collett | Version: 0.2.3 | Date: March "
-"6, 2025"
+"📖 Sermon Search | Written by: Jay Collett | Version: 0.2.10 | Date: March"
+" 6, 2025"
+msgstr ""
+
+#: templates/layout.html:173 templates/stats.html:44
+msgid "Stats for nerds"
 msgstr ""
 
 #: templates/results.html:196
@@ -164,19 +168,95 @@ msgstr ""
 msgid "Category Filters (optional)"
 msgstr ""
 
-#: templates/sermon.html:101
+#: templates/sermon.html:139
 msgid "Your browser does not support the audio element."
 msgstr ""
 
-#: templates/sermon.html:104
+#: templates/sermon.html:142
 msgid "Audio not available."
 msgstr ""
 
-#: templates/sermon.html:108
+#: templates/sermon.html:146
 msgid "Back to Search Results"
 msgstr ""
 
-#: templates/sermons.html:70
+#: templates/sermon.html:159
+msgid "AI-Generated Sermon Insights"
+msgstr ""
+
+#: templates/sermon.html:164
+msgid "Summary"
+msgstr ""
+
+#: templates/sermon.html:169
+msgid "Bible References"
+msgstr ""
+
+#: templates/sermon.html:174
+msgid "Sermon Style"
+msgstr ""
+
+#: templates/sermon.html:179
+msgid "Topics"
+msgstr ""
+
+#: templates/sermon.html:185
+msgid "Key Quotes"
+msgstr ""
+
+#: templates/sermon.html:192
+msgid "Sentiment"
+msgstr ""
+
+#: templates/sermon.html:197
+msgid "Citas Claves"
+msgstr ""
+
+#: templates/sermon.html:204
+msgid "Sentimiento"
+msgstr ""
+
+#: templates/sermons.html:75
 msgid "📂 Sermon Index"
+msgstr ""
+
+#: templates/stats.html:51
+msgid "Total Sermons"
+msgstr ""
+
+#: templates/stats.html:59
+msgid "Average Words per Sermon"
+msgstr ""
+
+#: templates/stats.html:69
+msgid "Largest Sermon"
+msgstr ""
+
+#: templates/stats.html:73 templates/stats.html:86
+msgid "Word Count:"
+msgstr ""
+
+#: templates/stats.html:82
+msgid "Shortest Sermon"
+msgstr ""
+
+#: templates/stats.html:95
+msgid "Most Common Category"
+msgstr ""
+
+#: templates/stats.html:103
+msgid "Top Ten Words"
+msgstr ""
+
+#: templates/stats.html:118 templates/stats.html:119
+msgid "Word Cloud"
+msgstr ""
+
+#: templates/stats.html:126
+msgid "Bi-gram Chart"
+msgstr ""
+
+#: templates/stats.html:131
+msgid "Last updated:"
 msgstr ""
 
