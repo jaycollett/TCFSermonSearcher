@@ -142,7 +142,7 @@
         <p>{{ _("Audio not available.") }}</p>
     {% endif %}
     <div class="back-container">
-        <a href="{{ url_for('search', q=request.args.get('q', ''), categories=request.args.getlist('categories')) }}" class="back-button">
+        <a href="{{ url_for('search', q=request.args.get('q', ''), categories=request.args.getlist('categories'), page=request.args.getlist('page')) }}" class="back-button">
             ⬅ {{ _("Back to Search Results") }}
         </a>
     </div>

@@ -8,6 +8,7 @@ import json
 import datetime
 import random
 import nltk
+import math
 nltk.download('stopwords', quiet=True)
 from nltk.corpus import stopwords
 from flask import Flask, g, render_template, request, send_from_directory, redirect, url_for, make_response, jsonify
@@ -438,6 +439,10 @@ def sanitize_search_term(term):
     return f'"{term}"'
 
 
+import math  # add this import near the other imports
+
+# ... existing code ...
+
 @app.route("/search", methods=["GET"])
 def search():
     query = request.args.get("q", "").strip()
@@ -451,6 +456,16 @@ def search():
     if not query:
         return render_template("search.html", all_categories=all_categories, selected_categories=selected_categories)
 
+    # Pagination parameters
+    try:
+        page = int(request.args.get("page", 1))
+        if page < 1:
+            page = 1
+    except ValueError:
+        page = 1
+    per_page = 10
+    offset = (page - 1) * per_page
+
     # Sanitize the search term for FTS
     sanitized_term = sanitize_search_term(query)
     results = []
@@ -462,7 +477,6 @@ def search():
         filter_params = []
         if selected_categories:
             conditions = []
-            # Use the base table alias (s) for filtering on unindexed columns in the join query.
             for cat in selected_categories:
                 conditions.append("s.categories LIKE ?")
                 filter_params.append(f"%{cat}%")
@@ -471,17 +485,29 @@ def search():
         # Build the FTS query string to search in specific columns.
         fts_query_str = f"sermon_title:{sanitized_term} OR transcription:{sanitized_term}"
 
-        # Query using a join between the base table and the FTS virtual table.
+        # Use pagination in the main FTS query.
         fts_sql = (
             "SELECT s.sermon_guid, s.sermon_title, s.audiofilename, s.transcription, s.categories "
             "FROM sermons s "
             "JOIN sermons_fts ON s.id = sermons_fts.rowid "
             "WHERE sermons_fts MATCH ? AND s.language = ? "
-            f"{filter_clause} LIMIT 25"
+            f"{filter_clause} LIMIT ? OFFSET ?"
         )
-        params = [fts_query_str, language] + filter_params
+        params = [fts_query_str, language] + filter_params + [per_page, offset]
         cur = db.execute(fts_sql, params)
         sermons = cur.fetchall()
+
+        # Get total count for pagination (FTS branch)
+        count_sql = (
+            "SELECT COUNT(*) as total "
+            "FROM sermons s "
+            "JOIN sermons_fts ON s.id = sermons_fts.rowid "
+            "WHERE sermons_fts MATCH ? AND s.language = ? "
+            f"{filter_clause}"
+        )
+        count_params = [fts_query_str, language] + filter_params
+        cur = db.execute(count_sql, count_params)
+        total_count = cur.fetchone()["total"]
 
         # Fallback: if no FTS results, do a LIKE search on the base table.
         if not sermons:
@@ -490,11 +516,24 @@ def search():
                 "SELECT s.sermon_guid, s.sermon_title, s.audiofilename, s.transcription, s.categories "
                 "FROM sermons s "
                 "WHERE s.transcription LIKE ? AND s.language = ? "
-                f"{filter_clause} LIMIT 25"
+                f"{filter_clause} LIMIT ? OFFSET ?"
             )
-            params = [like_query, language] + filter_params
+            params = [like_query, language] + filter_params + [per_page, offset]
             cur = db.execute(fallback_sql, params)
             sermons = cur.fetchall()
+
+            # Count for fallback search
+            count_sql = (
+                "SELECT COUNT(*) as total "
+                "FROM sermons s "
+                "WHERE s.transcription LIKE ? AND s.language = ? "
+                f"{filter_clause}"
+            )
+            count_params = [like_query, language] + filter_params
+            cur = db.execute(count_sql, count_params)
+            total_count = cur.fetchone()["total"]
+
+        total_pages = math.ceil(total_count / per_page) if total_count > 0 else 1
 
         for sermon in sermons:
             snippets = extract_relevant_snippets(sermon["transcription"], query)
@@ -508,7 +547,7 @@ def search():
                 "snippets": snippets
             })
 
-        app.logger.debug(f"Total results found: {len(results)}")
+        app.logger.debug(f"Total results found: {len(results)} out of {total_count}")
 
     except Exception as e:
         app.logger.error(f"Error during search: {str(e)}", exc_info=True)
@@ -519,7 +558,10 @@ def search():
                            results=results,
                            highlight_search_terms=highlight_search_terms,
                            all_categories=all_categories,
-                           selected_categories=selected_categories)
+                           selected_categories=selected_categories,
+                           page=page,
+                           total_pages=total_pages,
+                           total_count=total_count)
 
 
 @app.route("/sermon/<sermon_guid>")
@@ -529,6 +571,7 @@ def sermon_detail(sermon_guid):
     language = request.cookies.get("language", "en")  # Get user-selected language
     query = request.args.get("q", "").strip()
     selected_categories = request.args.getlist("categories")
+    page = request.args.get("page", 1)  # NEW: Get the current page
 
     cur = db.execute(
         "SELECT * FROM sermons WHERE sermon_guid = ? AND language = ?",
@@ -579,8 +622,10 @@ def sermon_detail(sermon_guid):
         language=language,
         formatted_transcript=highlighted_transcript,
         query=query,
-        selected_categories=selected_categories
+        selected_categories=selected_categories,
+        page=page  # NEW: Pass the page to the template
     )
+
 
 @app.route("/stats")
 @app.route("/stats")

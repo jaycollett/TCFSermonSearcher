@@ -200,7 +200,7 @@
           {% endfor %}
         </div>
         <div class="header-flex" style="margin-top: 15px; display: flex; justify-content: space-between; align-items: center;">
-          <h4 style="margin: 0;">Search Results for "<span class="text-primary">{{ query_val }}</span>"</h4>
+          <h4 style="margin: 0;">{{ total_count }} Search Results for "<span class="text-primary">{{ query_val }}</span>"</h4>
           <a href="{{ url_for('search') }}" class="back-link" style="font-size: 0.9rem; text-decoration: none; color: #007bff;">{{ _("Back to Search") }}</a>
         </div>
       </form>
@@ -211,10 +211,10 @@
       {% if results %}
       <div class="mt-4">
         {% for row in results %}
-        <div class="card" data-href="{{ url_for('sermon_detail', sermon_guid=row['sermon_guid'], q=query_val, categories=selected_categories) }}">
+        <div class="card" data-href="{{ url_for('sermon_detail', sermon_guid=row['sermon_guid'], q=query_val, categories=selected_categories, page=page) }}">
           <div class="card-body">
             <h5 class="card-title">
-              <a href="{{ url_for('sermon_detail', sermon_guid=row['sermon_guid'], q=query_val, categories=selected_categories) }}" onclick="event.stopPropagation();">
+              <a href="{{ url_for('sermon_detail', sermon_guid=row['sermon_guid'], q=query_val, categories=selected_categories, page=page) }}" onclick="event.stopPropagation();">
                 {{ row['sermon_title'] }}
               </a>
               {% if row['categories'] %}
@@ -236,6 +236,91 @@
         </div>
         {% endfor %}
       </div>
+      {% if total_pages > 1 %}
+      {% set half_window = 3 %} {# how many pages to show on each side of the current page #}
+      
+      <!-- Calculate start_page and end_page so we only display a subset of pages -->
+      {% set start_page = page - half_window %}
+      {% set end_page = page + half_window %}
+      
+      <!-- Ensure start_page isn't less than 1 -->
+      {% if start_page < 1 %}
+        {% set end_page = end_page - (start_page - 1) %}
+        {% set start_page = 1 %}
+      {% endif %}
+      
+      <!-- Ensure end_page isn't greater than total_pages -->
+      {% if end_page > total_pages %}
+        {% set start_page = start_page - (end_page - total_pages) %}
+        {% set end_page = total_pages %}
+        {% if start_page < 1 %}
+          {% set start_page = 1 %}
+        {% endif %}
+      {% endif %}
+      
+      <nav aria-label="Search results pages">
+        <ul class="pagination justify-content-end mt-4">
+          <!-- Previous Button -->
+          {% if page > 1 %}
+            <li class="page-item">
+              <a class="page-link" href="{{ url_for('search', q=query_val, page=page-1, categories=selected_categories) }}">Previous</a>
+            </li>
+          {% else %}
+            <li class="page-item disabled">
+              <span class="page-link">Previous</span>
+            </li>
+          {% endif %}
+      
+          <!-- Link to First Page if needed -->
+          {% if start_page > 1 %}
+            <li class="page-item {% if page == 1 %}active{% endif %}">
+              <a class="page-link" href="{{ url_for('search', q=query_val, page=1, categories=selected_categories) }}">1</a>
+            </li>
+          {% endif %}
+      
+          <!-- Ellipses if there's a gap before start_page -->
+          {% if start_page > 2 %}
+            <li class="page-item disabled">
+              <span class="page-link">...</span>
+            </li>
+          {% endif %}
+      
+          <!-- Page Number Links (windowed) -->
+          {% for p in range(start_page, end_page + 1) %}
+            <li class="page-item {% if p == page %}active{% endif %}">
+              <a class="page-link" href="{{ url_for('search', q=query_val, page=p, categories=selected_categories) }}">{{ p }}</a>
+            </li>
+          {% endfor %}
+      
+          <!-- Ellipses if there's a gap after end_page -->
+          {% if end_page < total_pages - 1 %}
+            <li class="page-item disabled">
+              <span class="page-link">...</span>
+            </li>
+          {% endif %}
+      
+          <!-- Link to Last Page if needed -->
+          {% if end_page < total_pages %}
+            <li class="page-item {% if page == total_pages %}active{% endif %}">
+              <a class="page-link" href="{{ url_for('search', q=query_val, page=total_pages, categories=selected_categories) }}">{{ total_pages }}</a>
+            </li>
+          {% endif %}
+      
+          <!-- Next Button -->
+          {% if page < total_pages %}
+            <li class="page-item">
+              <a class="page-link" href="{{ url_for('search', q=query_val, page=page+1, categories=selected_categories) }}">Next</a>
+            </li>
+          {% else %}
+            <li class="page-item disabled">
+              <span class="page-link">Next</span>
+            </li>
+          {% endif %}
+        </ul>
+      </nav>
+      {% endif %}
+      
+
       {% else %}
       <div class="alert alert-warning text-center mt-4">
         <strong>{{ _("No results found.") }}</strong> {{ _("Try a different search term.") }}
