@@ -100,6 +100,7 @@ def init_db():
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     sermon_title TEXT NOT NULL,
                     transcription TEXT NOT NULL,
+                    transcription_timings TEXT,
                     audiofilename TEXT,
                     sermon_guid VARCHAR(40) NOT NULL,
                     language VARCHAR(2) NOT NULL DEFAULT 'en',
@@ -953,6 +954,7 @@ def upload_sermon():
     language = request.form.get("Language")
     categories = request.form.get("Categories")
     church = request.form.get("Church")
+    transcription_timings = request.form.get("TranscriptionTimings", None) # optional field in the API
 
     if not all([audiofile, transcription, sermon_guid, sermon_title, language, categories, church]):
         return jsonify({"error": "Missing required fields"}), 400
@@ -964,16 +966,17 @@ def upload_sermon():
         with sqlite3.connect(DATABASE) as conn:
             cursor = conn.cursor()
             cursor.execute('''
-                INSERT INTO sermons (sermon_title, transcription, audiofilename, sermon_guid, language, categories, church)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO sermons (sermon_title, transcription, audiofilename, sermon_guid, language, categories, church, transcription_timings)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT(sermon_guid, language) 
                 DO UPDATE SET
                     sermon_title = excluded.sermon_title,
                     transcription = excluded.transcription,
                     audiofilename = excluded.audiofilename,
                     categories = excluded.categories,
-                    church = excluded.church
-            ''', (sermon_title, transcription, audio_filename, sermon_guid, language, categories, church))
+                    church = excluded.church,
+                    transcription_timings = excluded.transcription_timings
+            ''', (sermon_title, transcription, audio_filename, sermon_guid, language, categories, church, transcription_timings))
             conn.commit()
     except sqlite3.IntegrityError:
         return jsonify({"error": "Database error occurred."}), 400
