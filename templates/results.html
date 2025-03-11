@@ -23,41 +23,48 @@
   /* Sticky Header (White Background) */
   .sticky-header {
     position: sticky;
-    top: 15px;  /* Default space when not scrolled */
+    top: 15px;
+    /* Default space when not scrolled */
     z-index: 1000;
     background: #fff;
     padding: 15px;
     border-bottom: 2px solid #ddd;
-    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
     border-radius: 12px;
     color: black;
     margin-bottom: 5px;
     transition: all 0.3s ease;
   }
+
   .sticky-header.fixed {
     position: fixed;
-    top: 90px; /* Fixed below the navbar */
+    top: 90px;
+    /* Fixed below the navbar */
     left: 50%;
     transform: translateX(-50%);
     width: 95%;
     max-width: 1200px;
     margin-bottom: 0;
   }
+
   .sticky-header .header-flex {
     display: flex;
     justify-content: space-between;
     align-items: center;
   }
+
   .sticky-header h4 {
     font-size: 1.5rem;
     font-weight: 600;
     margin: 0;
   }
+
   .sticky-header .back-link {
     font-size: 0.9rem;
     text-decoration: none;
     color: #007bff;
   }
+
   .sticky-header .back-link:hover {
     text-decoration: underline;
   }
@@ -78,11 +85,12 @@
     gap: 8px;
     justify-content: center;
   }
+
   .filter-box {
     display: inline-block;
     padding: 6px 12px;
     font-size: 0.85rem;
-    background: rgba(0,123,255,0.15);
+    background: rgba(0, 123, 255, 0.15);
     border-radius: 20px;
     color: #007bff;
     font-weight: 500;
@@ -90,11 +98,13 @@
     transition: background-color 0.3s ease, transform 0.2s ease;
     cursor: pointer;
   }
+
   .filter-box:hover {
     background-color: #007bff;
     color: #fff;
     transform: scale(1.05);
   }
+
   .filter-box.active {
     background-color: #007bff;
     color: white;
@@ -111,28 +121,34 @@
     box-shadow: 0px 3px 8px rgba(255, 255, 255, 0.1);
     cursor: pointer;
   }
+
   .card:hover {
     transform: translateY(-3px);
     box-shadow: 0px 6px 12px rgba(255, 255, 255, 0.2);
   }
+
   .card-body {
     padding: 20px;
   }
+
   .card-title {
     display: flex;
     justify-content: space-between;
     align-items: center;
   }
+
   .card-title a {
     color: #007bff;
     text-decoration: none;
     font-weight: 600;
     font-size: 1.25rem;
   }
+
   .card-title a:hover {
     text-decoration: underline;
     color: #0056b3;
   }
+
   .card-title span {
     font-style: italic;
     font-size: 0.85rem;
@@ -153,6 +169,7 @@
     text-align: right;
     margin-top: 10px;
   }
+
   .audio-info small {
     font-style: italic;
     color: #555;
@@ -166,7 +183,7 @@
 
   /* Highlight Styling */
   .highlight {
-    background-color: rgba(0,123,255,0.15);
+    background-color: rgba(0, 123, 255, 0.15);
     color: #007bff;
     font-weight: bold;
     padding: 0 3px;
@@ -188,7 +205,7 @@
 <!-- Full-Screen Background -->
 <div class="results-wrapper">
   <div class="results-container">
-    
+
     <!-- Sticky Header with Filters and Back Button -->
     <div class="sticky-header" id="sticky-header">
       <form action="{{ url_for('search') }}" method="get" id="results-form">
@@ -196,12 +213,16 @@
         <div class="filter-title">{{ _("Category Filters") }}</div>
         <div class="filter-group" id="results-filter-group">
           {% for cat in all_categories %}
-            <a href="javascript:void(0)" class="filter-box {% if cat in selected_categories %}active{% endif %}" data-filter="{{ cat }}">{{ cat }}</a>
+          <a href="javascript:void(0)" class="filter-box {% if cat in selected_categories %}active{% endif %}"
+            data-filter="{{ cat }}">{{ cat }}</a>
           {% endfor %}
         </div>
-        <div class="header-flex" style="margin-top: 15px; display: flex; justify-content: space-between; align-items: center;">
-          <h4 style="margin: 0;">{{ total_count }} Search Results for "<span class="text-primary">{{ query_val }}</span>"</h4>
-          <a href="{{ url_for('search') }}" class="back-link" style="font-size: 0.9rem; text-decoration: none; color: #007bff;">{{ _("Back to Search") }}</a>
+        <div class="header-flex"
+          style="margin-top: 15px; display: flex; justify-content: space-between; align-items: center;">
+          <h4 style="margin: 0;">{{ total_count }} Search Results for "<span class="text-primary">{{ query_val
+              }}</span>"</h4>
+          <a href="{{ url_for('search') }}" class="back-link"
+            style="font-size: 0.9rem; text-decoration: none; color: #007bff;">{{ _("Back to Search") }}</a>
         </div>
       </form>
     </div>
@@ -211,22 +232,24 @@
       {% if results %}
       <div class="mt-4">
         {% for row in results %}
-        <div class="card" data-href="{{ url_for('sermon_detail', sermon_guid=row['sermon_guid'], q=query_val, categories=selected_categories, page=page) }}">
+        <div class="card"
+          data-href="{{ url_for('sermon_detail', sermon_guid=row['sermon_guid'], q=query_val, categories=selected_categories, page=page) }}">
           <div class="card-body">
             <h5 class="card-title">
-              <a href="{{ url_for('sermon_detail', sermon_guid=row['sermon_guid'], q=query_val, categories=selected_categories, page=page) }}" onclick="event.stopPropagation();">
+              <a href="{{ url_for('sermon_detail', sermon_guid=row['sermon_guid'], q=query_val, categories=selected_categories, page=page) }}"
+                onclick="event.stopPropagation();">
                 {{ row['sermon_title'] }}
               </a>
               {% if row['categories'] %}
-                <span>{{ row['categories'] }}</span>
+              <span>{{ row['categories'] }}</span>
               {% else %}
-                <span class="text-muted">No categories</span>
+              <span class="text-muted">No categories</span>
               {% endif %}
             </h5>
             {% if row['snippets'] %}
-              {% for snippet in row['snippets'] %}
-                <p class="snippet">...{{ highlight_search_terms(snippet, query_val) | safe }}...</p>
-              {% endfor %}
+            {% for snippet in row['snippets'] %}
+            <p class="snippet">...{{ highlight_search_terms(snippet, query_val) | safe }}...</p>
+            {% endfor %}
             {% endif %}
             <!-- Audio Info Text -->
             <div class="audio-info">
@@ -238,94 +261,88 @@
       </div>
       {% if total_pages > 1 %}
       {% set half_window = 3 %} {# how many pages to show on each side of the current page #}
-      
+
       <!-- Calculate start_page and end_page so we only display a subset of pages -->
       {% set start_page = page - half_window %}
       {% set end_page = page + half_window %}
-      
+
       <!-- Ensure start_page isn't less than 1 -->
-      {% if start_page < 1 %}
-        {% set end_page = end_page - (start_page - 1) %}
-        {% set start_page = 1 %}
-      {% endif %}
-      
-      <!-- Ensure end_page isn't greater than total_pages -->
-      {% if end_page > total_pages %}
+      {% if start_page < 1 %} {% set end_page=end_page - (start_page - 1) %} {% set start_page=1 %} {% endif %} <!--
+        Ensure end_page isn't greater than total_pages -->
+        {% if end_page > total_pages %}
         {% set start_page = start_page - (end_page - total_pages) %}
         {% set end_page = total_pages %}
-        {% if start_page < 1 %}
-          {% set start_page = 1 %}
-        {% endif %}
-      {% endif %}
-      
-      <nav aria-label="Search results pages">
-        <ul class="pagination justify-content-end mt-4">
-          <!-- Previous Button -->
-          {% if page > 1 %}
+        {% if start_page < 1 %} {% set start_page=1 %} {% endif %} {% endif %} <nav aria-label="Search results pages">
+          <ul class="pagination justify-content-end mt-4">
+            <!-- Previous Button -->
+            {% if page > 1 %}
             <li class="page-item">
-              <a class="page-link" href="{{ url_for('search', q=query_val, page=page-1, categories=selected_categories) }}">Previous</a>
+              <a class="page-link"
+                href="{{ url_for('search', q=query_val, page=page-1, categories=selected_categories) }}">Previous</a>
             </li>
-          {% else %}
+            {% else %}
             <li class="page-item disabled">
               <span class="page-link">Previous</span>
             </li>
-          {% endif %}
-      
-          <!-- Link to First Page if needed -->
-          {% if start_page > 1 %}
-            <li class="page-item {% if page == 1 %}active{% endif %}">
-              <a class="page-link" href="{{ url_for('search', q=query_val, page=1, categories=selected_categories) }}">1</a>
-            </li>
-          {% endif %}
-      
-          <!-- Ellipses if there's a gap before start_page -->
-          {% if start_page > 2 %}
-            <li class="page-item disabled">
-              <span class="page-link">...</span>
-            </li>
-          {% endif %}
-      
-          <!-- Page Number Links (windowed) -->
-          {% for p in range(start_page, end_page + 1) %}
-            <li class="page-item {% if p == page %}active{% endif %}">
-              <a class="page-link" href="{{ url_for('search', q=query_val, page=p, categories=selected_categories) }}">{{ p }}</a>
-            </li>
-          {% endfor %}
-      
-          <!-- Ellipses if there's a gap after end_page -->
-          {% if end_page < total_pages - 1 %}
-            <li class="page-item disabled">
-              <span class="page-link">...</span>
-            </li>
-          {% endif %}
-      
-          <!-- Link to Last Page if needed -->
-          {% if end_page < total_pages %}
-            <li class="page-item {% if page == total_pages %}active{% endif %}">
-              <a class="page-link" href="{{ url_for('search', q=query_val, page=total_pages, categories=selected_categories) }}">{{ total_pages }}</a>
-            </li>
-          {% endif %}
-      
-          <!-- Next Button -->
-          {% if page < total_pages %}
-            <li class="page-item">
-              <a class="page-link" href="{{ url_for('search', q=query_val, page=page+1, categories=selected_categories) }}">Next</a>
-            </li>
-          {% else %}
-            <li class="page-item disabled">
-              <span class="page-link">Next</span>
-            </li>
-          {% endif %}
-        </ul>
-      </nav>
-      {% endif %}
-      
+            {% endif %}
 
-      {% else %}
-      <div class="alert alert-warning text-center mt-4">
-        <strong>{{ _("No results found.") }}</strong> {{ _("Try a different search term.") }}
-      </div>
-      {% endif %}
+            <!-- Link to First Page if needed -->
+            {% if start_page > 1 %}
+            <li class="page-item {% if page == 1 %}active{% endif %}">
+              <a class="page-link"
+                href="{{ url_for('search', q=query_val, page=1, categories=selected_categories) }}">1</a>
+            </li>
+            {% endif %}
+
+            <!-- Ellipses if there's a gap before start_page -->
+            {% if start_page > 2 %}
+            <li class="page-item disabled">
+              <span class="page-link">...</span>
+            </li>
+            {% endif %}
+
+            <!-- Page Number Links (windowed) -->
+            {% for p in range(start_page, end_page + 1) %}
+            <li class="page-item {% if p == page %}active{% endif %}">
+              <a class="page-link"
+                href="{{ url_for('search', q=query_val, page=p, categories=selected_categories) }}">{{ p }}</a>
+            </li>
+            {% endfor %}
+
+            <!-- Ellipses if there's a gap after end_page -->
+            {% if end_page < total_pages - 1 %} <li class="page-item disabled">
+              <span class="page-link">...</span>
+              </li>
+              {% endif %}
+
+              <!-- Link to Last Page if needed -->
+              {% if end_page < total_pages %} <li class="page-item {% if page == total_pages %}active{% endif %}">
+                <a class="page-link"
+                  href="{{ url_for('search', q=query_val, page=total_pages, categories=selected_categories) }}">{{
+                  total_pages }}</a>
+                </li>
+                {% endif %}
+
+                <!-- Next Button -->
+                {% if page < total_pages %} <li class="page-item">
+                  <a class="page-link"
+                    href="{{ url_for('search', q=query_val, page=page+1, categories=selected_categories) }}">Next</a>
+                  </li>
+                  {% else %}
+                  <li class="page-item disabled">
+                    <span class="page-link">Next</span>
+                  </li>
+                  {% endif %}
+          </ul>
+          </nav>
+          {% endif %}
+
+
+          {% else %}
+          <div class="alert alert-warning text-center mt-4">
+            <strong>{{ _("No results found.") }}</strong> {{ _("Try a different search term.") }}
+          </div>
+          {% endif %}
     </div>
   </div>
 </div>
@@ -333,7 +350,7 @@
 <!-- JavaScript: Make the Entire Card Clickable -->
 <script>
   document.querySelectorAll('.card').forEach(card => {
-    card.addEventListener('click', function(e) {
+    card.addEventListener('click', function (e) {
       // Prevent navigation if a link was clicked inside the card
       if (!e.target.closest('a')) {
         window.location = card.getAttribute('data-href');
@@ -345,7 +362,7 @@
 <!-- JavaScript: Sticky Header Positioning -->
 <script>
   var lastScrollY = 0;
-  window.addEventListener('scroll', function() {
+  window.addEventListener('scroll', function () {
     var stickyHeader = document.getElementById('sticky-header');
     var navbarHeight = document.querySelector('.navbar').offsetHeight;
     var currentScrollY = window.scrollY;
@@ -372,7 +389,7 @@
 <!-- JavaScript: Filters Update Instantly -->
 <script>
   document.querySelectorAll('.filter-box').forEach(filter => {
-    filter.addEventListener('click', function() {
+    filter.addEventListener('click', function () {
       let query = new URLSearchParams(window.location.search);
       let category = this.getAttribute('data-filter');
       let selected = query.getAll("categories");

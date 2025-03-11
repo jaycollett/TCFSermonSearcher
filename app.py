@@ -629,7 +629,6 @@ def sermon_detail(sermon_guid):
 
 
 @app.route("/stats")
-@app.route("/stats")
 def stats():
     db = get_db()
     row = db.execute("SELECT * FROM stats_for_nerds WHERE id = 1").fetchone()
@@ -666,7 +665,7 @@ def sermon_index():
     db = get_db()
     language = request.cookies.get("language", "en")
     
-    cur = db.execute("SELECT sermon_guid, sermon_title, audiofilename, transcription, categories FROM sermons WHERE language = ? ORDER BY sermon_title ASC", (language,))
+    cur = db.execute("SELECT sermon_guid, sermon_title, audiofilename, transcription, categories FROM sermons WHERE language = ? ORDER BY sermon_title ASC LIMIT 12", (language,))
     sermons = cur.fetchall()
 
     def extract_first_sentences(text, min_sentences=3, max_sentences=4):
@@ -690,6 +689,46 @@ def sermon_index():
         })
 
     return render_template("sermons.html", sermons=processed_sermons)
+
+@app.route("/api/sermons")
+def api_sermons():
+    # Use query parameter 'page', default to 1
+    try:
+        page = int(request.args.get("page", 1))
+    except ValueError:
+        page = 1
+    per_page = 20  # Number of sermons per page
+    offset = (page - 1) * per_page
+
+    db = get_db()
+    language = request.cookies.get("language", "en")
+    cur = db.execute(
+        "SELECT sermon_guid, sermon_title, transcription, categories "
+        "FROM sermons "
+        "WHERE language = ? ORDER BY sermon_title ASC "
+        "LIMIT ? OFFSET ?",
+        (language, per_page, offset)
+    )
+    sermons = cur.fetchall()
+
+    # Create a snippet using a similar approach as extract_first_sentences
+    def extract_first_sentences(text, min_sentences=3, max_sentences=4):
+        if not text:
+            return "(No transcription available)"
+        sentences = re.split(r'(?<=[.!?])\s+', text)
+        snippet = " ".join(sentences[:random.randint(min_sentences, max_sentences)])
+        return snippet
+
+    processed_sermons = []
+    for sermon in sermons:
+        processed_sermons.append({
+            "sermon_guid": sermon["sermon_guid"],
+            "sermon_title": sermon["sermon_title"],
+            "snippet": extract_first_sentences(sermon["transcription"]),
+            "categories": sermon["categories"] or "Uncategorized"
+        })
+    return jsonify(processed_sermons)
+
 
 @app.route("/audiofiles/<path:filename>")
 def audiofiles(filename):

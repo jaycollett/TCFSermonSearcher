@@ -73,17 +73,64 @@
 </style>
 
 <h2 class="sermon-index-title">{{ _("📂 Sermon Index") }}</h2>
-<div class="sermon-grid">
+<div class="sermon-grid" id="sermon-grid">
     {% for sermon in sermons %}
-        <div class="sermon-card">
-            <h5>
-                <a href="{{ url_for('sermon_detail', sermon_guid=sermon['sermon_guid']) }}">
-                    {{ sermon['sermon_title'] }}
-                </a>
-            </h5>
-            <p class="sermon-snippet">{{ sermon['snippet']|truncate_text(250) }}</p>
-            <div class="sermon-categories">{{ sermon['categories'] }}</div>
-        </div>
+    <div class="sermon-card">
+        <h5>
+            <a href="{{ url_for('sermon_detail', sermon_guid=sermon['sermon_guid']) }}">
+                {{ sermon['sermon_title'] }}
+            </a>
+        </h5>
+        <p class="sermon-snippet">{{ sermon['snippet']|truncate_text(250) }}</p>
+        <div class="sermon-categories">{{ sermon['categories'] }}</div>
+    </div>
     {% endfor %}
 </div>
+<div id="loading" style="text-align:center; margin:20px; display:none;">
+    <em>Loading more sermons...</em>
+</div>
+
+<script>
+  let currentPage = 1;
+  let loading = false;
+  let endOfData = false;
+
+  async function loadMoreSermons() {
+    if (loading || endOfData) return;
+    loading = true;
+    currentPage += 1;
+    document.getElementById('loading').style.display = 'block';
+    try {
+      const response = await fetch(`/api/sermons?page=${currentPage}`);
+      if (response.ok) {
+        const sermons = await response.json();
+        if (sermons.length === 0) {
+          endOfData = true;
+        } else {
+          const grid = document.getElementById('sermon-grid');
+          sermons.forEach(sermon => {
+            const card = document.createElement('div');
+            card.className = 'sermon-card';
+            card.innerHTML = `
+              <h5><a href="/sermon/${sermon.sermon_guid}">${sermon.sermon_title}</a></h5>
+              <p class="sermon-snippet">${sermon.snippet.substring(0, 250)}</p>
+              <div class="sermon-categories">${sermon.categories}</div>
+            `;
+            grid.appendChild(card);
+          });
+        }
+      }
+    } catch (error) {
+      console.error("Error loading sermons:", error);
+    }
+    document.getElementById('loading').style.display = 'none';
+    loading = false;
+  }
+
+  window.addEventListener('scroll', () => {
+    if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500) {
+      loadMoreSermons();
+    }
+  });
+</script>
 {% endblock %}

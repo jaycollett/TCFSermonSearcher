@@ -4,7 +4,8 @@
     /* Hero Section */
     .hero {
         background: url("https://source.unsplash.com/1600x600/?church,bible,light") center/cover no-repeat;
-        min-height: 250px; /* Adjusted height */
+        min-height: 250px;
+        /* Adjusted height */
         display: flex;
         align-items: center;
         justify-content: center;
@@ -14,12 +15,17 @@
         border-radius: 8px;
         overflow: hidden;
         box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
-        margin: 80px 0 30px 0; /* Added margin to push it below the navbar */
-        background-color: #f8f9fa; /* Off-white background */
-        padding: 30px 20px; /* Adjusted padding for better spacing */
+        margin: 80px 0 30px 0;
+        /* Added margin to push it below the navbar */
+        background-color: #f8f9fa;
+        /* Off-white background */
+        padding: 30px 20px;
+        /* Adjusted padding for better spacing */
     }
+
     .hero-overlay {
-        background: rgba(255, 255, 255, 0.75); /* Softer overlay */
+        background: rgba(255, 255, 255, 0.75);
+        /* Softer overlay */
         position: absolute;
         top: 0;
         left: 0;
@@ -30,19 +36,23 @@
         justify-content: center;
         padding: 20px;
     }
+
     .hero-content {
         position: relative;
         z-index: 1;
         max-width: 800px;
         text-align: center;
     }
+
     .hero h1 {
         font-size: 2.8rem;
         font-weight: 700;
-        font-family: 'Merriweather', serif; /* New elegant font */
+        font-family: 'Merriweather', serif;
+        /* New elegant font */
         text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
         margin-bottom: 15px;
     }
+
     .hero p {
         font-size: 1.15rem;
         font-weight: 400;
@@ -51,6 +61,7 @@
         margin: 0 auto 20px auto;
         line-height: 1.6;
     }
+
     .btn-primary {
         background-color: #007bff;
         border-color: #007bff;
@@ -59,6 +70,7 @@
         border-radius: 6px;
         transition: all 0.3s ease;
     }
+
     .btn-primary:hover {
         background-color: #0056b3;
         transform: translateY(-2px);
@@ -75,6 +87,7 @@
         box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.1);
         color: black;
     }
+
     .content-container h2 {
         font-weight: 700;
         color: #333;
@@ -82,12 +95,14 @@
         font-size: 2rem;
         text-align: center;
     }
+
     .content-container p {
         font-size: 1.1rem;
         line-height: 1.6;
         color: #444;
         text-align: justify;
     }
+
     .quote {
         font-style: italic;
         color: #555;
@@ -96,6 +111,7 @@
         margin: 15px 0;
         font-size: 1rem;
     }
+
     .highlight {
         color: #007bff;
         font-weight: bold;
@@ -106,9 +122,11 @@
         .hero h1 {
             font-size: 2.2rem;
         }
+
         .hero p {
             font-size: 1rem;
         }
+
         .content-container {
             padding: 20px;
         }
@@ -117,17 +135,19 @@
     /* Signature Styling */
     .signature {
         display: block;
-        width: 150px; /* Adjust as needed */
-        margin-top: 20px; /* Space from the last paragraph */
+        width: 150px;
+        /* Adjust as needed */
+        margin-top: 20px;
+        /* Space from the last paragraph */
     }
 
     .signature-wrapper {
         display: flex;
-        justify-content: flex-start; /* Aligns to the left */
-        margin-top: 30px; /* Adjust spacing */
+        justify-content: flex-start;
+        /* Aligns to the left */
+        margin-top: 30px;
+        /* Adjust spacing */
     }
-
-
 </style>
 
 <!-- Hero Section -->
@@ -144,25 +164,33 @@
 <div class="content-container">
     <h2>{{ _("The Inspiration Behind This Project") }}</h2>
     <p>
-        {{ _("This project was born from a light-hearted moment during a <span class='highlight'>Craw/LaSage homegroup</span> meeting.") | safe }}
+        {{ _("This project was born from a light-hearted moment during a <span class='highlight'>Craw/LaSage
+            homegroup</span> meeting.") | safe }}
     </p>
     <p>
-        {{ _("During the meeting, we were discussing how difficult it can be to find something specific in our old sermon notes. That’s when it hit me—how incredible would it be if we could quickly search for a sermon based on our own notes or key takeaways?") }}
+        {{ _("During the meeting, we were discussing how difficult it can be to find something specific in our old
+        sermon notes. That’s when it hit me—how incredible would it be if we could quickly search for a sermon based on
+        our own notes or key takeaways?") }}
         {{ _("What started as a passing thought turned into a mission.") }}
     </p>
 
     <blockquote class="quote">
-        {{ _("These sermons hold spiritual wisdom—guidance, truth, and encouragement that can uplift and transform lives. It's been incredibly fulfilling to help make them even more accessible to everyone.") }}
+        {{ _("These sermons hold spiritual wisdom—guidance, truth, and encouragement that can uplift and transform
+        lives. It's been incredibly fulfilling to help make them even more accessible to everyone.") }}
     </blockquote>
 
     <p>
-        {{ _("Leveraging my experience in technology, I developed a solution—<span class='highlight'>Sermon Search</span>—where past sermons are automatically transcribed, indexed, and even translated.") | safe }}
+        {{ _("Leveraging my experience in technology, I developed a solution—<span class='highlight'>Sermon
+            Search</span>—where past sermons are automatically transcribed, indexed, and even translated.") | safe }}
     </p>
     <p>
-        {{ _("Whether you're revisiting a past message, searching for biblical references, or exploring specific topics, you can now do so in the language that feels most familiar to you.") }}
+        {{ _("Whether you're revisiting a past message, searching for biblical references, or exploring specific topics,
+        you can now do so in the language that feels most familiar to you.") }}
     </p>
     <p>
-        {{ _("This wouldn’t be possible without the dedication and hard work of those who have faithfully prepared and delivered these sermons—ensuring that God’s message is shared with clarity, truth, and love. Enjoy exploring, it's my prayer that this resource be a blessing to you.") }}
+        {{ _("This wouldn’t be possible without the dedication and hard work of those who have faithfully prepared and
+        delivered these sermons—ensuring that God’s message is shared with clarity, truth, and love. Enjoy exploring,
+        it's my prayer that this resource be a blessing to you.") }}
     </p>
 
     <!-- Signature Image -->

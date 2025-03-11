@@ -10,9 +10,11 @@
     width: 100vw;
     height: 100vh;
     display: flex;
-    align-items: flex-start; /* Moves box toward the top */
+    align-items: flex-start;
+    /* Moves box toward the top */
     justify-content: center;
-    padding-top: 10vh; /* Moves search box down a bit */
+    padding-top: 10vh;
+    /* Moves search box down a bit */
   }
 
   /* Centered White Search Box */
@@ -21,10 +23,11 @@
     padding: 40px;
     background-color: #fff;
     border-radius: 12px;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
     transition: transform 0.3s ease;
     text-align: center;
   }
+
   .search-container:hover {
     transform: translateY(-3px);
   }
@@ -39,10 +42,12 @@
     align-items: center;
     gap: 10px;
   }
+
   .search-container h1::before {
     content: "🔍";
     font-size: 2rem;
   }
+
   .search-container p {
     font-size: 1.1rem;
     color: #666;
@@ -58,10 +63,11 @@
     border-radius: 8px;
     transition: border-color 0.3s ease, box-shadow 0.3s ease;
   }
+
   .search-box:focus {
     border-color: #007bff;
     outline: none;
-    box-shadow: 0 0 10px rgba(0,123,255,0.3);
+    box-shadow: 0 0 10px rgba(0, 123, 255, 0.3);
   }
 
   /* Search Button */
@@ -76,11 +82,13 @@
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
   }
+
   .search-button:hover {
     background-color: #0056b3;
     transform: translateY(-3px);
-    box-shadow: 0 5px 12px rgba(0,0,0,0.15);
+    box-shadow: 0 5px 12px rgba(0, 0, 0, 0.15);
   }
+
   .search-button:disabled {
     background-color: #ccc;
     cursor: not-allowed;
@@ -103,10 +111,11 @@
     gap: 10px;
     justify-content: center;
   }
+
   .filter-box {
     display: inline-block;
     padding: 8px 14px;
-    background: rgba(0,123,255,0.15);
+    background: rgba(0, 123, 255, 0.15);
     border-radius: 20px;
     font-size: 1rem;
     color: #007bff;
@@ -115,11 +124,13 @@
     transition: background-color 0.3s ease, transform 0.2s ease;
     cursor: pointer;
   }
+
   .filter-box:hover {
     background-color: #007bff;
     color: #fff;
     transform: scale(1.05);
   }
+
   .filter-box.active {
     background-color: #007bff;
     color: white;
@@ -139,6 +150,7 @@
       padding: 30px;
       max-width: 90%;
     }
+
     .search-container h1 {
       font-size: 2rem;
     }
@@ -153,14 +165,16 @@
     <h1>{{ _("Search Sermons") }}</h1>
     <p>{{ _("Find past sermons by keyword or topic.") }}</p>
     <form action="{{ url_for('search') }}" method="get" id="search-form">
-      
-      <input type="text" id="search-input" name="q" class="search-box" placeholder="{{ _('Enter a search term or phrase...') }}" required minlength="3" value="{{ query_val }}">
+
+      <input type="text" id="search-input" name="q" class="search-box"
+        placeholder="{{ _('Enter a search term or phrase...') }}" required minlength="3" value="{{ query_val }}">
       <div id="tooltip" class="tooltip">{{ _("Enter a search term or phrase...") }}</div>
 
       <div class="filter-title">{{ _("Category Filters (optional)") }}</div>
       <div class="filter-group" id="filter-group">
         {% for cat in all_categories %}
-          <a href="javascript:void(0)" class="filter-box {% if cat in selected_categories %}active{% endif %}" data-filter="{{ cat }}">{{ cat }}</a>
+        <a href="javascript:void(0)" class="filter-box {% if cat in selected_categories %}active{% endif %}"
+          data-filter="{{ cat }}">{{ cat }}</a>
         {% endfor %}
       </div>
 
@@ -192,8 +206,8 @@
   });
 
   // Handle category filters
-  document.querySelectorAll('.filter-box').forEach(function(el) {
-    el.addEventListener('click', function() {
+  document.querySelectorAll('.filter-box').forEach(function (el) {
+    el.addEventListener('click', function () {
       el.classList.toggle('active');
       updateHiddenFilters();
     });
@@ -202,7 +216,7 @@
   function updateHiddenFilters() {
     const container = document.getElementById('hidden-filters');
     container.innerHTML = '';
-    document.querySelectorAll('.filter-box.active').forEach(function(el) {
+    document.querySelectorAll('.filter-box.active').forEach(function (el) {
       const input = document.createElement('input');
       input.type = 'hidden';
       input.name = 'categories';
@@ -212,7 +226,7 @@
   }
 
   // Prevent form submission if only filters are selected but no search term
-  document.getElementById('search-form').addEventListener('submit', function(event) {
+  document.getElementById('search-form').addEventListener('submit', function (event) {
     if (searchInput.value.trim().length < 3) {
       tooltip.style.display = 'block';
       event.preventDefault();

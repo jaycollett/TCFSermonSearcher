@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="{{ language }}">
+
 <head>
     <meta charset="UTF-8">
     <title>{{ _("TCF - Sermon Search") }}</title>
@@ -16,14 +17,17 @@
             display: flex;
             flex-direction: column;
         }
+
         .container {
             max-width: 1200px;
             margin-top: 20px;
         }
+
         .content-wrapper {
             flex: 1;
             padding: 30px;
         }
+
         .footer {
             background-color: #343a40;
             color: white;
@@ -39,6 +43,7 @@
             padding: 15px 25px;
             border-radius: 0 0 10px 10px;
         }
+
         .navbar-brand {
             font-family: 'Merriweather', serif;
             font-size: 1.8rem;
@@ -46,15 +51,18 @@
             color: #222;
             transition: color 0.3s ease;
         }
+
         .navbar-brand:hover {
             color: #007bff;
         }
+
         .navbar-nav .nav-link {
             color: #333 !important;
             font-size: 1.1rem;
             padding: 8px 15px;
             transition: color 0.3s ease, transform 0.2s ease;
         }
+
         .navbar-nav .nav-link:hover {
             color: #007bff;
             transform: translateY(-2px);
@@ -70,19 +78,23 @@
             padding: 8px 15px;
             transition: color 0.3s ease, transform 0.2s ease;
         }
+
         .dropdown-toggle:hover {
             color: #007bff;
             transform: translateY(-2px);
         }
+
         .dropdown-menu {
             border-radius: 6px;
             box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
         }
+
         .dropdown-item {
             font-size: 1rem;
             padding: 8px 12px;
             transition: background-color 0.2s ease;
         }
+
         .dropdown-item:hover {
             background-color: #f0f0f0;
         }
@@ -93,29 +105,39 @@
             color: white;
             padding: 15px;
             font-size: 0.9rem;
-            text-align: center; /* Centers the primary text */
-            position: relative; /* Enables absolute positioning for the stats link */
+            text-align: center;
+            /* Centers the primary text */
+            position: relative;
+            /* Enables absolute positioning for the stats link */
         }
+
         .footer-container {
             position: relative;
         }
+
         .footer-text {
-            display: inline-block; /* Keeps the text block-level for proper centering */
+            display: inline-block;
+            /* Keeps the text block-level for proper centering */
         }
+
         .stats-link {
             position: absolute;
             right: 15px;
             top: 50%;
-            transform: translateY(-50%); /* Vertically centers the link */
-            font-size: 0.75rem; /* Smaller font than the footer text */
+            transform: translateY(-50%);
+            /* Vertically centers the link */
+            font-size: 0.75rem;
+            /* Smaller font than the footer text */
             color: white;
             text-decoration: none;
         }
+
         .stats-link:hover {
             text-decoration: underline;
         }
-   </style>
+    </style>
 </head>
+
 <body>
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-light fixed-top">
@@ -134,24 +156,29 @@
                     </li>
                     <!-- Language Dropdown -->
                     <li class="nav-item dropdown">
-                        <button class="btn dropdown-toggle" type="button" id="languageDropdown" data-bs-toggle="dropdown">
+                        <button class="btn dropdown-toggle" type="button" id="languageDropdown"
+                            data-bs-toggle="dropdown">
                             {% if language == "es" %}
-                                {{ _("Spanish") }}
+                            {{ _("Spanish") }}
                             {% else %}
-                                {{ _("English") }} <!-- Defaults to English -->
+                            {{ _("English") }} <!-- Defaults to English -->
                             {% endif %}
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="languageDropdown">
                             <li>
                                 <form action="{{ url_for('set_language') }}" method="post" id="languageForm-en">
                                     <input type="hidden" name="language" value="en">
-                                    <button type="submit" class="dropdown-item {% if language == 'en' %}active{% endif %}">{{ _("English") }}</button>
+                                    <button type="submit"
+                                        class="dropdown-item {% if language == 'en' %}active{% endif %}">{{ _("English")
+                                        }}</button>
                                 </form>
                             </li>
                             <li>
                                 <form action="{{ url_for('set_language') }}" method="post" id="languageForm-es">
                                     <input type="hidden" name="language" value="es">
-                                    <button type="submit" class="dropdown-item {% if language == 'es' %}active{% endif %}">{{ _("Spanish") }}</button>
+                                    <button type="submit"
+                                        class="dropdown-item {% if language == 'es' %}active{% endif %}">{{ _("Spanish")
+                                        }}</button>
                                 </form>
                             </li>
                         </ul>
@@ -167,12 +194,13 @@
     <!-- Footer -->
     <footer class="footer">
         <div class="footer-container">
-        <span class="footer-text">
-            {{ _("📖 Sermon Search | Written by: Jay Collett | Version: 0.2.11 | Date: March 6, 2025") }}
-        </span>
-        <a href="{{ url_for('stats') }}" class="stats-link">{{ _("Stats for nerds") }}</a>
+            <span class="footer-text">
+                {{ _("📖 Sermon Search | Written by: Jay Collett | Version: 0.2.12 | Date: March 6, 2025") }}
+            </span>
+            <a href="{{ url_for('stats') }}" class="stats-link">{{ _("Stats for nerds") }}</a>
         </div>
     </footer>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

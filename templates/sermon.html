@@ -17,7 +17,8 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 15px; /* Increased space below the header */
+        margin-bottom: 15px;
+        /* Increased space below the header */
     }
 
     .sticky-audio h3 {
@@ -38,18 +39,22 @@
         text-align: left;
         margin-top: 6px;
     }
+
     .back-button {
         background: #6c757d;
         color: white;
         font-weight: bold;
         border: none;
-        padding: 6px 10px;  /* Reduced padding for a smaller button */
+        padding: 6px 10px;
+        /* Reduced padding for a smaller button */
         border-radius: 6px;
         transition: background 0.3s, transform 0.2s, box-shadow 0.3s ease;
         display: inline-block;
         text-decoration: none;
-        font-size: 0.7rem;  /* Smaller font size */
+        font-size: 0.7rem;
+        /* Smaller font size */
     }
+
     .back-button:hover {
         background: #5a6268;
         transform: scale(1.05);
@@ -69,17 +74,19 @@
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         transition: box-shadow 0.3s ease, transform 0.2s ease;
     }
+
     .sermon-text:hover {
         box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
         transform: translateY(-5px);
     }
+
     .sermon-text p {
         margin-bottom: 25px;
     }
 
     /* 🔹 Search Term Highlighting */
     .highlight {
-        background-color: rgba(0,123,255,0.15);
+        background-color: rgba(0, 123, 255, 0.15);
         color: #007bff;
         font-weight: bold;
         padding: 2px 4px;
@@ -88,14 +95,17 @@
 
     /* 🔹 Refined Elegant Pull Quote Styling */
     .pull-quote {
-        font-size: 1.1rem; /* Slightly smaller font */
+        font-size: 1.1rem;
+        /* Slightly smaller font */
         font-weight: bold;
         font-style: italic;
         color: #333;
         padding: 12px 18px;
         margin: 18px 28px;
-        background: #fdf8e5; /* Soft parchment-style background */
-        border-left: 4px solid rgba(139, 69, 19, 0.6); /* Warm brown accent */
+        background: #fdf8e5;
+        /* Soft parchment-style background */
+        border-left: 4px solid rgba(139, 69, 19, 0.6);
+        /* Warm brown accent */
         box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
         display: inline-block;
         max-width: 48%;
@@ -117,12 +127,9 @@
     /* Soft glow effect on hover */
     .pull-quote:hover {
         box-shadow: 3px 3px 12px rgba(0, 0, 0, 0.15);
-        background: #fcf2d6; /* Slightly richer parchment color */
+        background: #fcf2d6;
+        /* Slightly richer parchment color */
     }
-
-
-
-
 </style>
 
 <!-- Back to Search is now inside the sticky audio area -->
@@ -130,19 +137,20 @@
     <div class="header-container">
         <h3 class="mb-0">{{ sermon['sermon_title'] }}</h3>
         {% if sermon['categories'] %}
-            <span class="category-text">{{ sermon['categories'] }}</span>
+        <span class="category-text">{{ sermon['categories'] }}</span>
         {% endif %}
     </div>
     {% if sermon['audiofilename'] %}
-        <audio controls style="width: 100%;">
-            <source src="{{ url_for('audiofiles', filename=sermon['audiofilename']) }}" type="audio/mpeg">
-            {{ _("Your browser does not support the audio element.") }}
-        </audio>
+    <audio controls style="width: 100%;">
+        <source src="{{ url_for('audiofiles', filename=sermon['audiofilename']) }}" type="audio/mpeg">
+        {{ _("Your browser does not support the audio element.") }}
+    </audio>
     {% else %}
-        <p>{{ _("Audio not available.") }}</p>
+    <p>{{ _("Audio not available.") }}</p>
     {% endif %}
     <div class="back-container">
-        <a href="{{ url_for('search', q=request.args.get('q', ''), categories=request.args.getlist('categories'), page=request.args.getlist('page')) }}" class="back-button">
+        <a href="{{ url_for('search', q=request.args.get('q', ''), categories=request.args.getlist('categories'), page=request.args.getlist('page')) }}"
+            class="back-button">
             ⬅ {{ _("Back to Search Results") }}
         </a>
     </div>
@@ -155,7 +163,7 @@
 {% if ai_content %}
 <div class="ai-content-container">
     <div id="toggle-insights" class="ai-header">
-        <span class="toggle-icon">➕</span> 
+        <span class="toggle-icon">➕</span>
         {{ _("AI-Generated Sermon Insights") }}
     </div>
 
@@ -212,7 +220,8 @@
 <style>
     /* AI Content Section Styling */
     .ai-content-container {
-        max-width: 1200px; /* Matches sermon text width */
+        max-width: 1200px;
+        /* Matches sermon text width */
         margin: 30px auto;
         padding: 15px;
         background: #ffffff;
@@ -310,8 +319,8 @@
 
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        document.querySelectorAll('audio').forEach(function(player) {
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('audio').forEach(function (player) {
             player.volume = 0.5; // Set audio volume to 50%
         });
     });
