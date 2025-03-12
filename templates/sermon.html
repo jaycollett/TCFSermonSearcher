@@ -4,7 +4,7 @@
     /* 🔹 Sticky audio player */
     .sticky-audio {
         position: sticky;
-        top: 90px;
+        top: 105px;
         background: white;
         padding: 20px;
         z-index: 1000;
@@ -67,7 +67,8 @@
         line-height: 1.8;
         color: #444;
         max-width: 1200px;
-        margin: 30px auto;
+        margin: 40px auto;
+        margin-top: 65px !important;
         padding: 20px;
         background-color: #ffffff;
         border-radius: 10px;
@@ -81,7 +82,7 @@
     }
 
     .sermon-text p {
-        margin-bottom: 25px;
+        margin-bottom: 20px;
     }
 
     /* 🔹 Search Term Highlighting */
@@ -95,40 +96,19 @@
 
     /* 🔹 Refined Elegant Pull Quote Styling */
     .pull-quote {
-        font-size: 1.1rem;
-        /* Slightly smaller font */
-        font-weight: bold;
+        display: inline;
         font-style: italic;
-        color: #333;
-        padding: 12px 18px;
-        margin: 18px 28px;
-        background: #fdf8e5;
-        /* Soft parchment-style background */
-        border-left: 4px solid rgba(139, 69, 19, 0.6);
-        /* Warm brown accent */
-        box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
-        display: inline-block;
-        max-width: 48%;
-        text-align: center;
-        float: right;
-        clear: right;
-        line-height: 1.5;
-        border-radius: 6px;
-    }
-
-    /* Alternate pull quotes for balanced layout */
-    .pull-quote:nth-of-type(odd) {
-        float: left;
-        border-left: none;
-        border-right: 4px solid rgba(139, 69, 19, 0.6);
-        clear: left;
-    }
-
-    /* Soft glow effect on hover */
-    .pull-quote:hover {
-        box-shadow: 3px 3px 12px rgba(0, 0, 0, 0.15);
-        background: #fcf2d6;
-        /* Slightly richer parchment color */
+        font-weight: bold;
+        color: inherit; /* Match surrounding text color */
+        background: none;
+        border: none;
+        padding: 0;
+        margin: 0;
+        /* Subtle underline */
+        text-decoration: underline;
+        text-decoration-color: #ccc;     /* Light gray color for underline */
+        text-decoration-thickness: 1px;  /* Thin line */
+        text-underline-offset: 2px;      /* Slight gap between text and underline */
     }
 </style>
 

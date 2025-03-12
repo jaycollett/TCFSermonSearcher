@@ -604,17 +604,19 @@ def sermon_detail(sermon_guid):
 
     # Insert AI-generated pull quotes into the paragraphs where they appear
     if ai_content and ai_content["key_quotes"]:
-        ai_quotes = ai_content["key_quotes"].split(" | ")  # Split quotes into a list
-        paragraphs = highlighted_transcript.split("</p>")  # Split sermon into paragraphs
+        ai_quotes = ai_content["key_quotes"].split(" | ")
+        paragraphs = highlighted_transcript.split("</p>")
 
         for quote in ai_quotes:
+            # Remove any leading/trailing whitespace and quotes
+            clean_quote = quote.strip().strip('"')
             for i, paragraph in enumerate(paragraphs):
-                if quote.strip() in paragraph:  # Check if the paragraph contains the quote
-                    quote_html = f'<div class="pull-quote">{quote.strip()}</div>'
-                    paragraphs[i] = paragraph.replace(quote.strip(), quote_html)  # Replace quote with styled version
+                if clean_quote in paragraph:
+                    quote_html = f'<div class="pull-quote">{clean_quote}</div>'
+                    paragraphs[i] = paragraph.replace(clean_quote, quote_html)
                     break  # Only insert once per quote
+        highlighted_transcript = "</p>".join(paragraphs)
 
-        highlighted_transcript = "</p>".join(paragraphs)  # Rebuild transcript with injected quotes
 
     return render_template(
         "sermon.html",

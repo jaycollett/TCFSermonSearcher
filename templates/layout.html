@@ -41,7 +41,7 @@
             background-color: #f8f9fa;
             display: flex !important;
             align-items: center !important;
-            /* No fixed height */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15); /* Adds a subtle drop shadow */
         }
 
         .navbar-brand {
@@ -202,7 +202,7 @@
     <footer class="footer">
         <div class="footer-container">
             <span class="footer-text">
-                {{ _("📖 Sermon Search | Written by: Jay Collett | Version: 0.2.14 | Date: March 6, 2025") }}
+                {{ _("📖 Sermon Search | Written by: Jay Collett | Version: 0.2.15 | Date: March 6, 2025") }}
             </span>
             <a href="{{ url_for('stats') }}" class="stats-link">{{ _("Stats for nerds") }}</a>
         </div>
