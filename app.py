@@ -422,6 +422,7 @@ def sitemap():
                 """, 200, {'Content-Type': 'application/xml'}
 
 
+@app.route('/Robots.txt')
 @app.route('/robots.txt')
 def robots():
     return """User-agent: *
