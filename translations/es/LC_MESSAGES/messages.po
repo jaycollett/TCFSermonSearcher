@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-03-14 14:45-0400\n"
+"POT-Creation-Date: 2025-03-14 15:38-0400\n"
 "PO-Revision-Date: 2025-03-08 17:45-0500\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: es\n"
@@ -22,11 +22,11 @@ msgstr ""
 msgid "Welcome to Sermon Search!"
 msgstr "¡Bienvenido a la Búsqueda de Sermones!"
 
-#: routes.py:266 sermon_search/routes.py:164
+#: routes.py:266 sermon_search/routes.py:178
 msgid "An error occurred while processing your search. Please try again."
 msgstr "Ocurrió un error al procesar su búsqueda. Por favor, inténtelo de nuevo."
 
-#: routes.py:297 sermon_search/routes.py:198
+#: routes.py:297 sermon_search/routes.py:212
 msgid "Sermon not found"
 msgstr "Sermón no encontrado"
 
@@ -125,31 +125,32 @@ msgstr ""
 msgid "Sermon Search"
 msgstr "Búsqueda de Sermones"
 
-#: templates/layout.html:202
+#: templates/layout.html:205
 msgid "Search"
 msgstr "Buscar"
 
-#: templates/layout.html:205
+#: templates/layout.html:208
 msgid "Sermon Index"
 msgstr "Índice de Sermones"
 
-#: templates/layout.html:211 templates/layout.html:228
+#: templates/layout.html:214 templates/layout.html:231
 msgid "Spanish"
 msgstr "Español"
 
-#: templates/layout.html:213 templates/layout.html:221
+#: templates/layout.html:216 templates/layout.html:224
 msgid "English"
 msgstr "Inglés"
 
-#: templates/layout.html:246
+#: templates/layout.html:249
+#, fuzzy
 msgid ""
-"📖 Sermon Search | Written by: Jay Collett | Version: 0.3.0 | Date: March "
-"6, 2025"
+"📖 Sermon Search | Written by: Jay Collett | Version: 0.3.56 | Date: March"
+" 14, 2025"
 msgstr ""
 "📖 Búsqueda de Sermones | Escrito por: Jay Collett | Versión: 0.3.0 | "
 "Fecha: 6 de marzo de 2025"
 
-#: templates/layout.html:248 templates/stats.html:50
+#: templates/layout.html:251 templates/stats.html:50
 msgid "Stats for nerds"
 msgstr "Estadísticas para nerds"
 
