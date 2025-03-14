@@ -17,15 +17,32 @@ def get_locale():
     return request.cookies.get('language', 'en')
 
 def create_app(config_name=None):
+    """
+    Create and configure a Flask application instance.
+    
+    Args:
+        config_name: Configuration to use ('development', 'testing', 'production') 
+                    If None, uses FLASK_ENV environment variable
+    
+    Returns:
+        Configured Flask application
+    """
     if config_name is None:
         config_name = os.getenv('FLASK_ENV', 'development')
 
     app = Flask(__name__)
     Config = get_config(config_name)
+    
+    # Initialize directories if needed (only if not in testing mode)
+    if hasattr(Config, 'init_directories') and not config_name == 'testing':
+        Config.init_directories()
+        
     app.config.from_object(Config)
 
     # Initialize Babel with a locale selector.
     babel = Babel(app, locale_selector=get_locale)
+    babel.locale_selector_func = get_locale  # Explicitly attach get_local
+    app.babel = babel
 
     # Initialize the database (and other extensions) within the app context.
     with app.app_context():

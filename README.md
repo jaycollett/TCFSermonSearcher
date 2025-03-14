@@ -43,3 +43,23 @@ The recommended way to run TCFSermonSearcher is via Docker. Follow these steps:
 6. **Access the Application**
 
    - Open your browser and go to: `http://localhost:5000`
+
+## Development
+
+### Testing
+
+Tests are written using pytest. To run the tests:
+
+1. **Install the required packages:**
+
+   ```sh
+   pip install -r requirements.txt
+   ```
+
+2. **Run the tests:**
+
+   ```sh
+   pytest -xvs test_app.py
+   ```
+
+This will run the tests for the Flask application, checking configuration, template filters, and more.

@@ -35,6 +35,10 @@ RUN pybabel compile -d translations
 EXPOSE 5000
 
 ENV SERMON_API_TOKEN="54cb3aed-c710-1bd2-9d6b-a1aef5757ee1"
+ENV FLASK_ENV production
+
+# Run tests. If any test fails, the build will stop.
+RUN pytest --maxfail=1 --disable-warnings
 
 # Set the default command to run your Flask app
 #CMD ["python3", "app.py"]
