@@ -164,7 +164,7 @@
   <div class="search-container">
     <h1>{{ _("Search Sermons") }}</h1>
     <p>{{ _("Find past sermons by keyword or topic.") }}</p>
-    <form action="{{ url_for('search') }}" method="get" id="search-form">
+    <form action="{{ url_for('main.search') }}" method="get" id="search-form">
 
       <input type="text" id="search-input" name="q" class="search-box"
         placeholder="{{ _('Enter a search term or phrase...') }}" required minlength="3" value="{{ query_val }}">

@@ -122,14 +122,14 @@
     </div>
     {% if sermon['audiofilename'] %}
     <audio controls style="width: 100%;">
-        <source src="{{ url_for('audiofiles', filename=sermon['audiofilename']) }}" type="audio/mpeg">
+        <source src="{{ url_for('main.audiofiles', filename=sermon['audiofilename']) }}" type="audio/mpeg">
         {{ _("Your browser does not support the audio element.") }}
     </audio>
     {% else %}
     <p>{{ _("Audio not available.") }}</p>
     {% endif %}
     <div class="back-container">
-        <a href="{{ url_for('search', q=request.args.get('q', ''), categories=request.args.getlist('categories'), page=request.args.getlist('page')) }}"
+        <a href="{{ url_for('main.search', q=request.args.get('q', ''), categories=request.args.getlist('categories'), page=request.args.getlist('page')) }}"
             class="back-button">
             ⬅ {{ _("Back to Search Results") }}
         </a>

@@ -1,0 +1,6 @@
+Flask
+Flask-Babel
+WordCloud
+nltk
+matplotlib
+gunicorn

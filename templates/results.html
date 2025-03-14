@@ -208,7 +208,7 @@
 
     <!-- Sticky Header with Filters and Back Button -->
     <div class="sticky-header" id="sticky-header">
-      <form action="{{ url_for('search') }}" method="get" id="results-form">
+      <form action="{{ url_for('main.search') }}" method="get" id="results-form">
         <input type="hidden" name="q" value="{{ query_val }}">
         <div class="filter-title">{{ _("Category Filters") }}</div>
         <div class="filter-group" id="results-filter-group">
@@ -221,7 +221,7 @@
           style="margin-top: 15px; display: flex; justify-content: space-between; align-items: center;">
           <h4 style="margin: 0;">{{ total_count }} Search Results for "<span class="text-primary">{{ query_val
               }}</span>"</h4>
-          <a href="{{ url_for('search') }}" class="back-link"
+          <a href="{{ url_for('main.search') }}" class="back-link"
             style="font-size: 0.9rem; text-decoration: none; color: #007bff;">{{ _("Back to Search") }}</a>
         </div>
       </form>
@@ -233,10 +233,10 @@
       <div class="mt-4">
         {% for row in results %}
         <div class="card"
-          data-href="{{ url_for('sermon_detail', sermon_guid=row['sermon_guid'], q=query_val, categories=selected_categories, page=page) }}">
+          data-href="{{ url_for('main.sermon_detail', sermon_guid=row['sermon_guid'], q=query_val, categories=selected_categories, page=page) }}">
           <div class="card-body">
             <h5 class="card-title">
-              <a href="{{ url_for('sermon_detail', sermon_guid=row['sermon_guid'], q=query_val, categories=selected_categories, page=page) }}"
+              <a href="{{ url_for('main.sermon_detail', sermon_guid=row['sermon_guid'], q=query_val, categories=selected_categories, page=page) }}"
                 onclick="event.stopPropagation();">
                 {{ row['sermon_title'] }}
               </a>
@@ -278,7 +278,7 @@
             {% if page > 1 %}
             <li class="page-item">
               <a class="page-link"
-                href="{{ url_for('search', q=query_val, page=page-1, categories=selected_categories) }}">Previous</a>
+                href="{{ url_for('main.search', q=query_val, page=page-1, categories=selected_categories) }}">Previous</a>
             </li>
             {% else %}
             <li class="page-item disabled">
@@ -290,7 +290,7 @@
             {% if start_page > 1 %}
             <li class="page-item {% if page == 1 %}active{% endif %}">
               <a class="page-link"
-                href="{{ url_for('search', q=query_val, page=1, categories=selected_categories) }}">1</a>
+                href="{{ url_for('main.search', q=query_val, page=1, categories=selected_categories) }}">1</a>
             </li>
             {% endif %}
 
@@ -305,7 +305,7 @@
             {% for p in range(start_page, end_page + 1) %}
             <li class="page-item {% if p == page %}active{% endif %}">
               <a class="page-link"
-                href="{{ url_for('search', q=query_val, page=p, categories=selected_categories) }}">{{ p }}</a>
+                href="{{ url_for('main.search', q=query_val, page=p, categories=selected_categories) }}">{{ p }}</a>
             </li>
             {% endfor %}
 
@@ -318,7 +318,7 @@
               <!-- Link to Last Page if needed -->
               {% if end_page < total_pages %} <li class="page-item {% if page == total_pages %}active{% endif %}">
                 <a class="page-link"
-                  href="{{ url_for('search', q=query_val, page=total_pages, categories=selected_categories) }}">{{
+                  href="{{ url_for('main.search', q=query_val, page=total_pages, categories=selected_categories) }}">{{
                   total_pages }}</a>
                 </li>
                 {% endif %}
@@ -326,7 +326,7 @@
                 <!-- Next Button -->
                 {% if page < total_pages %} <li class="page-item">
                   <a class="page-link"
-                    href="{{ url_for('search', q=query_val, page=page+1, categories=selected_categories) }}">Next</a>
+                    href="{{ url_for('main.search', q=query_val, page=page+1, categories=selected_categories) }}">Next</a>
                   </li>
                   {% else %}
                   <li class="page-item disabled">
