@@ -1,87 +1,19 @@
+"""
+Main entry point for the TCF Sermon Searcher application.
+
+This module provides WSGI compatibility for the Flask application.
+For running the application directly, use run.py instead.
+"""
+
 import os
-import logging
-import sqlite3
-import json
-import datetime
-import nltk
-import math
-nltk.download('stopwords', quiet=True)  # Consider checking if already downloaded
-from nltk.corpus import stopwords
-from flask import Flask, g, request
-from flask_babel import Babel, gettext as _
-from config import get_config
-from models import init_db  # Database initialization function
+import sys
 
-def get_locale():
-    """Return the user's locale based on a cookie (default 'en')."""
-    return request.cookies.get('language', 'en')
+# Add the project root to the Python path
+sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
-def create_app(config_name=None):
-    """
-    Create and configure a Flask application instance.
-    
-    Args:
-        config_name: Configuration to use ('development', 'testing', 'production') 
-                    If None, uses FLASK_ENV environment variable
-    
-    Returns:
-        Configured Flask application
-    """
-    if config_name is None:
-        config_name = os.getenv('FLASK_ENV', 'development')
+# Create the Flask application
+from sermon_search.app_factory import create_app
+app = create_app(os.getenv('FLASK_ENV', 'development'))
 
-    app = Flask(__name__)
-    Config = get_config(config_name)
-    
-    # Initialize directories if needed (only if not in testing mode)
-    if hasattr(Config, 'init_directories') and not config_name == 'testing':
-        Config.init_directories()
-        
-    app.config.from_object(Config)
-
-    # Initialize Babel with a locale selector.
-    babel = Babel(app, locale_selector=get_locale)
-    babel.locale_selector_func = get_locale  # Explicitly attach get_local
-    app.babel = babel
-
-    # Initialize the database (and other extensions) within the app context.
-    with app.app_context():
-        init_db()
-
-    # Register the blueprint from routes.py.
-    from routes import bp as main_bp
-    app.register_blueprint(main_bp)
-
-    # Teardown: close the database connection after each request.
-    @app.teardown_appcontext
-    def close_connection(exception):
-        db = getattr(g, '_database', None)
-        if db is not None:
-            db.close()
-
-    # Template filter: truncate text.
-    @app.template_filter('truncate_text')
-    def truncate_text_filter(s, max_length=165):
-        if not s:
-            return ''
-        if len(s) <= max_length:
-            return s
-        cutoff = s[:max_length]
-        last_space = cutoff.rfind(' ')
-        if last_space != -1:
-            return cutoff[:last_space] + '...'
-        else:
-            return cutoff + '...'
-
-    # Context processor: inject the language into templates.
-    @app.context_processor
-    def inject_language():
-        language = request.cookies.get('language', 'en')
-        return dict(language=language)
-
-    return app
-
-if __name__ == "__main__":
-    app = create_app()
-    # For production, consider using a WSGI server like gunicorn instead of app.run().
-    app.run(host="0.0.0.0", port=5000, debug=True)
+# This file is used by gunicorn in production:
+# gunicorn --bind 0.0.0.0:5000 app:app
