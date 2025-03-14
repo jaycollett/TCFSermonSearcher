@@ -81,9 +81,12 @@ def create_app(config_name=None):
     with app.app_context():
         init_db()
 
-    # Register the blueprint from routes
+    # Register blueprints
     from sermon_search.routes import bp as main_bp
-    app.register_blueprint(main_bp)
+    from sermon_search.api import bp as api_bp
+    
+    app.register_blueprint(main_bp)  # Main UI routes
+    app.register_blueprint(api_bp)   # API routes
 
     # Teardown: close the database connection after each request
     @app.teardown_appcontext

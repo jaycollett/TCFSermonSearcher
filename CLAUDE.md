@@ -69,17 +69,32 @@ pybabel compile -d translations
 ├── sermon_search/          # Main package
 │   ├── __init__.py         # Package initialization
 │   ├── app_factory.py      # Flask app factory
-│   ├── routes.py           # Route handlers
+│   ├── routes.py           # UI route handlers
 │   ├── api/                # API endpoints
+│   │   ├── __init__.py     # API blueprint definition
+│   │   └── routes.py       # API route handlers
 │   ├── database/           # Database models and operations
+│   │   ├── __init__.py     # Database package exports
+│   │   └── models.py       # Database models and functions
 │   └── utils/              # Utility functions
+│       ├── __init__.py     # Utility package exports
+│       ├── security.py     # Security-related utilities
+│       ├── sermons.py      # Sermon-related utilities
+│       └── text.py         # Text processing utilities
 ├── templates/              # HTML templates
 ├── static/                 # Static files (CSS, JS, images)
+│   ├── css/                # CSS files including Bootstrap
+│   ├── js/                 # JavaScript files including Bootstrap
+│   └── images/             # Image assets
 ├── translations/           # Internationalization files
 ├── data/                   # Database and media files
+│   └── audiofiles/         # Sermon audio recordings
 ├── tests/                  # Test suite
 ├── app.py                  # Application entry point
+├── run.py                  # Development server script
 ├── config/                 # Configuration settings
+├── download_bootstrap.py   # Script to download Bootstrap locally
+├── update_translations.py  # Script to update translations
 ├── requirements.txt        # Python dependencies
 └── .env                    # Environment variables
 ```
@@ -118,6 +133,38 @@ pybabel compile -d translations
 
 ### ip_bans
 - Security table for tracking API abuse
+
+## API Endpoints
+
+The application provides the following API endpoints:
+
+### GET /api/sermons
+- Returns a list of available sermons
+- Takes optional `page` parameter for pagination
+- Returns JSON array of sermon objects
+
+### POST /api/upload_sermon
+- Uploads a new sermon with audio file
+- Requires authentication via `X-API-Token` header
+- Form parameters:
+  - SermonGUID: Unique identifier
+  - SermonTitle: Title of the sermon
+  - Transcription: Full text transcription
+  - Language: Language code (en, es)
+  - Categories: Comma-separated list of categories
+  - Church: Church identifier
+  - TranscriptionTimings: Optional timing data
+  - audiofile: MP3 file upload
+
+### POST /api/ai_sermon_content
+- Uploads AI-generated content for a sermon
+- Requires authentication via `X-API-Token` header
+- JSON payload with sermon_guid and AI content fields
+
+### POST /api/update_stats
+- Updates statistics about the sermon database
+- Requires authentication via `X-API-Token` header
+- Generates visualizations and calculates word counts
 
 ## Frontend Assets
 
