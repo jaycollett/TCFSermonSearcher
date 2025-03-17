@@ -23,6 +23,7 @@ def get_db() -> sqlite3.Connection:
         db_path = current_app.config.get('DATABASE')
         db = g._database = sqlite3.connect(db_path)
         db.row_factory = sqlite3.Row
+        db.execute("PRAGMA cache_size = 4000")
     return db
 
 
@@ -116,6 +117,7 @@ def _create_sermons_table(conn: sqlite3.Connection) -> None:
         conn.execute('CREATE INDEX IF NOT EXISTS idx_sermon_guid ON sermons (sermon_guid)')
         conn.execute('CREATE INDEX IF NOT EXISTS idx_sermons_language ON sermons(language);')
         conn.execute('CREATE INDEX IF NOT EXISTS idx_sermons_categories ON sermons(categories);')
+        conn.execute('CREATE INDEX IF NOT EXISTS idx_language_sermon_title ON sermons (language, sermon_title);')
         conn.commit()
         current_app.logger.info("Sermons table created successfully.")
     except sqlite3.Error as e:

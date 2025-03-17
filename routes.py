@@ -362,7 +362,7 @@ def stats():
 def sermon_index():
     db = get_db()
     language = request.cookies.get("language", "en")
-    cur = db.execute("SELECT sermon_guid, sermon_title, audiofilename, transcription, categories FROM sermons WHERE language = ? ORDER BY sermon_title ASC LIMIT 12", (language,))
+    cur = db.execute("SELECT sermon_guid, sermon_title, SUBSTR(transcription, 1, 250) as transcription, categories FROM sermons WHERE language = ? ORDER BY sermon_title ASC LIMIT 12", (language,))
     sermons = cur.fetchall()
 
     def extract_first_sentences(text, min_sentences=3, max_sentences=4):
