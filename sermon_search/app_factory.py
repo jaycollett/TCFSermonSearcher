@@ -9,6 +9,7 @@ import logging
 import datetime
 from flask import Flask, g, request, current_app
 from flask_babel import Babel, gettext as _
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 from config import get_config
 from sermon_search.database.models import init_main_db
@@ -57,6 +58,9 @@ def create_app(config_name=None):
     app = Flask(__name__, 
                 template_folder=template_dir,
                 static_folder=static_dir)
+    
+    # Apply ProxyFix middleware to handle HAProxy layer
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=3, x_proto=2)
     
     # Get configuration based on environment
     Config = get_config(config_name)
