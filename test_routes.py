@@ -113,15 +113,22 @@ def test_index(client):
 
 # Test set_language route with valid language
 def test_set_language_valid(client):
-    response = client.post("/set_language", data={"language": "es"}, follow_redirects=True)
-    assert response.status_code == 200
-    assert "language=es" in response.headers.get("Set-Cookie", "")
+    response = client.post("/set_language", data={"language": "es"})
+    assert response.status_code == 302
+    cookie = response.headers.get("Set-Cookie", "")
+    assert "language=es" in cookie
+    # Follow the redirect to verify the final status code is 200
+    follow_response = client.get(response.headers['Location'])
+    assert follow_response.status_code == 200
 
 # Test set_language route with invalid language (fallback to 'en')
 def test_set_language_invalid(client):
-    response = client.post("/set_language", data={"language": "fr"}, follow_redirects=True)
-    assert response.status_code == 200
-    assert "language=en" in response.headers.get("Set-Cookie", "")
+    response = client.post("/set_language", data={"language": "fr"})
+    assert response.status_code == 302
+    cookie = response.headers.get("Set-Cookie", "")
+    assert "language=en" in cookie
+    follow_response = client.get(response.headers['Location'])
+    assert follow_response.status_code == 200
 
 # Test sitemap route
 def test_sitemap(client):

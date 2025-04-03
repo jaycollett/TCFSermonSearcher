@@ -122,8 +122,8 @@ msgstr ""
 
 #: templates/layout.html:249
 msgid ""
-"📖 Sermon Search | Written by: Jay Collett | Version: 0.3.56 | Date: March"
-" 14, 2025"
+"📖 Sermon Search | Written by: Jay Collett | Version: 0.3.68 | Date: April"
+" 2, 2025"
 msgstr ""
 
 #: templates/layout.html:251 templates/stats.html:50
