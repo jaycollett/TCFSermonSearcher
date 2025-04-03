@@ -1,8 +1,14 @@
 # Ignore data directory
 data/
+metrics.db
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
+*/__pycache__/
+*/*/__pycache__/
+*/*/*/__pycache__/
+sermon_search/**/__pycache__/
+config/__pycache__/
 *.py[cod]
 *$py.class
 
@@ -95,5 +101,3 @@ ENV/
 
 # VS Code settings:
 .vscode/
-venv/
-__pycache__/

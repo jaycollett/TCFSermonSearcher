@@ -7,6 +7,14 @@ import pytest
 from flask import Response
 from sermon_search.app_factory import create_app
 
+# Add mock for security functions
+def dummy_get_or_create_visitor_id():
+    return "test-visitor-id"
+
+def dummy_set_visitor_id_cookie(response):
+    # Just return the response unchanged for testing
+    return response
+
 # Dummy functions for monkeypatching
 def dummy_search_sermons(query, language, selected_categories, page, per_page):
     return {
@@ -106,7 +114,10 @@ def app():
     return app
 
 @pytest.fixture
-def client(app):
+def client(app, monkeypatch):
+    # Mock visitor ID functions
+    monkeypatch.setattr("sermon_search.routes.get_or_create_visitor_id", dummy_get_or_create_visitor_id)
+    monkeypatch.setattr("sermon_search.routes.set_visitor_id_cookie", dummy_set_visitor_id_cookie)
     return app.test_client()
 
 # Test index route
