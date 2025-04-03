@@ -5,9 +5,10 @@ This module contains functions for IP ban management and API authentication.
 """
 
 import os
+import uuid
 import datetime
 from typing import Tuple, Optional
-from flask import request, current_app
+from flask import request, current_app, make_response, Response
 from sermon_search.database.models import get_db
 
 
@@ -45,6 +46,50 @@ def is_ip_banned(ip: str) -> bool:
             db.execute("UPDATE ip_bans SET failed_attempts = 0, banned_until = NULL WHERE ip_address = ?", (ip,))
             db.commit()
     return False
+
+
+def get_or_create_visitor_id() -> str:
+    """
+    Get the visitor ID from cookie or create a new one.
+    
+    Returns:
+        str: A unique visitor ID
+    """
+    visitor_id = request.cookies.get('visitor_id')
+    
+    if not visitor_id:
+        # Generate a new visitor ID if none exists
+        visitor_id = str(uuid.uuid4())
+        current_app.logger.debug(f"Generated new visitor ID: {visitor_id}")
+    
+    return visitor_id
+
+
+def set_visitor_id_cookie(response: Response) -> Response:
+    """
+    Set or update the visitor ID cookie on the response.
+    
+    Args:
+        response: The Flask response object
+        
+    Returns:
+        Response: The updated response with the visitor ID cookie
+    """
+    visitor_id = get_or_create_visitor_id()
+    
+    # Set the cookie to expire in 2 years
+    expires = datetime.datetime.now() + datetime.timedelta(days=365*2)
+    
+    response.set_cookie(
+        'visitor_id',
+        visitor_id,
+        expires=expires,
+        httponly=True,
+        samesite='Lax',
+        path='/'
+    )
+    
+    return response
 
 
 def verify_api_token() -> Tuple[bool, Optional[str]]:

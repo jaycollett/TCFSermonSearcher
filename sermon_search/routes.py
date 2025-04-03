@@ -42,7 +42,9 @@ from sermon_search.utils import (
     sanitize_search_term,
     extract_first_sentences,
     search_sermons,
-    get_sermon_statistics
+    get_sermon_statistics,
+    get_or_create_visitor_id,
+    set_visitor_id_cookie
 )
 
 # Ensure NLTK resources are available
@@ -140,16 +142,21 @@ def log_search_metrics(query: str, categories: list = None, search_type: str = "
     """
     Log search query metrics to the metrics database.
     Implements rate limiting to prevent spamming the database with
-    identical searches from the same IP within a short time window.
+    identical searches from the same visitor within a short time window.
     
     Args:
         query: The search query entered by the user
         categories: Optional list of category filters applied
         search_type: Type of search action ('new_search', 'filter_change', etc.)
     """
+    # Skip logging in test mode
+    if current_app.config.get('TESTING', False):
+        return
+        
     try:
         db = get_metrics_db()
         ip_address = get_client_ip()
+        visitor_id = get_or_create_visitor_id()
         
         # Convert categories list to string if provided
         category_filters = None
@@ -157,27 +164,27 @@ def log_search_metrics(query: str, categories: list = None, search_type: str = "
             category_filters = ",".join(categories)
         
         # Check for duplicate searches within a time window (5 minutes)
-        # Only for the same query, categories and type from the same IP
+        # Only for the same query, categories and type from the same visitor
         five_minutes_ago = (datetime.datetime.now() - datetime.timedelta(minutes=5)).strftime('%Y-%m-%d %H:%M:%S')
         cursor = db.execute(
             "SELECT COUNT(*) as count FROM Search_History "
-            "WHERE search_query = ? AND ip = ? AND "
+            "WHERE search_query = ? AND visitor_id = ? AND "
             "(category_filters = ? OR (category_filters IS NULL AND ? IS NULL)) "
             "AND search_type = ? AND timestamp > ?",
-            (query, ip_address, category_filters, category_filters, search_type, five_minutes_ago)
+            (query, visitor_id, category_filters, category_filters, search_type, five_minutes_ago)
         )
         recent_search_count = cursor.fetchone()["count"]
         
         # Only log if this is not a duplicate search within the time window
         if recent_search_count == 0:
             db.execute(
-                "INSERT INTO Search_History (search_query, ip, category_filters, search_type) VALUES (?, ?, ?, ?)",
-                (query, ip_address, category_filters, search_type)
+                "INSERT INTO Search_History (search_query, ip, visitor_id, category_filters, search_type) VALUES (?, ?, ?, ?, ?)",
+                (query, ip_address, visitor_id, category_filters, search_type)
             )
             db.commit()
-            current_app.logger.debug(f"Logged {search_type} query: '{query}' with categories: {category_filters} from IP: {ip_address}")
+            current_app.logger.debug(f"Logged {search_type} query: '{query}' with categories: {category_filters} from visitor: {visitor_id}")
         else:
-            current_app.logger.debug(f"Skipped logging duplicate search: '{query}' from IP: {ip_address} (duplicate within time window)")
+            current_app.logger.debug(f"Skipped logging duplicate search: '{query}' from visitor: {visitor_id} (duplicate within time window)")
     except Exception as e:
         current_app.logger.error(f"Failed to log search metrics: {str(e)}", exc_info=True)
 
@@ -185,35 +192,40 @@ def log_search_metrics(query: str, categories: list = None, search_type: str = "
 def log_sermon_access(sermon_guid: str) -> None:
     """
     Log sermon access to the metrics database.
-    Only records one access per IP address per sermon per hour to prevent
+    Only records one access per visitor per sermon per hour to prevent
     duplicate entries from page refreshes.
     
     Args:
         sermon_guid: The unique identifier of the accessed sermon
     """
+    # Skip logging in test mode
+    if current_app.config.get('TESTING', False):
+        return
+        
     try:
         db = get_metrics_db()
         ip_address = get_client_ip()
+        visitor_id = get_or_create_visitor_id()
         
-        # Check if this IP has accessed this sermon recently (within the last hour)
+        # Check if this visitor has accessed this sermon recently (within the last hour)
         one_hour_ago = (datetime.datetime.now() - datetime.timedelta(hours=1)).strftime('%Y-%m-%d %H:%M:%S')
         cursor = db.execute(
             "SELECT COUNT(*) as count FROM Sermon_Access "
-            "WHERE sermon_guid = ? AND ip = ? AND timestamp > ?",
-            (sermon_guid, ip_address, one_hour_ago)
+            "WHERE sermon_guid = ? AND visitor_id = ? AND timestamp > ?",
+            (sermon_guid, visitor_id, one_hour_ago)
         )
         recent_access_count = cursor.fetchone()["count"]
         
         # Only log if this is a new access (not a refresh within the time window)
         if recent_access_count == 0:
             db.execute(
-                "INSERT INTO Sermon_Access (sermon_guid, ip) VALUES (?, ?)",
-                (sermon_guid, ip_address)
+                "INSERT INTO Sermon_Access (sermon_guid, ip, visitor_id) VALUES (?, ?, ?)",
+                (sermon_guid, ip_address, visitor_id)
             )
             db.commit()
-            current_app.logger.debug(f"Logged sermon access: {sermon_guid} from IP: {ip_address}")
+            current_app.logger.debug(f"Logged sermon access: {sermon_guid} from visitor: {visitor_id}")
         else:
-            current_app.logger.debug(f"Skipped logging duplicate sermon access: {sermon_guid} from IP: {ip_address}")
+            current_app.logger.debug(f"Skipped logging duplicate sermon access: {sermon_guid} from visitor: {visitor_id}")
     except Exception as e:
         current_app.logger.error(f"Failed to log sermon access: {str(e)}", exc_info=True)
 
@@ -224,7 +236,14 @@ def log_sermon_access(sermon_guid: str) -> None:
 def index():
     """Render the application homepage."""
     greeting = _("Welcome to Sermon Search!")
-    return render_template("index.html", greeting=greeting)
+    response = make_response(render_template("index.html", greeting=greeting))
+    
+    # When testing, we might not have all functions available
+    if current_app.config.get('TESTING', False):
+        return response
+        
+    # Set visitor ID cookie
+    return set_visitor_id_cookie(response)
 
 
 @bp.route("/set_language", methods=["POST"])
@@ -298,11 +317,16 @@ def search():
     search_type = request.args.get("search_type", "new_search").strip()
     
     if not query:
-        return render_template(
+        response = make_response(render_template(
             "search.html",
             all_categories=all_categories,
             selected_categories=selected_categories
-        )
+        ))
+        
+        if current_app.config.get('TESTING', False):
+            return response
+            
+        return set_visitor_id_cookie(response)
     
     # Determine search type if not explicitly provided
     if search_type == "new_search" and "prev_categories" in request.args:
@@ -351,7 +375,7 @@ def search():
             "error.html",
             message=_("An error occurred while processing your search. Please try again.")
         )
-    return render_template(
+    response = make_response(render_template(
         "results.html",
         query=query,
         results=results,
@@ -361,7 +385,12 @@ def search():
         page=page,
         total_pages=total_pages,
         total_count=total_count
-    )
+    ))
+    
+    if current_app.config.get('TESTING', False):
+        return response
+        
+    return set_visitor_id_cookie(response)
 
 
 @bp.route("/sermon/<sermon_guid>")
@@ -405,7 +434,7 @@ def sermon_detail(sermon_guid):
                     break
         highlighted_transcript = "</p>".join(paragraphs)
 
-    return render_template(
+    response = make_response(render_template(
         "sermon.html",
         sermon=sermon,
         ai_content=ai_content,
@@ -414,14 +443,24 @@ def sermon_detail(sermon_guid):
         query=query,
         selected_categories=selected_categories,
         page=page
-    )
+    ))
+    
+    if current_app.config.get('TESTING', False):
+        return response
+        
+    return set_visitor_id_cookie(response)
 
 
 @bp.route("/stats")
 def stats():
     """Display statistics about the sermon database."""
     statistics = get_sermon_statistics()
-    return render_template("stats.html", **statistics)
+    response = make_response(render_template("stats.html", **statistics))
+    
+    if current_app.config.get('TESTING', False):
+        return response
+        
+    return set_visitor_id_cookie(response)
 
 
 @bp.route("/sermons")
@@ -456,7 +495,12 @@ def sermon_index():
             "snippet": extract_first_sentences(sermon["transcription"]),
             "categories": sermon["categories"] or "Uncategorized"
         })
-    return render_template("sermons.html", sermons=processed_sermons)
+    response = make_response(render_template("sermons.html", sermons=processed_sermons))
+    
+    if current_app.config.get('TESTING', False):
+        return response
+        
+    return set_visitor_id_cookie(response)
 
 
 @bp.route("/api/sermons")

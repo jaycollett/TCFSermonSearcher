@@ -54,13 +54,15 @@ def _check_column_exists(conn, table, column):
     return column in columns
 
 
-def _migrate_search_history_table(conn):
+def _migrate_tables(conn):
     """
-    Migrate the Search_History table schema if needed.
+    Migrate table schemas if needed.
     
     Args:
         conn: SQLite connection
     """
+    # Search_History table migrations
+    
     # Check if category_filters column exists
     if not _check_column_exists(conn, "Search_History", "category_filters"):
         try:
@@ -80,6 +82,26 @@ def _migrate_search_history_table(conn):
             current_app.logger.info("Successfully added search_type column")
         except sqlite3.Error as e:
             current_app.logger.error(f"Error adding search_type column: {e}")
+            
+    # Check if visitor_id column exists in Search_History
+    if not _check_column_exists(conn, "Search_History", "visitor_id"):
+        try:
+            current_app.logger.info("Adding visitor_id column to Search_History table")
+            conn.execute("ALTER TABLE Search_History ADD COLUMN visitor_id TEXT")
+            conn.commit()
+            current_app.logger.info("Successfully added visitor_id column to Search_History")
+        except sqlite3.Error as e:
+            current_app.logger.error(f"Error adding visitor_id column to Search_History: {e}")
+            
+    # Check if visitor_id column exists in Sermon_Access
+    if not _check_column_exists(conn, "Sermon_Access", "visitor_id"):
+        try:
+            current_app.logger.info("Adding visitor_id column to Sermon_Access table")
+            conn.execute("ALTER TABLE Sermon_Access ADD COLUMN visitor_id TEXT")
+            conn.commit()
+            current_app.logger.info("Successfully added visitor_id column to Sermon_Access")
+        except sqlite3.Error as e:
+            current_app.logger.error(f"Error adding visitor_id column to Sermon_Access: {e}")
 
 
 def init_metrics_db() -> None:
@@ -113,6 +135,7 @@ def init_metrics_db() -> None:
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 search_query TEXT NOT NULL,
                 ip TEXT,
+                visitor_id TEXT,
                 category_filters TEXT,
                 search_type TEXT DEFAULT 'new_search',
                 timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
@@ -125,12 +148,13 @@ def init_metrics_db() -> None:
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 sermon_guid TEXT NOT NULL,
                 ip TEXT,
+                visitor_id TEXT,
                 timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
             );
         """)
         conn.commit()
         
         # Run migrations for existing tables
-        _migrate_search_history_table(conn)
+        _migrate_tables(conn)
         
     current_app.logger.info("Metrics database initialized with tables: Search_History and Sermon_Access")
