@@ -73,15 +73,22 @@ def get_search_metrics(days: int = 30, limit: int = 100) -> dict:
         
         # Get recent searches
         recent_searches = db.execute(
-            "SELECT search_query, category_filters, ip, timestamp FROM Search_History "
+            "SELECT search_query, category_filters, search_type, ip, timestamp FROM Search_History "
             "WHERE timestamp > ? ORDER BY timestamp DESC LIMIT ?",
             (date_cutoff, limit)
         ).fetchall()
         
-        # Get popular searches
+        # Get popular searches by search type
         popular_searches = db.execute(
             "SELECT search_query, COUNT(*) as count FROM Search_History "
             "WHERE timestamp > ? GROUP BY search_query ORDER BY count DESC LIMIT 10",
+            (date_cutoff,)
+        ).fetchall()
+        
+        # Get search metrics by type
+        search_by_type = db.execute(
+            "SELECT search_type, COUNT(*) as count FROM Search_History "
+            "WHERE timestamp > ? GROUP BY search_type ORDER BY count DESC",
             (date_cutoff,)
         ).fetchall()
         
@@ -112,6 +119,7 @@ def get_search_metrics(days: int = 30, limit: int = 100) -> dict:
         return {
             "recent_searches": [dict(row) for row in recent_searches],
             "popular_searches": [dict(row) for row in popular_searches],
+            "search_by_type": [dict(row) for row in search_by_type],
             "popular_categories": [dict(row) for row in popular_categories],
             "recent_accesses": [dict(row) for row in recent_accesses],
             "popular_sermons": [dict(row) for row in popular_sermons]
@@ -122,18 +130,20 @@ def get_search_metrics(days: int = 30, limit: int = 100) -> dict:
             "error": str(e),
             "recent_searches": [],
             "popular_searches": [],
+            "search_by_type": [],
             "popular_categories": [],
             "recent_accesses": [],
             "popular_sermons": []
         }
 
-def log_search_metrics(query: str, categories: list = None) -> None:
+def log_search_metrics(query: str, categories: list = None, search_type: str = "new_search") -> None:
     """
     Log search query metrics to the metrics database.
     
     Args:
         query: The search query entered by the user
         categories: Optional list of category filters applied
+        search_type: Type of search action ('new_search', 'filter_change', etc.)
     """
     try:
         db = get_metrics_db()
@@ -145,11 +155,11 @@ def log_search_metrics(query: str, categories: list = None) -> None:
             category_filters = ",".join(categories)
         
         db.execute(
-            "INSERT INTO Search_History (search_query, ip, category_filters) VALUES (?, ?, ?)",
-            (query, ip_address, category_filters)
+            "INSERT INTO Search_History (search_query, ip, category_filters, search_type) VALUES (?, ?, ?, ?)",
+            (query, ip_address, category_filters, search_type)
         )
         db.commit()
-        current_app.logger.debug(f"Logged search query: '{query}' with categories: {category_filters} from IP: {ip_address}")
+        current_app.logger.debug(f"Logged {search_type} query: '{query}' with categories: {category_filters} from IP: {ip_address}")
     except Exception as e:
         current_app.logger.error(f"Failed to log search metrics: {str(e)}", exc_info=True)
 
@@ -252,6 +262,7 @@ def search():
     language = request.cookies.get("language", "en")
     selected_categories = request.args.getlist("categories")
     all_categories = get_all_categories(language)
+    search_type = request.args.get("search_type", "new_search").strip()
     
     if not query:
         return render_template(
@@ -260,8 +271,18 @@ def search():
             selected_categories=selected_categories
         )
     
+    # Determine search type if not explicitly provided
+    if search_type == "new_search" and "prev_categories" in request.args:
+        # Check if categories changed from previous search
+        prev_categories = request.args.getlist("prev_categories")
+        prev_set = set(prev_categories)
+        current_set = set(selected_categories)
+        
+        if prev_set != current_set:
+            search_type = "filter_change"
+    
     # Log search metrics
-    log_search_metrics(query, selected_categories)
+    log_search_metrics(query, selected_categories, search_type)
     try:
         page = int(request.args.get("page", 1))
         if page < 1:

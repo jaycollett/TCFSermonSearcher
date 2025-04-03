@@ -70,6 +70,16 @@ def _migrate_search_history_table(conn):
             current_app.logger.info("Successfully added category_filters column")
         except sqlite3.Error as e:
             current_app.logger.error(f"Error adding category_filters column: {e}")
+            
+    # Check if search_type column exists
+    if not _check_column_exists(conn, "Search_History", "search_type"):
+        try:
+            current_app.logger.info("Adding search_type column to Search_History table")
+            conn.execute("ALTER TABLE Search_History ADD COLUMN search_type TEXT DEFAULT 'new_search'")
+            conn.commit()
+            current_app.logger.info("Successfully added search_type column")
+        except sqlite3.Error as e:
+            current_app.logger.error(f"Error adding search_type column: {e}")
 
 
 def init_metrics_db() -> None:
@@ -103,6 +113,8 @@ def init_metrics_db() -> None:
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 search_query TEXT NOT NULL,
                 ip TEXT,
+                category_filters TEXT,
+                search_type TEXT DEFAULT 'new_search',
                 timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
             );
         """)

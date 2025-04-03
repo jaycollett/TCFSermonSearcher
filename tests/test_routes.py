@@ -282,8 +282,9 @@ def test_metrics_success(client, monkeypatch):
     
     # Mock get_search_metrics to return dummy data
     dummy_metrics = {
-        "recent_searches": [{"search_query": "test", "category_filters": "Test", "ip": "127.0.0.1"}],
+        "recent_searches": [{"search_query": "test", "category_filters": "Test", "search_type": "new_search", "ip": "127.0.0.1"}],
         "popular_searches": [{"search_query": "test", "count": 5}],
+        "search_by_type": [{"search_type": "new_search", "count": 8}, {"search_type": "filter_change", "count": 4}],
         "popular_categories": [{"category_filters": "Test", "count": 3}],
         "recent_accesses": [{"sermon_guid": "test-guid", "sermon_title": "Test Sermon", "ip": "127.0.0.1"}],
         "popular_sermons": [{"sermon_guid": "test-guid", "sermon_title": "Test Sermon", "count": 10}]

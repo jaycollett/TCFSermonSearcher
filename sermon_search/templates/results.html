@@ -210,6 +210,11 @@
     <div class="sticky-header" id="sticky-header">
       <form action="{{ url_for('main.search') }}" method="get" id="results-form">
         <input type="hidden" name="q" value="{{ query_val }}">
+        <!-- Add hidden fields to track previous categories -->
+        <input type="hidden" name="search_type" value="filter_change">
+        {% for cat in selected_categories %}
+        <input type="hidden" name="prev_categories" value="{{ cat }}">
+        {% endfor %}
         <div class="filter-title">{{ _("Category Filters") }}</div>
         <div class="filter-group" id="results-filter-group">
           {% for cat in all_categories %}
@@ -278,7 +283,7 @@
             {% if page > 1 %}
             <li class="page-item">
               <a class="page-link"
-                href="{{ url_for('main.search', q=query_val, page=page-1, categories=selected_categories) }}">Previous</a>
+                href="{{ url_for('main.search', q=query_val, page=page-1, categories=selected_categories, search_type='filter_change', prev_categories=selected_categories) }}">Previous</a>
             </li>
             {% else %}
             <li class="page-item disabled">
@@ -290,7 +295,7 @@
             {% if start_page > 1 %}
             <li class="page-item {% if page == 1 %}active{% endif %}">
               <a class="page-link"
-                href="{{ url_for('main.search', q=query_val, page=1, categories=selected_categories) }}">1</a>
+                href="{{ url_for('main.search', q=query_val, page=1, categories=selected_categories, search_type='filter_change', prev_categories=selected_categories) }}">1</a>
             </li>
             {% endif %}
 
@@ -305,7 +310,7 @@
             {% for p in range(start_page, end_page + 1) %}
             <li class="page-item {% if p == page %}active{% endif %}">
               <a class="page-link"
-                href="{{ url_for('main.search', q=query_val, page=p, categories=selected_categories) }}">{{ p }}</a>
+                href="{{ url_for('main.search', q=query_val, page=p, categories=selected_categories, search_type='filter_change', prev_categories=selected_categories) }}">{{ p }}</a>
             </li>
             {% endfor %}
 
@@ -318,7 +323,7 @@
               <!-- Link to Last Page if needed -->
               {% if end_page < total_pages %} <li class="page-item {% if page == total_pages %}active{% endif %}">
                 <a class="page-link"
-                  href="{{ url_for('main.search', q=query_val, page=total_pages, categories=selected_categories) }}">{{
+                  href="{{ url_for('main.search', q=query_val, page=total_pages, categories=selected_categories, search_type='filter_change', prev_categories=selected_categories) }}">{{
                   total_pages }}</a>
                 </li>
                 {% endif %}
@@ -326,7 +331,7 @@
                 <!-- Next Button -->
                 {% if page < total_pages %} <li class="page-item">
                   <a class="page-link"
-                    href="{{ url_for('main.search', q=query_val, page=page+1, categories=selected_categories) }}">Next</a>
+                    href="{{ url_for('main.search', q=query_val, page=page+1, categories=selected_categories, search_type='filter_change', prev_categories=selected_categories) }}">Next</a>
                   </li>
                   {% else %}
                   <li class="page-item disabled">
@@ -399,8 +404,21 @@
       } else {
         selected.push(category);
       }
+      
+      // Save current categories as previous before making changes
+      let prevCategories = [...selected];
+      
+      // Clear and reset categories
       query.delete("categories");
       selected.forEach(c => query.append("categories", c));
+      
+      // Add search_type and prev_categories
+      query.set("search_type", "filter_change");
+      
+      // Clear and reset prev_categories
+      query.delete("prev_categories");
+      prevCategories.forEach(c => query.append("prev_categories", c));
+      
       window.location.search = query.toString();
     });
   });
