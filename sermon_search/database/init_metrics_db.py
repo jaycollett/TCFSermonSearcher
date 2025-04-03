@@ -10,6 +10,7 @@ It creates the following two tables:
 
 import os
 import sqlite3
+import datetime
 from flask import g, current_app
 
 def get_metrics_db() -> sqlite3.Connection:
@@ -21,7 +22,17 @@ def get_metrics_db() -> sqlite3.Connection:
     """
     db = getattr(g, '_metrics_db', None)
     if db is None:
-        db_path = current_app.config.get('METRICS_DATABASE', 'metrics.db')
+        db_path = current_app.config.get('METRICS_DATABASE')
+        if not db_path:
+            # Default path if not specified
+            db_path = os.path.join(
+                os.path.dirname(current_app.config.get('DATABASE', './data/sermons.db')),
+                'metrics.db'
+            )
+        
+        # Ensure the directory exists
+        os.makedirs(os.path.dirname(db_path) or '.', exist_ok=True)
+        
         db = g._metrics_db = sqlite3.connect(db_path)
         db.row_factory = sqlite3.Row
     return db
@@ -31,7 +42,14 @@ def init_metrics_db() -> None:
     Initializes the metrics SQLite database with required tables.
     The database path is configurable via the METRICS_DATABASE configuration variable.
     """
-    db_path = current_app.config.get('METRICS_DATABASE', 'metrics.db')
+    db_path = current_app.config.get('METRICS_DATABASE')
+    if not db_path:
+        # Default path if not specified
+        db_path = os.path.join(
+            os.path.dirname(current_app.config.get('DATABASE', './data/sermons.db')),
+            'metrics.db'
+        )
+    
     current_app.logger.info(f"Initializing metrics database: {db_path}")
 
     # Ensure the directory for the database exists (use '.' if no directory specified)
@@ -50,6 +68,7 @@ def init_metrics_db() -> None:
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 search_query TEXT NOT NULL,
                 ip TEXT,
+                category_filters TEXT,
                 timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
             );
         """)

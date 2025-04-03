@@ -30,6 +30,7 @@ from wordcloud import WordCloud, STOPWORDS
 
 # Local imports
 from sermon_search.database import get_db, get_sermon_by_guid, get_ai_content_by_guid
+from sermon_search.database.init_metrics_db import get_metrics_db
 from sermon_search.utils import (
     get_client_ip,
     is_ip_banned,
@@ -49,6 +50,129 @@ nltk.download('stopwords', quiet=True)
 
 # Create a blueprint for routes
 bp = Blueprint("main", __name__)
+
+
+# --- Metrics Tracking Functions ---
+
+def get_search_metrics(days: int = 30, limit: int = 100) -> dict:
+    """
+    Get recent search metrics data.
+    
+    Args:
+        days: Number of days to look back
+        limit: Maximum number of results to return
+        
+    Returns:
+        Dictionary with metrics data
+    """
+    try:
+        db = get_metrics_db()
+        
+        # Calculate the date range
+        date_cutoff = (datetime.datetime.now() - datetime.timedelta(days=days)).strftime('%Y-%m-%d %H:%M:%S')
+        
+        # Get recent searches
+        recent_searches = db.execute(
+            "SELECT search_query, category_filters, ip, timestamp FROM Search_History "
+            "WHERE timestamp > ? ORDER BY timestamp DESC LIMIT ?",
+            (date_cutoff, limit)
+        ).fetchall()
+        
+        # Get popular searches
+        popular_searches = db.execute(
+            "SELECT search_query, COUNT(*) as count FROM Search_History "
+            "WHERE timestamp > ? GROUP BY search_query ORDER BY count DESC LIMIT 10",
+            (date_cutoff,)
+        ).fetchall()
+        
+        # Get popular categories
+        popular_categories = db.execute(
+            "SELECT category_filters, COUNT(*) as count FROM Search_History "
+            "WHERE timestamp > ? AND category_filters IS NOT NULL "
+            "GROUP BY category_filters ORDER BY count DESC LIMIT 10",
+            (date_cutoff,)
+        ).fetchall()
+        
+        # Get recent sermon accesses
+        recent_accesses = db.execute(
+            "SELECT sa.sermon_guid, s.sermon_title, sa.ip, sa.timestamp "
+            "FROM Sermon_Access sa LEFT JOIN sermons s ON sa.sermon_guid = s.sermon_guid "
+            "WHERE sa.timestamp > ? ORDER BY sa.timestamp DESC LIMIT ?",
+            (date_cutoff, limit)
+        ).fetchall()
+        
+        # Get popular sermons
+        popular_sermons = db.execute(
+            "SELECT sa.sermon_guid, s.sermon_title, COUNT(*) as count "
+            "FROM Sermon_Access sa LEFT JOIN sermons s ON sa.sermon_guid = s.sermon_guid "
+            "WHERE sa.timestamp > ? GROUP BY sa.sermon_guid ORDER BY count DESC LIMIT 10",
+            (date_cutoff,)
+        ).fetchall()
+        
+        return {
+            "recent_searches": [dict(row) for row in recent_searches],
+            "popular_searches": [dict(row) for row in popular_searches],
+            "popular_categories": [dict(row) for row in popular_categories],
+            "recent_accesses": [dict(row) for row in recent_accesses],
+            "popular_sermons": [dict(row) for row in popular_sermons]
+        }
+    except Exception as e:
+        current_app.logger.error(f"Failed to get search metrics: {str(e)}", exc_info=True)
+        return {
+            "error": str(e),
+            "recent_searches": [],
+            "popular_searches": [],
+            "popular_categories": [],
+            "recent_accesses": [],
+            "popular_sermons": []
+        }
+
+def log_search_metrics(query: str, categories: list = None) -> None:
+    """
+    Log search query metrics to the metrics database.
+    
+    Args:
+        query: The search query entered by the user
+        categories: Optional list of category filters applied
+    """
+    try:
+        db = get_metrics_db()
+        ip_address = get_client_ip()
+        
+        # Convert categories list to string if provided
+        category_filters = None
+        if categories and len(categories) > 0:
+            category_filters = ",".join(categories)
+        
+        db.execute(
+            "INSERT INTO Search_History (search_query, ip, category_filters) VALUES (?, ?, ?)",
+            (query, ip_address, category_filters)
+        )
+        db.commit()
+        current_app.logger.debug(f"Logged search query: '{query}' with categories: {category_filters} from IP: {ip_address}")
+    except Exception as e:
+        current_app.logger.error(f"Failed to log search metrics: {str(e)}", exc_info=True)
+
+
+def log_sermon_access(sermon_guid: str) -> None:
+    """
+    Log sermon access to the metrics database.
+    
+    Args:
+        sermon_guid: The unique identifier of the accessed sermon
+    """
+    try:
+        db = get_metrics_db()
+        ip_address = get_client_ip()
+        
+        db.execute(
+            "INSERT INTO Sermon_Access (sermon_guid, ip) VALUES (?, ?)",
+            (sermon_guid, ip_address)
+        )
+        db.commit()
+        current_app.logger.debug(f"Logged sermon access: {sermon_guid} from IP: {ip_address}")
+    except Exception as e:
+        current_app.logger.error(f"Failed to log sermon access: {str(e)}", exc_info=True)
 
 
 # --- Route Handlers ---
@@ -128,12 +252,16 @@ def search():
     language = request.cookies.get("language", "en")
     selected_categories = request.args.getlist("categories")
     all_categories = get_all_categories(language)
+    
     if not query:
         return render_template(
             "search.html",
             all_categories=all_categories,
             selected_categories=selected_categories
         )
+    
+    # Log search metrics
+    log_search_metrics(query, selected_categories)
     try:
         page = int(request.args.get("page", 1))
         if page < 1:
@@ -201,6 +329,9 @@ def sermon_detail(sermon_guid):
     sermon = get_sermon_by_guid(sermon_guid, language)
     if not sermon:
         return _("Sermon not found"), 404
+    
+    # Log sermon access
+    log_sermon_access(sermon_guid)
 
     ai_content = get_ai_content_by_guid(sermon_guid)
 
@@ -322,6 +453,35 @@ def audiofiles(filename):
         Audio file response
     """
     return send_from_directory(current_app.config.get("AUDIOFILES_DIR"), filename)
+
+
+@bp.route("/api/metrics", methods=["GET"])
+def api_metrics():
+    """
+    API endpoint to retrieve search and access metrics.
+    
+    This endpoint requires API token authentication.
+    
+    Returns:
+        JSON response with metrics data
+    """
+    is_valid, error_message = verify_api_token()
+    if not is_valid:
+        return jsonify({"error": error_message}), 403 if error_message == "Too many failed attempts. Try again later." else 401
+    
+    try:
+        days = request.args.get("days", 30, type=int)
+        limit = request.args.get("limit", 100, type=int)
+        
+        # Enforce reasonable limits
+        days = max(1, min(days, 365))  # Between 1 and 365 days
+        limit = max(10, min(limit, 1000))  # Between 10 and 1000 results
+        
+        metrics = get_search_metrics(days=days, limit=limit)
+        return jsonify(metrics)
+    except Exception as e:
+        current_app.logger.error(f"Error retrieving metrics: {str(e)}", exc_info=True)
+        return jsonify({"error": "An error occurred while retrieving metrics"}), 500
 
 
 @bp.route("/api/update_stats", methods=["POST"])

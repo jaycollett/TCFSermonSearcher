@@ -262,6 +262,33 @@ def test_update_stats_db_error(client, monkeypatch):
     response = client.post("/api/update_stats")
     assert response.status_code == 500
 
+# Test metrics API route with invalid token
+def test_metrics_invalid_token(client, monkeypatch):
+    monkeypatch.setattr("sermon_search.routes.verify_api_token", lambda: (False, "Invalid token"))
+    response = client.get("/api/metrics")
+    assert response.status_code in (401, 403)
+
+# Test metrics API route success
+def test_metrics_success(client, monkeypatch):
+    monkeypatch.setattr("sermon_search.routes.verify_api_token", lambda: (True, None))
+    
+    # Mock get_search_metrics to return dummy data
+    dummy_metrics = {
+        "recent_searches": [{"search_query": "test", "category_filters": "Test", "ip": "127.0.0.1"}],
+        "popular_searches": [{"search_query": "test", "count": 5}],
+        "popular_categories": [{"category_filters": "Test", "count": 3}],
+        "recent_accesses": [{"sermon_guid": "test-guid", "sermon_title": "Test Sermon", "ip": "127.0.0.1"}],
+        "popular_sermons": [{"sermon_guid": "test-guid", "sermon_title": "Test Sermon", "count": 10}]
+    }
+    monkeypatch.setattr("sermon_search.routes.get_search_metrics", lambda days, limit: dummy_metrics)
+    
+    response = client.get("/api/metrics")
+    assert response.status_code == 200
+    data = json.loads(response.data)
+    assert "recent_searches" in data
+    assert isinstance(data["recent_searches"], list)
+    assert len(data["recent_searches"]) > 0
+
 # Tests for /api/ai_sermon_content endpoint
 
 def test_ai_sermon_content_no_payload(client, monkeypatch):

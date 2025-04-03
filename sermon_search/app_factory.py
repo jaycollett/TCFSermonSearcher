@@ -105,13 +105,19 @@ def create_app(config_name=None):
     
     app.register_blueprint(main_bp)  # All routes
 
-    # Teardown: close the database connection after each request
+    # Teardown: close the database connections after each request
     @app.teardown_appcontext
     def close_connection(exception):
-        """Close database connection at the end of each request."""
+        """Close database connections at the end of each request."""
+        # Close main database
         db = getattr(g, '_database', None)
         if db is not None:
             db.close()
+            
+        # Close metrics database
+        metrics_db = getattr(g, '_metrics_db', None)
+        if metrics_db is not None:
+            metrics_db.close()
 
     # Template filter: truncate text
     @app.template_filter('truncate_text')
