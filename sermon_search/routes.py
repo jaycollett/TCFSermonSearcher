@@ -192,7 +192,7 @@ def log_search_metrics(query: str, categories: list = None, search_type: str = "
 def log_sermon_access(sermon_guid: str) -> None:
     """
     Log sermon access to the metrics database.
-    Only records one access per visitor per sermon per hour to prevent
+    Only records one access per visitor per sermon per 2 minutes to prevent
     duplicate entries from page refreshes.
     
     Args:
@@ -207,12 +207,12 @@ def log_sermon_access(sermon_guid: str) -> None:
         ip_address = get_client_ip()
         visitor_id = get_or_create_visitor_id()
         
-        # Check if this visitor has accessed this sermon recently (within the last hour)
-        one_hour_ago = (datetime.datetime.now() - datetime.timedelta(hours=1)).strftime('%Y-%m-%d %H:%M:%S')
+        # Check if this visitor has accessed this sermon recently (within the last 2 minutes)
+        two_mins_ago = (datetime.datetime.now() - datetime.timedelta(minutes=2)).strftime('%Y-%m-%d %H:%M:%S')
         cursor = db.execute(
             "SELECT COUNT(*) as count FROM Sermon_Access "
             "WHERE sermon_guid = ? AND visitor_id = ? AND timestamp > ?",
-            (sermon_guid, visitor_id, one_hour_ago)
+            (sermon_guid, visitor_id, two_mins_ago)
         )
         recent_access_count = cursor.fetchone()["count"]
         
