@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-04-03 14:51-0400\n"
+"POT-Creation-Date: 2025-04-03 15:07-0400\n"
 "PO-Revision-Date: 2025-03-06 15:39-0500\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -16,7 +16,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.17.0\n"
+"Generated-By: Babel 2.10.3\n"
 
 #: /home/jay/SourceCode/TCFSermonSearcher/sermon_search/routes.py:238
 msgid "Welcome to Sermon Search!"
@@ -266,15 +266,17 @@ msgid "Top Ten Words"
 msgstr ""
 
 #: /home/jay/SourceCode/TCFSermonSearcher/sermon_search/templates/stats.html:155
-#: /home/jay/SourceCode/TCFSermonSearcher/sermon_search/templates/stats.html:156
+#: /home/jay/SourceCode/TCFSermonSearcher/sermon_search/templates/stats.html:157
+#: /home/jay/SourceCode/TCFSermonSearcher/sermon_search/templates/stats.html:160
 msgid "Word Cloud"
 msgstr ""
 
-#: /home/jay/SourceCode/TCFSermonSearcher/sermon_search/templates/stats.html:164
+#: /home/jay/SourceCode/TCFSermonSearcher/sermon_search/templates/stats.html:170
+#: /home/jay/SourceCode/TCFSermonSearcher/sermon_search/templates/stats.html:173
 msgid "Bi-gram Chart"
 msgstr ""
 
-#: /home/jay/SourceCode/TCFSermonSearcher/sermon_search/templates/stats.html:170
+#: /home/jay/SourceCode/TCFSermonSearcher/sermon_search/templates/stats.html:180
 msgid "Last updated:"
 msgstr ""
 
@@ -302,14 +304,14 @@ msgstr ""
 msgid "Options"
 msgstr ""
 
-#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/core.py:1422
+#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/core.py:1424
 #, python-brace-format
 msgid "Got unexpected extra argument ({args})"
 msgid_plural "Got unexpected extra arguments ({args})"
 msgstr[0] ""
 msgstr[1] ""
 
-#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/core.py:1438
+#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/core.py:1437
 #, python-brace-format
 msgid "DeprecationWarning: The command {name!r} is deprecated."
 msgstr ""
@@ -331,7 +333,7 @@ msgstr ""
 msgid "Value must be an iterable."
 msgstr ""
 
-#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/core.py:2334
+#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/core.py:2336
 #, python-brace-format
 msgid "Takes {nargs} values but 1 was given."
 msgid_plural "Takes {nargs} values but {len} were given."
@@ -417,7 +419,7 @@ msgstr ""
 msgid "No such option: {name}"
 msgstr ""
 
-#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/exceptions.py:232
+#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/exceptions.py:234
 #, python-brace-format
 msgid "Did you mean {possibility}?"
 msgid_plural "(Possible options: {possibilities})"
@@ -447,14 +449,14 @@ msgstr ""
 msgid "Option {name!r} does not take a value."
 msgstr ""
 
-#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/parser.py:476
+#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/parser.py:475
 #, python-brace-format
 msgid "Option {name!r} requires an argument."
 msgid_plural "Option {name!r} requires {nargs} arguments."
 msgstr[0] ""
 msgstr[1] ""
 
-#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/shell_completion.py:326
+#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/shell_completion.py:325
 msgid "Shell completion is not supported for Bash versions older than 4.4."
 msgstr ""
 
@@ -494,14 +496,14 @@ msgid ""
 "\t{choices}"
 msgstr ""
 
-#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/types.py:299
+#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/types.py:301
 #, python-brace-format
 msgid "{value!r} is not {choice}."
 msgid_plural "{value!r} is not one of {choices}."
 msgstr[0] ""
 msgstr[1] ""
 
-#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/types.py:393
+#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/types.py:395
 #, python-brace-format
 msgid "{value!r} does not match the format {format}."
 msgid_plural "{value!r} does not match the formats {formats}."
@@ -570,7 +572,7 @@ msgstr ""
 msgid "{name} {filename!r} is not executable."
 msgstr ""
 
-#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/types.py:992
+#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/types.py:991
 #, python-brace-format
 msgid "{len_type} values are required, but {len_value} was given."
 msgid_plural "{len_type} values are required, but {len_value} were given."

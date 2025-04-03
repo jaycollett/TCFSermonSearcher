@@ -553,6 +553,25 @@ def audiofiles(filename):
     return send_from_directory(current_app.config.get("AUDIOFILES_DIR"), filename)
 
 
+@bp.route("/shared_images/<path:filename>")
+def shared_images(filename):
+    """
+    Serve images from the shared images directory.
+    
+    Args:
+        filename: Name of the image file
+        
+    Returns:
+        Image file response
+    """
+    # If SHARED_IMAGES_DIR is configured, serve from there
+    if current_app.config.get("SHARED_IMAGES_DIR"):
+        return send_from_directory(current_app.config.get("SHARED_IMAGES_DIR"), filename)
+    
+    # Fall back to static/images if SHARED_IMAGES_DIR is not configured
+    return send_from_directory(os.path.join(current_app.root_path, "static", "images"), filename)
+
+
 @bp.route("/api/metrics", methods=["GET"])
 def api_metrics():
     """
@@ -688,10 +707,18 @@ def update_stats():
         top_ten_words = json.dumps(top_ten_list)
 
         # Generate word cloud from the word count data we already have
-        static_images_dir = os.path.join(current_app.root_path, "static", "images")
-        if not os.path.exists(static_images_dir):
-            os.makedirs(static_images_dir)
-        word_cloud_path = os.path.join(static_images_dir, "data_cloud.png")
+        # Use shared images directory in production, fall back to static directory in development
+        if current_app.config.get('SHARED_IMAGES_DIR'):
+            images_dir = current_app.config.get('SHARED_IMAGES_DIR')
+            if not os.path.exists(images_dir):
+                os.makedirs(images_dir)
+            word_cloud_path = os.path.join(images_dir, "data_cloud.png")
+        else:
+            # Development fallback
+            static_images_dir = os.path.join(current_app.root_path, "static", "images")
+            if not os.path.exists(static_images_dir):
+                os.makedirs(static_images_dir)
+            word_cloud_path = os.path.join(static_images_dir, "data_cloud.png")
         
         # Use the top words we already counted instead of regenerating from all text
         # This is much more efficient than feeding the entire corpus to WordCloud
@@ -753,8 +780,18 @@ def update_stats():
             plt.title('Top 10 Bi-grams')
             plt.xticks(rotation=45, ha='right')
             plt.tight_layout()
-            bigram_chart_path = os.path.join(static_images_dir, "bigram_chart.png")
-            plt.savefig(bigram_chart_path)
+            
+            # Use shared images directory in production, fall back to static directory in development
+            if current_app.config.get('SHARED_IMAGES_DIR'):
+                images_dir = current_app.config.get('SHARED_IMAGES_DIR')
+                bigram_chart_path = os.path.join(images_dir, "bigram_chart.png")
+                plt.savefig(bigram_chart_path)
+            else:
+                # Development fallback
+                static_images_dir = os.path.join(current_app.root_path, "static", "images")
+                bigram_chart_path = os.path.join(static_images_dir, "bigram_chart.png")
+                plt.savefig(bigram_chart_path)
+            
             plt.close()
 
         # Find most common category using SQL for efficiency

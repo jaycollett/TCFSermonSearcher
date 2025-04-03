@@ -153,16 +153,26 @@
   <div class="card mb-3">
     <div class="card-body text-center">
       <h5 class="card-title">{{ _("Word Cloud") }}</h5>
+      {% if config.SHARED_IMAGES_DIR %}
+      <img src="{{ url_for('main.shared_images', filename='data_cloud.png') }}" alt="{{ _('Word Cloud') }}"
+        class="img-fluid">
+      {% else %}
       <img src="{{ url_for('static', filename='images/data_cloud.png') }}" alt="{{ _('Word Cloud') }}"
         class="img-fluid">
+      {% endif %}
     </div>
   </div>
 
   <!-- Top 10 Bi-grams Bar Chart -->
   <div class="card mb-3">
     <div class="card-body text-center">
+      {% if config.SHARED_IMAGES_DIR %}
+      <img src="{{ url_for('main.shared_images', filename='bigram_chart.png') }}" alt="{{ _('Bi-gram Chart') }}"
+        class="img-fluid">
+      {% else %}
       <img src="{{ url_for('static', filename='images/bigram_chart.png') }}" alt="{{ _('Bi-gram Chart') }}"
         class="img-fluid">
+      {% endif %}
     </div>
   </div>
 
