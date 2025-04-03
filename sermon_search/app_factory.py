@@ -154,5 +154,17 @@ def create_app(config_name=None):
         """
         language = request.cookies.get('language', 'en')
         return dict(language=language)
+        
+    # Add security headers to every response
+    @app.after_request
+    def set_security_headers(response):
+        """
+        Add security headers to all responses
+        """
+        response.headers["X-Frame-Options"] = "SAMEORIGIN"
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["X-XSS-Protection"] = "1; mode=block"
+        response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+        return response
 
     return app
