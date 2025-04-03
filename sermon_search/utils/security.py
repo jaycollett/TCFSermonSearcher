@@ -16,10 +16,20 @@ def get_client_ip() -> str:
     """
     Extract the real client IP behind a reverse proxy.
     
+    If request.remote_addr is a 10.x internal IP, it falls back to the X-Forwarded-For header.
+    
     Returns:
-        str: The client's IP address
+        str: The client's IP address.
     """
-    return request.remote_addr
+    remote_ip = request.remote_addr
+    # Check if remote_addr is an internal (10.x) IP
+    if remote_ip.startswith("10."):
+        # Get the X-Forwarded-For header value (if available)
+        xff = request.headers.get("X-Forwarded-For")
+        if xff:
+            # The first IP in the X-Forwarded-For header is the original client IP
+            return xff.split(",")[0].strip()
+    return remote_ip
 
 
 def is_ip_banned(ip: str) -> bool:
