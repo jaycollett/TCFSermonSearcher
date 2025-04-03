@@ -144,11 +144,11 @@ msgstr "Inglés"
 #: templates/layout.html:249
 #, fuzzy
 msgid ""
-"📖 Sermon Search | Written by: Jay Collett | Version: 0.3.57 | Date: March"
-" 17, 2025"
+"📖 Sermon Search | Written by: Jay Collett | Version: 0.3.67 | Date: April"
+" 2, 2025"
 msgstr ""
-"📖 Búsqueda de Sermones | Escrito por: Jay Collett | Versión: 0.3.57 | "
-"Fecha: 17 de Marzo de 2025"
+"📖 Búsqueda de Sermones | Escrito por: Jay Collett | Versión: 0.3.67 | "
+"Fecha: 2 de Abril de 2025"
 
 #: templates/layout.html:251 templates/stats.html:50
 msgid "Stats for nerds"
