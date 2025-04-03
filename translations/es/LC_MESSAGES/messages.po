@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-04-03 16:03-0400\n"
+"POT-Creation-Date: 2025-04-03 16:50-0400\n"
 "PO-Revision-Date: 2025-03-08 17:45-0500\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: es\n"
@@ -22,11 +22,11 @@ msgstr ""
 msgid "Welcome to Sermon Search!"
 msgstr "¡Bienvenido a la Búsqueda de Sermones!"
 
-#: /home/jay/SourceCode/TCFSermonSearcher/sermon_search/routes.py:376
+#: /home/jay/SourceCode/TCFSermonSearcher/sermon_search/routes.py:380
 msgid "An error occurred while processing your search. Please try again."
 msgstr "Ocurrió un error al procesar su búsqueda. Por favor, inténtelo de nuevo."
 
-#: /home/jay/SourceCode/TCFSermonSearcher/sermon_search/routes.py:414
+#: /home/jay/SourceCode/TCFSermonSearcher/sermon_search/routes.py:418
 msgid "Sermon not found"
 msgstr "Sermón no encontrado"
 

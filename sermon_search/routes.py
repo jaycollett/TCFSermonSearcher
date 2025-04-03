@@ -315,6 +315,10 @@ def search():
     selected_categories = request.args.getlist("categories")
     all_categories = get_all_categories(language)
     search_type = request.args.get("search_type", "new_search").strip()
+    current_app.logger.info("Request headers: %s", dict(request.headers))
+    current_app.logger.info("X-Forwarded-For header: %s", request.headers.get("X-Forwarded-For"))
+    # If using ProxyFix, request.remote_addr reflects the client IP from X-Forwarded-For
+    current_app.logger.info("Client IP (remote_addr) from ProxyFix: %s", request.remote_addr)
     
     if not query:
         response = make_response(render_template(
