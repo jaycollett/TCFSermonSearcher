@@ -244,7 +244,7 @@
     <footer class="footer">
         <div class="footer-container">
             <span class="footer-text">
-                {{ _("📖 Sermon Search | Written by: Jay Collett | Version: 0.4.12 | Date: April 3, 2025") }}
+                {{ _("📖 Sermon Search | Written by: Jay Collett | Version: %(version)s | Date: %(date)s", version=app_version, date=release_date) }}
             </span>
             <a href="{{ url_for('main.stats') }}" class="stats-link">{{ _("Stats for nerds") }}</a>
         </div>

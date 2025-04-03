@@ -152,6 +152,17 @@ def init_metrics_db() -> None:
                 timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
             );
         """)
+        
+        # Create indexes for Search_History table to speed up common queries
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_search_history_timestamp ON Search_History(timestamp);")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_search_history_query_visitor ON Search_History(search_query, visitor_id);")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_search_history_type ON Search_History(search_type);")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_search_history_categories ON Search_History(category_filters);")
+        
+        # Create indexes for Sermon_Access table
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_sermon_access_timestamp ON Sermon_Access(timestamp);")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_sermon_access_guid_visitor ON Sermon_Access(sermon_guid, visitor_id);")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_sermon_access_guid ON Sermon_Access(sermon_guid);")
         conn.commit()
         
         # Run migrations for existing tables

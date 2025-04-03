@@ -606,7 +606,7 @@ def update_stats():
         if not total_sermons_query:
             return jsonify({"error": "No sermons found"}), 404
             
-        total_sermons = total_sermons_query[0]["count"]
+        total_sermons = total_sermons_query[0]["count"] if "count" in total_sermons_query[0] else total_sermons_query[0][0]
         
         if total_sermons == 0:
             return jsonify({"error": "No sermons found"}), 404

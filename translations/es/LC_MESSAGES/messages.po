@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-03-14 15:38-0400\n"
+"POT-Creation-Date: 2025-04-03 14:51-0400\n"
 "PO-Revision-Date: 2025-03-08 17:45-0500\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: es\n"
@@ -18,23 +18,23 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.17.0\n"
 
-#: routes.py:138 sermon_search/routes.py:59
+#: /home/jay/SourceCode/TCFSermonSearcher/sermon_search/routes.py:238
 msgid "Welcome to Sermon Search!"
 msgstr "¡Bienvenido a la Búsqueda de Sermones!"
 
-#: routes.py:266 sermon_search/routes.py:178
+#: /home/jay/SourceCode/TCFSermonSearcher/sermon_search/routes.py:376
 msgid "An error occurred while processing your search. Please try again."
 msgstr "Ocurrió un error al procesar su búsqueda. Por favor, inténtelo de nuevo."
 
-#: routes.py:297 sermon_search/routes.py:212
+#: /home/jay/SourceCode/TCFSermonSearcher/sermon_search/routes.py:414
 msgid "Sermon not found"
 msgstr "Sermón no encontrado"
 
-#: templates/index.html:157
+#: /home/jay/SourceCode/TCFSermonSearcher/sermon_search/templates/index.html:157
 msgid "Welcome to Sermon Search"
 msgstr "Bienvenido a la Búsqueda de Sermones"
 
-#: templates/index.html:158
+#: /home/jay/SourceCode/TCFSermonSearcher/sermon_search/templates/index.html:158
 msgid ""
 "Easily find and revisit past sermons by searching key topics, phrases, "
 "scripture or category."
@@ -42,15 +42,15 @@ msgstr ""
 "Encuentra y revisita fácilmente sermones anteriores buscando temas clave,"
 " frases, pasajes bíblicos o categorías."
 
-#: templates/index.html:159
+#: /home/jay/SourceCode/TCFSermonSearcher/sermon_search/templates/index.html:159
 msgid "Start Searching"
 msgstr "Comienza a buscar"
 
-#: templates/index.html:165
+#: /home/jay/SourceCode/TCFSermonSearcher/sermon_search/templates/index.html:165
 msgid "The Inspiration Behind This Project"
 msgstr "La inspiración detrás de este proyecto"
 
-#: templates/index.html:167
+#: /home/jay/SourceCode/TCFSermonSearcher/sermon_search/templates/index.html:167
 msgid ""
 "This project was born from a light-hearted moment during a <span "
 "class='highlight'>Craw/LaSage\n"
@@ -59,7 +59,7 @@ msgstr ""
 "Este proyecto surgió de un momento desenfadado durante una reunión del "
 "grupo de hogar <span class='highlight'>Craw/LaSage</span>."
 
-#: templates/index.html:171
+#: /home/jay/SourceCode/TCFSermonSearcher/sermon_search/templates/index.html:171
 msgid ""
 "During the meeting, we were discussing how difficult it can be to find "
 "something specific in our old\n"
@@ -72,11 +72,11 @@ msgstr ""
 " me ocurrió: ¿qué tan increíble sería poder buscar rápidamente un sermón "
 "basándonos en nuestras propias notas o ideas principales?"
 
-#: templates/index.html:174
+#: /home/jay/SourceCode/TCFSermonSearcher/sermon_search/templates/index.html:174
 msgid "What started as a passing thought turned into a mission."
 msgstr "Lo que comenzó como un pensamiento pasajero se convirtió en una misión."
 
-#: templates/index.html:178
+#: /home/jay/SourceCode/TCFSermonSearcher/sermon_search/templates/index.html:178
 msgid ""
 "These sermons hold spiritual wisdom—guidance, truth, and encouragement "
 "that can uplift and transform\n"
@@ -87,7 +87,7 @@ msgstr ""
 " que pueden elevar y transformar vidas. Ha sido sumamente gratificante "
 "ayudar a hacerlos aún más accesibles para todos."
 
-#: templates/index.html:183
+#: /home/jay/SourceCode/TCFSermonSearcher/sermon_search/templates/index.html:183
 msgid ""
 "Leveraging my experience in technology, I developed a solution—<span "
 "class='highlight'>Sermon\n"
@@ -98,7 +98,7 @@ msgstr ""
 "class='highlight'>Sermon Search</span>—en la que los sermones anteriores "
 "son transcritos, indexados e incluso traducidos."
 
-#: templates/index.html:187
+#: /home/jay/SourceCode/TCFSermonSearcher/sermon_search/templates/index.html:187
 msgid ""
 "Whether you're revisiting a past message, searching for biblical "
 "references, or exploring specific topics,\n"
@@ -108,7 +108,7 @@ msgstr ""
 "bíblicas o explorando temas específicos, ahora puedes hacerlo en el "
 "idioma que te resulte más familiar."
 
-#: templates/index.html:191
+#: /home/jay/SourceCode/TCFSermonSearcher/sermon_search/templates/index.html:191
 msgid ""
 "This wouldn’t be possible without the dedication and hard work of those "
 "who have faithfully prepared and\n"
@@ -121,465 +121,495 @@ msgstr ""
 "Dios se comparta con claridad, verdad y amor. Disfruta explorando; es mi "
 "oración que este recurso sea una bendición para ti."
 
-#: templates/layout.html:6
+#: /home/jay/SourceCode/TCFSermonSearcher/sermon_search/templates/layout.html:6
 msgid "Sermon Search"
 msgstr "Búsqueda de Sermones"
 
-#: templates/layout.html:205
+#: /home/jay/SourceCode/TCFSermonSearcher/sermon_search/templates/layout.html:203
 msgid "Search"
 msgstr "Buscar"
 
-#: templates/layout.html:208
+#: /home/jay/SourceCode/TCFSermonSearcher/sermon_search/templates/layout.html:206
 msgid "Sermon Index"
 msgstr "Índice de Sermones"
 
-#: templates/layout.html:214 templates/layout.html:231
+#: /home/jay/SourceCode/TCFSermonSearcher/sermon_search/templates/layout.html:212
+#: /home/jay/SourceCode/TCFSermonSearcher/sermon_search/templates/layout.html:229
 msgid "Spanish"
 msgstr "Español"
 
-#: templates/layout.html:216 templates/layout.html:224
+#: /home/jay/SourceCode/TCFSermonSearcher/sermon_search/templates/layout.html:214
+#: /home/jay/SourceCode/TCFSermonSearcher/sermon_search/templates/layout.html:222
 msgid "English"
 msgstr "Inglés"
 
-#: templates/layout.html:249
+#: /home/jay/SourceCode/TCFSermonSearcher/sermon_search/templates/layout.html:247
+#, python-format
 msgid ""
-"📖 Sermon Search | Written by: Jay Collett | Version: 0.4.12 | Date: April"
-" 3, 2025"
+"📖 Sermon Search | Written by: Jay Collett | Version: %(version)s | Date: "
+"%(date)s"
 msgstr ""
-"📖 Búsqueda de Sermones | Escrito por: Jay Collett | Versión: 0.4.12 | "
-"Fecha: 3 de Abril de 2025"
+"📖 Búsqueda de Sermones | Escrito por: Jay Collett | Versión: %(version)s "
+"| Fecha: %(date)s"
 
-#: templates/layout.html:251 templates/stats.html:50
+#: /home/jay/SourceCode/TCFSermonSearcher/sermon_search/templates/layout.html:249
+#: /home/jay/SourceCode/TCFSermonSearcher/sermon_search/templates/stats.html:50
 msgid "Stats for nerds"
 msgstr "Estadísticas para nerds"
 
-#: templates/results.html:213
+#: /home/jay/SourceCode/TCFSermonSearcher/sermon_search/templates/results.html:218
 msgid "Category Filters"
 msgstr "Filtros de Categorías"
 
-#: templates/results.html:225
+#: /home/jay/SourceCode/TCFSermonSearcher/sermon_search/templates/results.html:230
 msgid "Back to Search"
 msgstr "Volver a la Búsqueda"
 
-#: templates/results.html:256
+#: /home/jay/SourceCode/TCFSermonSearcher/sermon_search/templates/results.html:261
 msgid "English, Spanish Audio Available"
 msgstr "Audio disponible en inglés y español"
 
-#: templates/results.html:343
+#: /home/jay/SourceCode/TCFSermonSearcher/sermon_search/templates/results.html:348
 msgid "No results found."
 msgstr "No se encontraron resultados."
 
-#: templates/results.html:343
+#: /home/jay/SourceCode/TCFSermonSearcher/sermon_search/templates/results.html:348
 msgid "Try a different search term."
 msgstr "Intenta con un término de búsqueda diferente."
 
-#: templates/search.html:165 templates/search.html:188
+#: /home/jay/SourceCode/TCFSermonSearcher/sermon_search/templates/search.html:165
+#: /home/jay/SourceCode/TCFSermonSearcher/sermon_search/templates/search.html:188
 msgid "Search Sermons"
 msgstr "Buscar Sermones"
 
-#: templates/search.html:166
+#: /home/jay/SourceCode/TCFSermonSearcher/sermon_search/templates/search.html:166
 msgid "Find past sermons by keyword or topic."
 msgstr "Encuentra sermones anteriores por palabra clave o tema."
 
-#: templates/search.html:170 templates/search.html:171
+#: /home/jay/SourceCode/TCFSermonSearcher/sermon_search/templates/search.html:170
+#: /home/jay/SourceCode/TCFSermonSearcher/sermon_search/templates/search.html:171
 msgid "Enter a search term or phrase..."
 msgstr "Ingresa un término o frase de búsqueda..."
 
-#: templates/search.html:173
+#: /home/jay/SourceCode/TCFSermonSearcher/sermon_search/templates/search.html:173
 msgid "Category Filters (optional)"
 msgstr "Filtros de Categorías (opcional)"
 
-#: templates/sermon.html:126
+#: /home/jay/SourceCode/TCFSermonSearcher/sermon_search/templates/sermon.html:126
 msgid "Your browser does not support the audio element."
 msgstr "Tu navegador no soporta el elemento de audio."
 
-#: templates/sermon.html:129
+#: /home/jay/SourceCode/TCFSermonSearcher/sermon_search/templates/sermon.html:129
 msgid "Audio not available."
 msgstr "Audio no disponible."
 
-#: templates/sermon.html:134
+#: /home/jay/SourceCode/TCFSermonSearcher/sermon_search/templates/sermon.html:134
 msgid "Back to Search Results"
 msgstr "Volver a los Resultados de Búsqueda"
 
-#: templates/sermon.html:147
+#: /home/jay/SourceCode/TCFSermonSearcher/sermon_search/templates/sermon.html:147
 msgid "AI-Generated Sermon Insights"
 msgstr "Perspectivas de Sermones Generadas por IA"
 
-#: templates/sermon.html:152
+#: /home/jay/SourceCode/TCFSermonSearcher/sermon_search/templates/sermon.html:152
 msgid "Summary"
 msgstr "Resumen"
 
-#: templates/sermon.html:157
+#: /home/jay/SourceCode/TCFSermonSearcher/sermon_search/templates/sermon.html:157
 msgid "Bible References"
 msgstr "Referencias Bíblicas"
 
-#: templates/sermon.html:162
+#: /home/jay/SourceCode/TCFSermonSearcher/sermon_search/templates/sermon.html:162
 msgid "Sermon Style"
 msgstr "Estilo del Sermón"
 
-#: templates/sermon.html:167
+#: /home/jay/SourceCode/TCFSermonSearcher/sermon_search/templates/sermon.html:167
 msgid "Topics"
 msgstr "Temas"
 
-#: templates/sermon.html:173
+#: /home/jay/SourceCode/TCFSermonSearcher/sermon_search/templates/sermon.html:173
 msgid "Key Quotes"
 msgstr "Citas Clave"
 
-#: templates/sermon.html:180
+#: /home/jay/SourceCode/TCFSermonSearcher/sermon_search/templates/sermon.html:180
 msgid "Sentiment"
 msgstr "Sentimiento"
 
-#: templates/sermon.html:185
+#: /home/jay/SourceCode/TCFSermonSearcher/sermon_search/templates/sermon.html:185
 msgid "Citas Claves"
 msgstr "Citas Clave"
 
-#: templates/sermon.html:192
+#: /home/jay/SourceCode/TCFSermonSearcher/sermon_search/templates/sermon.html:192
 msgid "Sentimiento"
 msgstr "Sentimiento"
 
-#: templates/sermons.html:75
+#: /home/jay/SourceCode/TCFSermonSearcher/sermon_search/templates/sermons.html:75
 msgid "📂 Sermon Index"
 msgstr "📂 Índice de Sermones"
 
-#: templates/stats.html:57
+#: /home/jay/SourceCode/TCFSermonSearcher/sermon_search/templates/stats.html:57
 msgid "Total Sermons"
 msgstr "Total de Sermones"
 
-#: templates/stats.html:65
+#: /home/jay/SourceCode/TCFSermonSearcher/sermon_search/templates/stats.html:65
 msgid "Average Words per Sermon"
 msgstr "Promedio de Palabras por Sermón"
 
-#: templates/stats.html:75
+#: /home/jay/SourceCode/TCFSermonSearcher/sermon_search/templates/stats.html:75
+#, fuzzy
+msgid "Top Accessed Sermons"
+msgstr "Total de Sermones"
+
+#: /home/jay/SourceCode/TCFSermonSearcher/sermon_search/templates/stats.html:81
+msgid "views"
+msgstr ""
+
+#: /home/jay/SourceCode/TCFSermonSearcher/sermon_search/templates/stats.html:86
+msgid "No sermon access data available yet."
+msgstr ""
+
+#: /home/jay/SourceCode/TCFSermonSearcher/sermon_search/templates/stats.html:94
 msgid "Largest Sermon"
 msgstr "Sermón Más Largo"
 
-#: templates/stats.html:79 templates/stats.html:92
+#: /home/jay/SourceCode/TCFSermonSearcher/sermon_search/templates/stats.html:104
+#: /home/jay/SourceCode/TCFSermonSearcher/sermon_search/templates/stats.html:123
 msgid "Word Count:"
 msgstr "Recuento de Palabras:"
 
-#: templates/stats.html:88
+#: /home/jay/SourceCode/TCFSermonSearcher/sermon_search/templates/stats.html:113
 msgid "Shortest Sermon"
 msgstr "Sermón Más Corto"
 
-#: templates/stats.html:101
+#: /home/jay/SourceCode/TCFSermonSearcher/sermon_search/templates/stats.html:132
 msgid "Most Common Category"
 msgstr "Categoría Más Común"
 
-#: templates/stats.html:109
+#: /home/jay/SourceCode/TCFSermonSearcher/sermon_search/templates/stats.html:140
 msgid "Top Ten Words"
 msgstr "Las Diez Palabras Más Frecuentes"
 
-#: templates/stats.html:124 templates/stats.html:125
+#: /home/jay/SourceCode/TCFSermonSearcher/sermon_search/templates/stats.html:155
+#: /home/jay/SourceCode/TCFSermonSearcher/sermon_search/templates/stats.html:156
 msgid "Word Cloud"
 msgstr "Nube de Palabras"
 
-#: templates/stats.html:133
+#: /home/jay/SourceCode/TCFSermonSearcher/sermon_search/templates/stats.html:164
 msgid "Bi-gram Chart"
 msgstr "Gráfico de Bi-gramas"
 
-#: templates/stats.html:139
+#: /home/jay/SourceCode/TCFSermonSearcher/sermon_search/templates/stats.html:170
 msgid "Last updated:"
 msgstr "Última actualización:"
 
-#: venv/lib/python3.12/site-packages/click/_termui_impl.py:556
+#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/_termui_impl.py:556
 #, python-brace-format
 msgid "{editor}: Editing failed"
 msgstr ""
 
-#: venv/lib/python3.12/site-packages/click/_termui_impl.py:560
+#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/_termui_impl.py:560
 #, python-brace-format
 msgid "{editor}: Editing failed: {e}"
 msgstr ""
 
-#: venv/lib/python3.12/site-packages/click/core.py:1124
+#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/core.py:1124
 msgid "Aborted!"
 msgstr ""
 
-#: venv/lib/python3.12/site-packages/click/core.py:1349
-#: venv/lib/python3.12/site-packages/click/core.py:1379
+#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/core.py:1349
+#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/core.py:1379
 #, python-brace-format
 msgid "(Deprecated) {text}"
 msgstr ""
 
-#: venv/lib/python3.12/site-packages/click/core.py:1396
+#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/core.py:1396
 #, fuzzy
 msgid "Options"
 msgstr "Temas"
 
-#: venv/lib/python3.12/site-packages/click/core.py:1422
+#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/core.py:1422
 #, python-brace-format
 msgid "Got unexpected extra argument ({args})"
 msgid_plural "Got unexpected extra arguments ({args})"
 msgstr[0] ""
 msgstr[1] ""
 
-#: venv/lib/python3.12/site-packages/click/core.py:1438
+#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/core.py:1438
 #, python-brace-format
 msgid "DeprecationWarning: The command {name!r} is deprecated."
 msgstr ""
 
-#: venv/lib/python3.12/site-packages/click/core.py:1645
+#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/core.py:1645
 msgid "Commands"
 msgstr ""
 
-#: venv/lib/python3.12/site-packages/click/core.py:1677
+#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/core.py:1677
 msgid "Missing command."
 msgstr ""
 
-#: venv/lib/python3.12/site-packages/click/core.py:1755
+#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/core.py:1755
 #, python-brace-format
 msgid "No such command {name!r}."
 msgstr ""
 
-#: venv/lib/python3.12/site-packages/click/core.py:2313
+#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/core.py:2313
 msgid "Value must be an iterable."
 msgstr ""
 
-#: venv/lib/python3.12/site-packages/click/core.py:2334
+#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/core.py:2334
 #, python-brace-format
 msgid "Takes {nargs} values but 1 was given."
 msgid_plural "Takes {nargs} values but {len} were given."
 msgstr[0] ""
 msgstr[1] ""
 
-#: venv/lib/python3.12/site-packages/click/core.py:2783
+#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/core.py:2783
 #, python-brace-format
 msgid "env var: {var}"
 msgstr ""
 
-#: venv/lib/python3.12/site-packages/click/core.py:2813
+#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/core.py:2813
 msgid "(dynamic)"
 msgstr ""
 
-#: venv/lib/python3.12/site-packages/click/core.py:2828
+#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/core.py:2828
 #, python-brace-format
 msgid "default: {default}"
 msgstr ""
 
-#: venv/lib/python3.12/site-packages/click/core.py:2841
+#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/core.py:2841
 msgid "required"
 msgstr ""
 
-#: venv/lib/python3.12/site-packages/click/decorators.py:457
+#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/decorators.py:457
 #, python-format
 msgid "%(prog)s, version %(version)s"
 msgstr ""
 
-#: venv/lib/python3.12/site-packages/click/decorators.py:520
+#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/decorators.py:520
 msgid "Show the version and exit."
 msgstr ""
 
-#: venv/lib/python3.12/site-packages/click/decorators.py:541
+#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/decorators.py:541
 msgid "Show this message and exit."
 msgstr ""
 
-#: venv/lib/python3.12/site-packages/click/exceptions.py:49
-#: venv/lib/python3.12/site-packages/click/exceptions.py:88
+#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/exceptions.py:49
+#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/exceptions.py:88
 #, python-brace-format
 msgid "Error: {message}"
 msgstr ""
 
-#: venv/lib/python3.12/site-packages/click/exceptions.py:80
+#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/exceptions.py:80
 #, python-brace-format
 msgid "Try '{command} {option}' for help."
 msgstr ""
 
-#: venv/lib/python3.12/site-packages/click/exceptions.py:129
+#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/exceptions.py:129
 #, python-brace-format
 msgid "Invalid value: {message}"
 msgstr ""
 
-#: venv/lib/python3.12/site-packages/click/exceptions.py:131
+#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/exceptions.py:131
 #, python-brace-format
 msgid "Invalid value for {param_hint}: {message}"
 msgstr ""
 
-#: venv/lib/python3.12/site-packages/click/exceptions.py:187
+#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/exceptions.py:187
 msgid "Missing argument"
 msgstr ""
 
-#: venv/lib/python3.12/site-packages/click/exceptions.py:189
+#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/exceptions.py:189
 msgid "Missing option"
 msgstr ""
 
-#: venv/lib/python3.12/site-packages/click/exceptions.py:191
+#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/exceptions.py:191
 msgid "Missing parameter"
 msgstr ""
 
-#: venv/lib/python3.12/site-packages/click/exceptions.py:193
+#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/exceptions.py:193
 #, python-brace-format
 msgid "Missing {param_type}"
 msgstr ""
 
-#: venv/lib/python3.12/site-packages/click/exceptions.py:200
+#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/exceptions.py:200
 #, python-brace-format
 msgid "Missing parameter: {param_name}"
 msgstr ""
 
-#: venv/lib/python3.12/site-packages/click/exceptions.py:220
+#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/exceptions.py:220
 #, python-brace-format
 msgid "No such option: {name}"
 msgstr ""
 
-#: venv/lib/python3.12/site-packages/click/exceptions.py:232
+#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/exceptions.py:232
 #, python-brace-format
 msgid "Did you mean {possibility}?"
 msgid_plural "(Possible options: {possibilities})"
 msgstr[0] ""
 msgstr[1] ""
 
-#: venv/lib/python3.12/site-packages/click/exceptions.py:270
+#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/exceptions.py:270
 msgid "unknown error"
 msgstr ""
 
-#: venv/lib/python3.12/site-packages/click/exceptions.py:277
+#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/exceptions.py:277
 #, python-brace-format
 msgid "Could not open file {filename!r}: {message}"
 msgstr ""
 
-#: venv/lib/python3.12/site-packages/click/formatting.py:156
+#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/formatting.py:156
 msgid "Usage:"
 msgstr ""
 
-#: venv/lib/python3.12/site-packages/click/parser.py:233
+#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/parser.py:233
 #, python-brace-format
 msgid "Argument {name!r} takes {nargs} values."
 msgstr ""
 
-#: venv/lib/python3.12/site-packages/click/parser.py:415
+#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/parser.py:415
 #, python-brace-format
 msgid "Option {name!r} does not take a value."
 msgstr ""
 
-#: venv/lib/python3.12/site-packages/click/parser.py:476
+#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/parser.py:476
 #, python-brace-format
 msgid "Option {name!r} requires an argument."
 msgid_plural "Option {name!r} requires {nargs} arguments."
 msgstr[0] ""
 msgstr[1] ""
 
-#: venv/lib/python3.12/site-packages/click/shell_completion.py:326
+#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/shell_completion.py:326
 msgid "Shell completion is not supported for Bash versions older than 4.4."
 msgstr ""
 
-#: venv/lib/python3.12/site-packages/click/shell_completion.py:333
+#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/shell_completion.py:333
 msgid "Couldn't detect Bash version, shell completion is not supported."
 msgstr ""
 
-#: venv/lib/python3.12/site-packages/click/termui.py:158
+#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/termui.py:158
 msgid "Repeat for confirmation"
 msgstr ""
 
-#: venv/lib/python3.12/site-packages/click/termui.py:174
+#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/termui.py:174
 msgid "Error: The value you entered was invalid."
 msgstr ""
 
-#: venv/lib/python3.12/site-packages/click/termui.py:176
+#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/termui.py:176
 #, python-brace-format
 msgid "Error: {e.message}"
 msgstr ""
 
-#: venv/lib/python3.12/site-packages/click/termui.py:187
+#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/termui.py:187
 msgid "Error: The two entered values do not match."
 msgstr ""
 
-#: venv/lib/python3.12/site-packages/click/termui.py:243
+#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/termui.py:243
 msgid "Error: invalid input"
 msgstr ""
 
-#: venv/lib/python3.12/site-packages/click/termui.py:773
+#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/termui.py:773
 msgid "Press any key to continue..."
 msgstr ""
 
-#: venv/lib/python3.12/site-packages/click/types.py:267
+#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/types.py:267
 #, python-brace-format
 msgid ""
 "Choose from:\n"
 "\t{choices}"
 msgstr ""
 
-#: venv/lib/python3.12/site-packages/click/types.py:299
+#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/types.py:299
 #, python-brace-format
 msgid "{value!r} is not {choice}."
 msgid_plural "{value!r} is not one of {choices}."
 msgstr[0] ""
 msgstr[1] ""
 
-#: venv/lib/python3.12/site-packages/click/types.py:393
+#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/types.py:393
 #, python-brace-format
 msgid "{value!r} does not match the format {format}."
 msgid_plural "{value!r} does not match the formats {formats}."
 msgstr[0] ""
 msgstr[1] ""
 
-#: venv/lib/python3.12/site-packages/click/types.py:415
+#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/types.py:415
 #, python-brace-format
 msgid "{value!r} is not a valid {number_type}."
 msgstr ""
 
-#: venv/lib/python3.12/site-packages/click/types.py:471
+#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/types.py:471
 #, python-brace-format
 msgid "{value} is not in the range {range}."
 msgstr ""
 
-#: venv/lib/python3.12/site-packages/click/types.py:612
+#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/types.py:612
 #, fuzzy, python-brace-format
 msgid "{value!r} is not a valid boolean."
 msgstr "Audio no disponible."
 
-#: venv/lib/python3.12/site-packages/click/types.py:636
+#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/types.py:636
 #, python-brace-format
 msgid "{value!r} is not a valid UUID."
 msgstr ""
 
-#: venv/lib/python3.12/site-packages/click/types.py:826
+#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/types.py:826
 msgid "file"
 msgstr ""
 
-#: venv/lib/python3.12/site-packages/click/types.py:828
+#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/types.py:828
 msgid "directory"
 msgstr ""
 
-#: venv/lib/python3.12/site-packages/click/types.py:830
+#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/types.py:830
 msgid "path"
 msgstr ""
 
-#: venv/lib/python3.12/site-packages/click/types.py:881
+#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/types.py:881
 #, python-brace-format
 msgid "{name} {filename!r} does not exist."
 msgstr ""
 
-#: venv/lib/python3.12/site-packages/click/types.py:890
+#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/types.py:890
 #, python-brace-format
 msgid "{name} {filename!r} is a file."
 msgstr ""
 
-#: venv/lib/python3.12/site-packages/click/types.py:898
+#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/types.py:898
 #, python-brace-format
 msgid "{name} {filename!r} is a directory."
 msgstr ""
 
-#: venv/lib/python3.12/site-packages/click/types.py:907
+#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/types.py:907
 #, python-brace-format
 msgid "{name} {filename!r} is not readable."
 msgstr ""
 
-#: venv/lib/python3.12/site-packages/click/types.py:916
+#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/types.py:916
 #, python-brace-format
 msgid "{name} {filename!r} is not writable."
 msgstr ""
 
-#: venv/lib/python3.12/site-packages/click/types.py:925
+#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/types.py:925
 #, python-brace-format
 msgid "{name} {filename!r} is not executable."
 msgstr ""
 
-#: venv/lib/python3.12/site-packages/click/types.py:992
+#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/click/types.py:992
 #, python-brace-format
 msgid "{len_type} values are required, but {len_value} was given."
 msgid_plural "{len_type} values are required, but {len_value} were given."
 msgstr[0] ""
 msgstr[1] ""
+
+#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/isort/main.py:159
+msgid "show this help message and exit"
+msgstr ""
+
+#: /home/jay/SourceCode/TCFSermonSearcher/venv/lib/python3.12/site-packages/mypy/main.py:415
+#, python-format
+msgid "%(prog)s: error: %(message)s\n"
+msgstr ""
 
 #~ msgid "TCF - Sermon Search"
 #~ msgstr "TCF - Búsqueda de Sermones"

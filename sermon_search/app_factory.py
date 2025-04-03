@@ -6,12 +6,14 @@ This module contains the functions to create and configure the Flask application
 
 import os
 import logging
+import datetime
 from flask import Flask, g, request, current_app
 from flask_babel import Babel, gettext as _
 
 from config import get_config
 from sermon_search.database.models import init_main_db
 from sermon_search.database.init_metrics_db import init_metrics_db
+from sermon_search import __version__, __release_date__
 
 
 def get_locale():
@@ -143,17 +145,21 @@ def create_app(config_name=None):
         else:
             return cutoff + '...'
 
-    # Context processor: inject the language into templates
+    # Context processor: inject the language and app version into templates
     @app.context_processor
-    def inject_language():
+    def inject_template_globals():
         """
-        Inject the current language into all templates.
+        Inject global variables into all templates.
         
         Returns:
-            dict: Dictionary with language information
+            dict: Dictionary with language information and app version
         """
         language = request.cookies.get('language', 'en')
-        return dict(language=language)
+        return dict(
+            language=language,
+            app_version=__version__,
+            release_date=__release_date__
+        )
         
     # Add security headers to every response
     @app.after_request
