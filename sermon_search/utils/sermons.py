@@ -188,33 +188,40 @@ def get_sermon_statistics() -> Dict[str, Any]:
     except Exception as e:
         current_app.logger.error(f"Failed to get top accessed sermons: {str(e)}", exc_info=True)
     
-    # Get sermon GUIDs for largest and shortest sermons
+    # Get sermon GUIDs directly from stats table
     largest_sermon_guid = None
     shortest_sermon_guid = None
     
     if row:
         try:
-            # Find the sermon GUID for the largest sermon
-            largest_sermon_query = """
-                SELECT sermon_guid FROM sermons 
-                WHERE sermon_title = ? AND language = 'en'
-                LIMIT 1
-            """
-            largest_cursor = db.execute(largest_sermon_query, (row["largest_sermon_title"],))
-            largest_result = largest_cursor.fetchone()
-            if largest_result:
-                largest_sermon_guid = largest_result["sermon_guid"]
+            # Use GUIDs directly from the stats_for_nerds table if available
+            if "largest_sermon_guid" in row and row["largest_sermon_guid"]:
+                largest_sermon_guid = row["largest_sermon_guid"]
+            else:
+                # Backward compatibility for older database versions
+                largest_sermon_query = """
+                    SELECT sermon_guid FROM sermons 
+                    WHERE sermon_title = ? AND language = 'en'
+                    LIMIT 1
+                """
+                largest_cursor = db.execute(largest_sermon_query, (row["largest_sermon_title"],))
+                largest_result = largest_cursor.fetchone()
+                if largest_result:
+                    largest_sermon_guid = largest_result["sermon_guid"]
                 
-            # Find the sermon GUID for the shortest sermon
-            shortest_sermon_query = """
-                SELECT sermon_guid FROM sermons 
-                WHERE sermon_title = ? AND language = 'en'
-                LIMIT 1
-            """
-            shortest_cursor = db.execute(shortest_sermon_query, (row["shortest_sermon_title"],))
-            shortest_result = shortest_cursor.fetchone()
-            if shortest_result:
-                shortest_sermon_guid = shortest_result["sermon_guid"]
+            if "shortest_sermon_guid" in row and row["shortest_sermon_guid"]:
+                shortest_sermon_guid = row["shortest_sermon_guid"]
+            else:
+                # Backward compatibility for older database versions
+                shortest_sermon_query = """
+                    SELECT sermon_guid FROM sermons 
+                    WHERE sermon_title = ? AND language = 'en'
+                    LIMIT 1
+                """
+                shortest_cursor = db.execute(shortest_sermon_query, (row["shortest_sermon_title"],))
+                shortest_result = shortest_cursor.fetchone()
+                if shortest_result:
+                    shortest_sermon_guid = shortest_result["sermon_guid"]
         except Exception as e:
             current_app.logger.error(f"Failed to get sermon GUIDs: {str(e)}", exc_info=True)
     

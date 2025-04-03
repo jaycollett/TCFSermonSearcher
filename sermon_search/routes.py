@@ -599,52 +599,146 @@ def update_stats():
     
     try:
         db = get_db()
-        sermons = db.execute("SELECT sermon_title, transcription, categories FROM sermons where language = 'en'").fetchall()
-        total_sermons = len(sermons)
+        
+        # Optimize by calculating total sermon count with a direct SQL query
+        total_sermons_query = db.execute("SELECT COUNT(*) as count FROM sermons WHERE language = 'en'").fetchone()
+        total_sermons = total_sermons_query["count"]
         
         if total_sermons == 0:
             return jsonify({"error": "No sermons found"}), 404
-
-        # Calculate sermon statistics
-        total_words = 0
-        sermon_stats = []
-        for sermon in sermons:
-            text = sermon["transcription"]
-            word_count = len(text.split())
-            total_words += word_count
-            sermon_stats.append({
-                "sermon_title": sermon["sermon_title"],
-                "word_count": word_count,
-                "categories": sermon["categories"] if sermon["categories"] else ""
-            })
-
-        average_words = total_words / total_sermons
-        largest_sermon = max(sermon_stats, key=lambda x: x["word_count"])
-        shortest_sermon = min(sermon_stats, key=lambda x: x["word_count"])
-
-        # Analyze text content
-        all_text = " ".join([sermon["transcription"] for sermon in sermons])
-        all_text_clean = re.sub(r'[^\w\s]', '', all_text.lower())
-        words = all_text_clean.split()
-        stop_words = set(stopwords.words('english'))
-        filtered_words = [w for w in words if w not in stop_words]
-        counter = Counter(filtered_words)
+            
+        # Calculate total word count and find largest/shortest sermon with SQL
+        # This avoids loading all transcriptions into memory at once
+        word_counts_query = """
+            SELECT sermon_title, sermon_guid,
+                   LENGTH(transcription) - LENGTH(REPLACE(transcription, ' ', '')) + 1 as word_count
+            FROM sermons 
+            WHERE language = 'en'
+        """
+        word_counts = db.execute(word_counts_query).fetchall()
+        
+        total_word_count = 0
+        largest_word_count = 0
+        largest_sermon_title = ""
+        largest_sermon_guid = ""
+        smallest_word_count = float('inf')
+        smallest_sermon_title = ""
+        smallest_sermon_guid = ""
+        
+        for row in word_counts:
+            word_count = row["word_count"]
+            total_word_count += word_count
+            
+            if word_count > largest_word_count:
+                largest_word_count = word_count
+                largest_sermon_title = row["sermon_title"]
+                largest_sermon_guid = row["sermon_guid"]
+                
+            if word_count < smallest_word_count:
+                smallest_word_count = word_count
+                smallest_sermon_title = row["sermon_title"]
+                smallest_sermon_guid = row["sermon_guid"]
+        
+        average_words = total_word_count / total_sermons
+        
+        # Prepare sermon_stats structure for consistency with the rest of the code
+        largest_sermon = {
+            "sermon_title": largest_sermon_title,
+            "word_count": largest_word_count,
+            "sermon_guid": largest_sermon_guid
+        }
+        
+        shortest_sermon = {
+            "sermon_title": smallest_sermon_title,
+            "word_count": smallest_word_count,
+            "sermon_guid": smallest_sermon_guid
+        }
+        
+        # Process top words in batches to reduce memory usage
+        counter = Counter()
+        batch_size = 100
+        offset = 0
+        
+        while True:
+            batch_query = f"""
+                SELECT transcription FROM sermons 
+                WHERE language = 'en'
+                LIMIT {batch_size} OFFSET {offset}
+            """
+            batch = db.execute(batch_query).fetchall()
+            
+            if not batch:
+                break
+                
+            for sermon in batch:
+                text = sermon["transcription"].lower()
+                text_clean = re.sub(r'[^\w\s]', '', text)
+                words = text_clean.split()
+                stop_words = set(stopwords.words('english'))
+                filtered_words = [w for w in words if w not in stop_words]
+                counter.update(filtered_words)
+                
+            offset += batch_size
+            
         top_ten_list = [{"word": word, "count": count} for word, count in counter.most_common(10)]
         top_ten_words = json.dumps(top_ten_list)
 
-        # Generate word cloud
+        # Generate word cloud from the word count data we already have
         static_images_dir = os.path.join(current_app.root_path, "static", "images")
         if not os.path.exists(static_images_dir):
             os.makedirs(static_images_dir)
         word_cloud_path = os.path.join(static_images_dir, "data_cloud.png")
-        combined_stopwords = STOPWORDS.union(stop_words)
-        wc = WordCloud(width=800, height=400, background_color="white", stopwords=combined_stopwords).generate(all_text)
+        
+        # Use the top words we already counted instead of regenerating from all text
+        # This is much more efficient than feeding the entire corpus to WordCloud
+        word_freq = {item["word"]: item["count"] for item in counter.most_common(300)}
+        
+        combined_stopwords = STOPWORDS.union(set(stopwords.words('english')))
+        wc = WordCloud(
+            width=800, 
+            height=400, 
+            background_color="white", 
+            stopwords=combined_stopwords,
+            max_words=150,
+            prefer_horizontal=0.9
+        ).generate_from_frequencies(word_freq)
         wc.to_file(word_cloud_path)
 
-        # Generate bigram chart
-        bigrams = zip(filtered_words, filtered_words[1:])
-        bigram_list = [' '.join(bigram) for bigram in bigrams]
-        bigram_counter = Counter(bigram_list)
+        # Generate bigram chart more efficiently
+        # Process bigrams in batches simultaneously with the word counting
+        bigram_counter = Counter()
+        
+        # Use the existing batch processing to also count bigrams
+        bigram_batch_size = 100
+        offset = 0
+        
+        while True:
+            batch_query = f"""
+                SELECT transcription FROM sermons 
+                WHERE language = 'en'
+                LIMIT {bigram_batch_size} OFFSET {offset}
+            """
+            batch = db.execute(batch_query).fetchall()
+            
+            if not batch:
+                break
+                
+            for sermon in batch:
+                text = sermon["transcription"].lower()
+                text_clean = re.sub(r'[^\w\s]', '', text)
+                words = text_clean.split()
+                stop_words = set(stopwords.words('english'))
+                filtered_words = [w for w in words if w not in stop_words]
+                
+                # Count bigrams in this batch
+                if len(filtered_words) > 1:
+                    for i in range(len(filtered_words) - 1):
+                        bigram = f"{filtered_words[i]} {filtered_words[i+1]}"
+                        bigram_counter[bigram] += 1
+                
+            offset += bigram_batch_size
+        
+        # Create bigram chart from the processed data
         top_ten_bigrams = bigram_counter.most_common(10)
         if top_ten_bigrams:
             bigrams_labels, bigrams_counts = zip(*top_ten_bigrams)
@@ -659,15 +753,22 @@ def update_stats():
             plt.savefig(bigram_chart_path)
             plt.close()
 
-        # Find most common category
+        # Find most common category using SQL for efficiency
+        categories_query = """
+            SELECT categories FROM sermons 
+            WHERE language = 'en' AND categories IS NOT NULL AND categories != ''
+        """
+        categories_result = db.execute(categories_query).fetchall()
+        
         category_counter = Counter()
-        for sermon in sermons:
-            cats = sermon["categories"]
+        for row in categories_result:
+            cats = row["categories"]
             if cats:
                 for cat in cats.split(","):
                     cat = cat.strip()
                     if cat:
                         category_counter[cat] += 1
+                        
         most_common_category = category_counter.most_common(1)[0][0] if category_counter else None
         now = datetime.datetime.now(datetime.UTC).isoformat()
 
@@ -675,16 +776,20 @@ def update_stats():
         db.execute("DELETE FROM stats_for_nerds")
         db.execute('''
              INSERT INTO stats_for_nerds 
-             (id, total_sermons, average_words_per_sermon, largest_sermon_title, largest_sermon_word_count,
-              shortest_sermon_title, shortest_sermon_word_count, top_ten_words, most_common_category, updated_at)
-             VALUES (1, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+             (id, total_sermons, average_words_per_sermon, 
+              largest_sermon_title, largest_sermon_word_count, largest_sermon_guid,
+              shortest_sermon_title, shortest_sermon_word_count, shortest_sermon_guid,
+              top_ten_words, most_common_category, updated_at)
+             VALUES (1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ''', (
              total_sermons,
              average_words,
              largest_sermon["sermon_title"],
              largest_sermon["word_count"],
+             largest_sermon["sermon_guid"],
              shortest_sermon["sermon_title"],
              shortest_sermon["word_count"],
+             shortest_sermon["sermon_guid"],
              top_ten_words,
              most_common_category,
              now

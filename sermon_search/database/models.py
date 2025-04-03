@@ -67,6 +67,88 @@ def drop_column_if_exists(conn: sqlite3.Connection, table: str, column: str) -> 
             current_app.logger.error(f"Error dropping column '{column}' from table '{table}': {e}")
 
 
+def _migrate_stats_table(conn: sqlite3.Connection) -> None:
+    """
+    Migrate stats_for_nerds table to add new columns.
+    
+    Args:
+        conn: SQLite connection
+    """
+    try:
+        current_app.logger.info("Checking stats_for_nerds table for needed migrations...")
+        
+        # Check if largest_sermon_guid column exists
+        cursor = conn.execute("PRAGMA table_info(stats_for_nerds)")
+        columns = [row["name"] for row in cursor.fetchall()]
+        
+        # Add largest_sermon_guid column if it doesn't exist
+        if "largest_sermon_guid" not in columns:
+            current_app.logger.info("Adding largest_sermon_guid column to stats_for_nerds table")
+            conn.execute("ALTER TABLE stats_for_nerds ADD COLUMN largest_sermon_guid TEXT")
+            conn.commit()
+            current_app.logger.info("Added largest_sermon_guid column")
+        
+        # Add shortest_sermon_guid column if it doesn't exist
+        if "shortest_sermon_guid" not in columns:
+            current_app.logger.info("Adding shortest_sermon_guid column to stats_for_nerds table")
+            conn.execute("ALTER TABLE stats_for_nerds ADD COLUMN shortest_sermon_guid TEXT")
+            conn.commit()
+            current_app.logger.info("Added shortest_sermon_guid column")
+            
+        # If we added new columns, populate them from sermons table if possible
+        if "largest_sermon_guid" not in columns or "shortest_sermon_guid" not in columns:
+            current_app.logger.info("Populating new sermon GUID columns in stats_for_nerds table")
+            
+            # Get the stats record
+            stats_cursor = conn.execute("SELECT * FROM stats_for_nerds WHERE id = 1")
+            stats_row = stats_cursor.fetchone()
+            
+            if stats_row:
+                largest_title = stats_row["largest_sermon_title"]
+                shortest_title = stats_row["shortest_sermon_title"]
+                
+                # Find GUIDs for largest sermon
+                largest_cursor = conn.execute(
+                    "SELECT sermon_guid FROM sermons WHERE sermon_title = ? AND language = 'en' LIMIT 1", 
+                    (largest_title,)
+                )
+                largest_result = largest_cursor.fetchone()
+                largest_guid = largest_result["sermon_guid"] if largest_result else None
+                
+                # Find GUIDs for shortest sermon
+                shortest_cursor = conn.execute(
+                    "SELECT sermon_guid FROM sermons WHERE sermon_title = ? AND language = 'en' LIMIT 1", 
+                    (shortest_title,)
+                )
+                shortest_result = shortest_cursor.fetchone()
+                shortest_guid = shortest_result["sermon_guid"] if shortest_result else None
+                
+                # Update the stats table with the GUIDs
+                if largest_guid or shortest_guid:
+                    update_sql = "UPDATE stats_for_nerds SET "
+                    params = []
+                    
+                    if largest_guid:
+                        update_sql += "largest_sermon_guid = ?"
+                        params.append(largest_guid)
+                    
+                    if shortest_guid:
+                        if largest_guid:
+                            update_sql += ", "
+                        update_sql += "shortest_sermon_guid = ?"
+                        params.append(shortest_guid)
+                    
+                    update_sql += " WHERE id = 1"
+                    
+                    conn.execute(update_sql, params)
+                    conn.commit()
+                    current_app.logger.info("Updated sermon GUIDs in stats_for_nerds table")
+        
+        current_app.logger.info("Completed stats_for_nerds table migrations")
+    except sqlite3.Error as e:
+        current_app.logger.error(f"Error migrating stats_for_nerds table: {e}")
+
+
 def init_main_db() -> None:
     """
     Initialize the database with all required tables and indexes.
@@ -99,6 +181,9 @@ def init_main_db() -> None:
         _create_ai_sermon_content_table(conn)
         _create_fulltext_search_table(conn)
         _create_triggers(conn)
+        
+        # Apply migrations for existing tables
+        _migrate_stats_table(conn)
 
     current_app.logger.info("Database initialization complete.")
 
@@ -160,8 +245,10 @@ def _create_stats_table(conn: sqlite3.Connection) -> None:
                 average_words_per_sermon INTEGER,
                 largest_sermon_title TEXT,
                 largest_sermon_word_count INTEGER,
+                largest_sermon_guid TEXT,
                 shortest_sermon_title TEXT,
                 shortest_sermon_word_count INTEGER,
+                shortest_sermon_guid TEXT,
                 top_ten_words TEXT,
                 most_common_category TEXT,
                 updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
