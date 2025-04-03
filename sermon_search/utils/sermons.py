@@ -148,23 +148,43 @@ def get_sermon_statistics() -> Dict[str, Any]:
     # Get top accessed sermons from metrics database
     top_accessed_sermons = []
     try:
+        # First, get sermon access counts from metrics database
         metrics_db = get_metrics_db()
-        
-        # Join Sermon_Access with sermons to get sermon titles
         sermon_access_query = """
-            SELECT sa.sermon_guid, s.sermon_title, COUNT(*) as access_count 
-            FROM Sermon_Access sa 
-            JOIN sermons s ON sa.sermon_guid = s.sermon_guid 
-            GROUP BY sa.sermon_guid 
+            SELECT sermon_guid, COUNT(*) as access_count 
+            FROM Sermon_Access 
+            GROUP BY sermon_guid 
             ORDER BY access_count DESC 
             LIMIT 10
         """
         
-        cursor = metrics_db.execute(sermon_access_query)
-        results = cursor.fetchall()
+        metrics_cursor = metrics_db.execute(sermon_access_query)
+        access_results = metrics_cursor.fetchall()
         
-        if results:
-            top_accessed_sermons = [dict(sermon) for sermon in results]
+        # For each accessed sermon, get its title from the main database
+        for access_record in access_results:
+            sermon_guid = access_record['sermon_guid']
+            main_db_query = """
+                SELECT sermon_title FROM sermons 
+                WHERE sermon_guid = ? AND language = 'en'
+                LIMIT 1
+            """
+            sermon_cursor = db.execute(main_db_query, (sermon_guid,))
+            sermon_result = sermon_cursor.fetchone()
+            
+            if sermon_result:
+                top_accessed_sermons.append({
+                    'sermon_guid': sermon_guid,
+                    'sermon_title': sermon_result['sermon_title'],
+                    'access_count': access_record['access_count']
+                })
+            else:
+                # If sermon not found in main DB (e.g., test data), use the GUID as title
+                top_accessed_sermons.append({
+                    'sermon_guid': sermon_guid,
+                    'sermon_title': f"Unknown sermon ({sermon_guid[:8]}...)",
+                    'access_count': access_record['access_count']
+                })
     except Exception as e:
         current_app.logger.error(f"Failed to get top accessed sermons: {str(e)}", exc_info=True)
     
