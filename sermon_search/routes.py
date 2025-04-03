@@ -155,12 +155,7 @@ def search():
         
         sermons = search_results['sermons']
         total_count = search_results['total_count']
-        total_pages = math.ceil(total_count / 10) if total_count > 0 else 1
-        
-        # Process results to extract snippets
-        results = []
-        for sermon in sermons:
-            snippets = extract_relevant_snippets(sermon["transcription"], query)
+        total_pages = math.ceil(total_count search_sermonsppets(sermon["transcription"], query)
             if not snippets or snippets == ["(No exact match found)"]:
                 snippets = [sermon["transcription"][:200]]
             results.append({
@@ -255,7 +250,7 @@ def sermon_index():
     language = request.cookies.get("language", "en")
     cur = db.execute(
         "SELECT sermon_guid, sermon_title, audiofilename, transcription, categories "
-        "FROM sermons WHERE language = ? ORDER BY sermon_title ASC LIMIT 12", 
+        "FROM sermons WHERE language = ? ORDER BY insert_date DESC LIMIT 12", 
         (language,)
     )
     sermons = cur.fetchall()
@@ -291,7 +286,7 @@ def get_sermons():
     cur = db.execute(
         "SELECT sermon_guid, sermon_title, transcription, categories "
         "FROM sermons "
-        "WHERE language = ? ORDER BY sermon_title ASC "
+        "WHERE language = ? ORDER BY insert_date DESC "
         "LIMIT ? OFFSET ?",
         (language, per_page, offset)
     )
@@ -370,7 +365,7 @@ def update_stats():
         filtered_words = [w for w in words if w not in stop_words]
         counter = Counter(filtered_words)
         top_ten_list = [{"word": word, "count": count} for word, count in counter.most_common(10)]
-        top_ten_words = json.dumps(top_ten_list)
+        top_ten_words = json.dumps(top_ten_list)sermon_title
 
         # Generate word cloud
         static_images_dir = os.path.join(current_app.root_path, "..", "static", "images")

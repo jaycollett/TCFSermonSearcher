@@ -178,7 +178,7 @@ def test_sermon_detail_found(client, monkeypatch):
 
 # Test stats route
 def test_stats(client, monkeypatch):
-    monkeypatch.setattr("sermon_search.routes.get_sermon_statistics", lambda: {"dummy_stat": 123})
+    monkeypatch.setattr("sermon_search.routes.get_sermon_statistics", lambda: {"total_sermons": 123})
     response = client.get("/stats")
     assert response.status_code == 200
 
