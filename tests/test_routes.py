@@ -192,17 +192,25 @@ def test_stats(client, monkeypatch):
         "shortest_sermon_word_count": 100,
         "top_ten_words": [{"word": "test", "count": 100}, {"word": "sermon", "count": 50}],
         "most_common_category": "Test",
-        "updated_at": "2025-01-01 12:00:00"
+        "updated_at": "2025-01-01 12:00:00",
+        "top_accessed_sermons": [
+            {"sermon_guid": "test-guid-1", "sermon_title": "Popular Sermon 1", "access_count": 50},
+            {"sermon_guid": "test-guid-2", "sermon_title": "Popular Sermon 2", "access_count": 30}
+        ]
     }
     monkeypatch.setattr("sermon_search.routes.get_sermon_statistics", lambda: dummy_stats)
     
     # Mock the loading of images for the word cloud and bigrams
-    def mock_url_for(endpoint, filename=None):
+    def mock_url_for(endpoint, filename=None, sermon_guid=None):
+        if endpoint == 'main.sermon_detail':
+            return f"/sermon/{sermon_guid}"
         return f"/static/{filename}"
     monkeypatch.setattr("flask.url_for", mock_url_for)
     
     response = client.get("/stats")
     assert response.status_code == 200
+    assert b"Top Accessed Sermons" in response.data
+    assert b"Popular Sermon 1" in response.data
 
 # Test sermon_index route
 def test_sermon_index(client, monkeypatch):

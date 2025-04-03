@@ -8,6 +8,7 @@ from typing import List, Dict, Any, Optional
 from collections import Counter
 from flask import current_app
 from sermon_search.database.models import get_db
+from sermon_search.database.init_metrics_db import get_metrics_db
 
 
 def get_all_categories(language: str) -> List[str]:
@@ -140,7 +141,32 @@ def get_sermon_statistics() -> Dict[str, Any]:
         Dict containing statistics or default values if none exist
     """
     db = get_db()
+    
+    # Get basic stats from stats_for_nerds table
     row = db.execute("SELECT * FROM stats_for_nerds WHERE id = 1").fetchone()
+    
+    # Get top accessed sermons from metrics database
+    top_accessed_sermons = []
+    try:
+        metrics_db = get_metrics_db()
+        
+        # Join Sermon_Access with sermons to get sermon titles
+        sermon_access_query = """
+            SELECT sa.sermon_guid, s.sermon_title, COUNT(*) as access_count 
+            FROM Sermon_Access sa 
+            JOIN sermons s ON sa.sermon_guid = s.sermon_guid 
+            GROUP BY sa.sermon_guid 
+            ORDER BY access_count DESC 
+            LIMIT 10
+        """
+        
+        cursor = metrics_db.execute(sermon_access_query)
+        results = cursor.fetchall()
+        
+        if results:
+            top_accessed_sermons = [dict(sermon) for sermon in results]
+    except Exception as e:
+        current_app.logger.error(f"Failed to get top accessed sermons: {str(e)}", exc_info=True)
     
     if row:
         import json
@@ -154,6 +180,7 @@ def get_sermon_statistics() -> Dict[str, Any]:
             "top_ten_words": json.loads(row["top_ten_words"]) if row["top_ten_words"] else [],
             "most_common_category": row["most_common_category"],
             "updated_at": row["updated_at"],
+            "top_accessed_sermons": top_accessed_sermons
         }
     else:
         return {
@@ -166,4 +193,5 @@ def get_sermon_statistics() -> Dict[str, Any]:
             "top_ten_words": [],
             "most_common_category": "N/A",
             "updated_at": "N/A",
+            "top_accessed_sermons": []
         }
