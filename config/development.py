@@ -7,6 +7,7 @@ class DevelopmentConfig(DefaultConfig):
     # Use environment variables with fallbacks to default paths
     DATABASE = os.getenv('DEV_DATABASE_PATH', './data/sermons.db')
     AUDIOFILES_DIR = os.getenv('DEV_AUDIOFILES_DIR', './data/audiofiles')
+    METRICS_DATABASE = os.getenv('DEV_METRICS_DATABASE', './data/metrics.db')
 
     # Directory creation is moved to app initialization to avoid permission issues during import
     @classmethod

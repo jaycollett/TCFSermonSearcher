@@ -7,7 +7,8 @@ class ProductionConfig(DefaultConfig):
     # Use environment variables with fallbacks to default paths
     DATABASE = os.getenv('PROD_DATABASE_PATH', '/data/sermons.db')
     AUDIOFILES_DIR = os.getenv('PROD_AUDIOFILES_DIR', '/data/audiofiles')
-    
+    METRICS_DATABASE = os.getenv('PROD_METRICS_DATABASE', '/data/metrics.db')
+
     # Directory creation is moved to app initialization to avoid permission issues during import
     @classmethod
     def init_directories(cls):

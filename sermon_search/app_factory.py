@@ -10,7 +10,8 @@ from flask import Flask, g, request, current_app
 from flask_babel import Babel, gettext as _
 
 from config import get_config
-from sermon_search.database.models import init_db
+from sermon_search.database.models import init_main_db
+from sermon_search.database.init_metrics_db import init_metrics_db
 
 
 def get_locale():
@@ -79,7 +80,8 @@ def create_app(config_name=None):
 
     # Initialize the database (and other extensions) within the app context
     with app.app_context():
-        init_db()
+        init_main_db()
+        init_metrics_db.init_db()
 
     # Register blueprint
     from sermon_search.routes import bp as main_bp

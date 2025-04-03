@@ -47,7 +47,7 @@ def drop_column_if_exists(conn: sqlite3.Connection, table: str, column: str) -> 
             current_app.logger.error(f"Error dropping column '{column}' from table '{table}': {e}")
 
 
-def init_db() -> None:
+def init_main_db() -> None:
     """
     Initialize the database with all required tables and indexes.
     
