@@ -30,6 +30,7 @@ def get_db() -> sqlite3.Connection:
 def drop_column_if_exists(conn: sqlite3.Connection, table: str, column: str) -> None:
     """
     Check if a column exists in a table. If it does, drop it.
+    First attempts to drop any indexes on the column to avoid constraints.
     
     Args:
         conn: SQLite connection
@@ -40,6 +41,25 @@ def drop_column_if_exists(conn: sqlite3.Connection, table: str, column: str) -> 
     columns = [row["name"] for row in cursor.fetchall()]
     if column in columns:
         try:
+            # Get all indexes for the table
+            indexes_cursor = conn.execute(f"PRAGMA index_list({table})")
+            indexes = indexes_cursor.fetchall()
+            
+            # Check each index to see if it includes our column
+            for idx in indexes:
+                index_name = idx["name"]
+                index_info_cursor = conn.execute(f"PRAGMA index_info({index_name})")
+                index_columns = [col["name"] for col in index_info_cursor.fetchall()]
+                
+                # If the column is part of this index, drop the index
+                if column in index_columns:
+                    try:
+                        conn.execute(f"DROP INDEX {index_name}")
+                        current_app.logger.info(f"Dropped index '{index_name}' on table '{table}'.")
+                    except sqlite3.Error as e:
+                        current_app.logger.error(f"Error dropping index '{index_name}': {e}")
+            
+            # Now drop the column
             conn.execute(f"ALTER TABLE {table} DROP COLUMN {column}")
             conn.commit()
             current_app.logger.info(f"Dropped column '{column}' from table '{table}'.")
