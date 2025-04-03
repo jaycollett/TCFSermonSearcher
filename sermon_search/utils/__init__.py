@@ -16,7 +16,9 @@ from sermon_search.utils.text import (
 from sermon_search.utils.security import (
     get_client_ip,
     is_ip_banned,
-    verify_api_token
+    verify_api_token,
+    get_or_create_visitor_id,
+    set_visitor_id_cookie
 )
 
 from sermon_search.utils.sermons import (
