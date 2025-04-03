@@ -601,8 +601,12 @@ def update_stats():
         db = get_db()
         
         # Optimize by calculating total sermon count with a direct SQL query
-        total_sermons_query = db.execute("SELECT COUNT(*) as count FROM sermons WHERE language = 'en'").fetchone()
-        total_sermons = total_sermons_query["count"]
+        # Use fetchall() first and take the first row to be compatible with test mocks
+        total_sermons_query = db.execute("SELECT COUNT(*) as count FROM sermons WHERE language = 'en'").fetchall()
+        if not total_sermons_query:
+            return jsonify({"error": "No sermons found"}), 404
+            
+        total_sermons = total_sermons_query[0]["count"]
         
         if total_sermons == 0:
             return jsonify({"error": "No sermons found"}), 404
