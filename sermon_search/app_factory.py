@@ -60,7 +60,7 @@ def create_app(config_name=None):
                 static_folder=static_dir)
     
     # Apply ProxyFix middleware to handle HAProxy layer
-    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=3, x_proto=2)
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=6, x_proto=6)
     
     # Get configuration based on environment
     Config = get_config(config_name)
