@@ -37,6 +37,41 @@ def get_metrics_db() -> sqlite3.Connection:
         db.row_factory = sqlite3.Row
     return db
 
+def _check_column_exists(conn, table, column):
+    """
+    Check if a column exists in a table.
+    
+    Args:
+        conn: SQLite connection
+        table: Table name
+        column: Column name
+        
+    Returns:
+        bool: True if column exists, False otherwise
+    """
+    cursor = conn.execute(f"PRAGMA table_info({table})")
+    columns = [row["name"] for row in cursor.fetchall()]
+    return column in columns
+
+
+def _migrate_search_history_table(conn):
+    """
+    Migrate the Search_History table schema if needed.
+    
+    Args:
+        conn: SQLite connection
+    """
+    # Check if category_filters column exists
+    if not _check_column_exists(conn, "Search_History", "category_filters"):
+        try:
+            current_app.logger.info("Adding category_filters column to Search_History table")
+            conn.execute("ALTER TABLE Search_History ADD COLUMN category_filters TEXT")
+            conn.commit()
+            current_app.logger.info("Successfully added category_filters column")
+        except sqlite3.Error as e:
+            current_app.logger.error(f"Error adding category_filters column: {e}")
+
+
 def init_metrics_db() -> None:
     """
     Initializes the metrics SQLite database with required tables.
@@ -68,7 +103,6 @@ def init_metrics_db() -> None:
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 search_query TEXT NOT NULL,
                 ip TEXT,
-                category_filters TEXT,
                 timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
             );
         """)
@@ -83,4 +117,8 @@ def init_metrics_db() -> None:
             );
         """)
         conn.commit()
+        
+        # Run migrations for existing tables
+        _migrate_search_history_table(conn)
+        
     current_app.logger.info("Metrics database initialized with tables: Search_History and Sermon_Access")
