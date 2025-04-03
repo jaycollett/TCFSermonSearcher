@@ -207,7 +207,7 @@ def search():
             "FROM sermons s "
             "JOIN sermons_fts ON s.id = sermons_fts.rowid "
             "WHERE sermons_fts MATCH ? AND s.language = ? "
-            f"{filter_clause} LIMIT ? OFFSET ?"
+            f"{filter_clause} ORDER BY s.insert_date DESC LIMIT ? OFFSET ?"
         )
         params = [fts_query_str, language] + filter_params + [per_page, offset]
         cur = db.execute(fts_sql, params)
@@ -230,7 +230,7 @@ def search():
                 "SELECT s.sermon_guid, s.sermon_title, s.audiofilename, s.transcription, s.categories "
                 "FROM sermons s "
                 "WHERE s.transcription LIKE ? AND s.language = ? "
-                f"{filter_clause} LIMIT ? OFFSET ?"
+                f"{filter_clause} ORDER BY s.insert_date DESC LIMIT ? OFFSET ?"
             )
             params = [like_query, language] + filter_params + [per_page, offset]
             cur = db.execute(fallback_sql, params)
