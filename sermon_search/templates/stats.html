@@ -92,7 +92,13 @@
   <div class="card mb-3">
     <div class="card-body">
       <h5 class="card-title">{{ _("Largest Sermon") }}</h5>
-      <p class="card-text">{{ largest_sermon_title }}</p>
+      <p class="card-text">
+        {% if largest_sermon_guid %}
+          <a href="{{ url_for('main.sermon_detail', sermon_guid=largest_sermon_guid) }}">{{ largest_sermon_title }}</a>
+        {% else %}
+          {{ largest_sermon_title }}
+        {% endif %}
+      </p>
       <p class="card-text">
         <span style="font-size: 0.85rem;">
           <strong>{{ _("Word Count:") }}</strong> {{ "{:,}".format(largest_sermon_word_count) }}
@@ -105,7 +111,13 @@
   <div class="card mb-3">
     <div class="card-body">
       <h5 class="card-title">{{ _("Shortest Sermon") }}</h5>
-      <p class="card-text">{{ shortest_sermon_title }}</p>
+      <p class="card-text">
+        {% if shortest_sermon_guid %}
+          <a href="{{ url_for('main.sermon_detail', sermon_guid=shortest_sermon_guid) }}">{{ shortest_sermon_title }}</a>
+        {% else %}
+          {{ shortest_sermon_title }}
+        {% endif %}
+      </p>
       <p class="card-text">
         <span style="font-size: 0.85rem;">
           <strong>{{ _("Word Count:") }}</strong> {{ "{:,}".format(shortest_sermon_word_count) }}

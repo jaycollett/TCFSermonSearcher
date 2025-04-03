@@ -188,6 +188,36 @@ def get_sermon_statistics() -> Dict[str, Any]:
     except Exception as e:
         current_app.logger.error(f"Failed to get top accessed sermons: {str(e)}", exc_info=True)
     
+    # Get sermon GUIDs for largest and shortest sermons
+    largest_sermon_guid = None
+    shortest_sermon_guid = None
+    
+    if row:
+        try:
+            # Find the sermon GUID for the largest sermon
+            largest_sermon_query = """
+                SELECT sermon_guid FROM sermons 
+                WHERE sermon_title = ? AND language = 'en'
+                LIMIT 1
+            """
+            largest_cursor = db.execute(largest_sermon_query, (row["largest_sermon_title"],))
+            largest_result = largest_cursor.fetchone()
+            if largest_result:
+                largest_sermon_guid = largest_result["sermon_guid"]
+                
+            # Find the sermon GUID for the shortest sermon
+            shortest_sermon_query = """
+                SELECT sermon_guid FROM sermons 
+                WHERE sermon_title = ? AND language = 'en'
+                LIMIT 1
+            """
+            shortest_cursor = db.execute(shortest_sermon_query, (row["shortest_sermon_title"],))
+            shortest_result = shortest_cursor.fetchone()
+            if shortest_result:
+                shortest_sermon_guid = shortest_result["sermon_guid"]
+        except Exception as e:
+            current_app.logger.error(f"Failed to get sermon GUIDs: {str(e)}", exc_info=True)
+    
     if row:
         import json
         return {
@@ -195,8 +225,10 @@ def get_sermon_statistics() -> Dict[str, Any]:
             "average_words_per_sermon": row["average_words_per_sermon"],
             "largest_sermon_title": row["largest_sermon_title"],
             "largest_sermon_word_count": row["largest_sermon_word_count"],
+            "largest_sermon_guid": largest_sermon_guid,
             "shortest_sermon_title": row["shortest_sermon_title"],
             "shortest_sermon_word_count": row["shortest_sermon_word_count"],
+            "shortest_sermon_guid": shortest_sermon_guid,
             "top_ten_words": json.loads(row["top_ten_words"]) if row["top_ten_words"] else [],
             "most_common_category": row["most_common_category"],
             "updated_at": row["updated_at"],
@@ -208,8 +240,10 @@ def get_sermon_statistics() -> Dict[str, Any]:
             "average_words_per_sermon": 0,
             "largest_sermon_title": "No data",
             "largest_sermon_word_count": 0,
+            "largest_sermon_guid": None,
             "shortest_sermon_title": "No data",
             "shortest_sermon_word_count": 0,
+            "shortest_sermon_guid": None,
             "top_ten_words": [],
             "most_common_category": "N/A",
             "updated_at": "N/A",
