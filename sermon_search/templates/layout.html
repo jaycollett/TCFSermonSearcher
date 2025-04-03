@@ -10,17 +10,17 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}" 
           onerror="this.onerror=null;this.href='https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css';"
           crossorigin="anonymous">
-    <link rel="icon" type="image/png" href="/static/images/favicon-96x96.png" sizes="96x96" />
-    <link rel="icon" type="image/svg+xml" href="/static/images/favicon.svg" />
-    <link rel="shortcut icon" href="/static/images/favicon.ico" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/static/images/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/favicon-96x96.png') }}" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='images/favicon.svg') }}" />
+    <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.ico') }}" />
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='images/apple-touch-icon.png') }}" />
     <meta name="apple-mobile-web-app-title" content="Sermon Search" />
-    <link rel="manifest" href="/static/site.webmanifest" />
+    <link rel="manifest" href="{{ url_for('static', filename='site.webmanifest') }}" />
 
     <meta property="og:title" content="Sermon Search" />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://sermonsearch.collett.us" />
-    <meta property="og:image" content="https://sermonsearch.collett.us/static/images/logo.svg" />
+    <meta property="og:image" content="https://sermonsearch.collett.us{{ url_for('static', filename='images/logo.svg') }}" />
     <meta property="og:description" content="Easily find and revisit past sermons by searching key topics, phrases, scripture or category." />
     <meta property="og:site_name" content="Sermon Search" />
     <meta property="og:locale" content="en_US" />
@@ -34,7 +34,7 @@
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Sermon Search" />
     <meta name="twitter:description" content="Easily find and revisit past sermons by searching key topics, phrases, scripture or category." />
-    <meta name="twitter:image" content="https://sermonsearch.collett.us/static/images/logo.svg" />
+    <meta name="twitter:image" content="https://sermonsearch.collett.us{{ url_for('static', filename='images/logo.svg') }}" />
     
 
     <meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
@@ -246,7 +246,7 @@
     <footer class="footer">
         <div class="footer-container">
             <span class="footer-text">
-                {{ _("📖 Sermon Search | Written by: Jay Collett | Version: 0.3.68 | Date: April 2, 2025") }}
+                {{ _("📖 Sermon Search | Written by: Jay Collett | Version: 0.3.57 | Date: March 17, 2025") }}
             </span>
             <a href="{{ url_for('main.stats') }}" class="stats-link">{{ _("Stats for nerds") }}</a>
         </div>

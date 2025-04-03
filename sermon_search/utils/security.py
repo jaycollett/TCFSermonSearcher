@@ -39,7 +39,7 @@ def is_ip_banned(ip: str) -> bool:
     if row:
         failed_attempts, banned_until = row["failed_attempts"], row["banned_until"]
         if banned_until:
-            current_time = int(datetime.datetime.utcnow().timestamp())
+            current_time = int(datetime.datetime.now(datetime.UTC).timestamp())
             if banned_until > current_time:
                 return True
             db.execute("UPDATE ip_bans SET failed_attempts = 0, banned_until = NULL WHERE ip_address = ?", (ip,))
@@ -71,7 +71,7 @@ def verify_api_token() -> Tuple[bool, Optional[str]]:
         
         if attempts >= 3:
             # Ban for 24 hours
-            banned_until = int(datetime.datetime.utcnow().timestamp()) + 86400
+            banned_until = int(datetime.datetime.now(datetime.UTC).timestamp()) + 86400
             db.execute(
                 "REPLACE INTO ip_bans (ip_address, failed_attempts, banned_until) VALUES (?, ?, ?)",
                 (ip, attempts, banned_until)

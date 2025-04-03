@@ -1,7 +1,7 @@
 import os
 import pytest
 from flask import Flask
-from app import create_app
+from sermon_search.app_factory import create_app
 from flask import request
 from flask_babel import Babel, gettext as _
 

@@ -41,9 +41,20 @@ def create_app(config_name=None):
     if config_name is None:
         config_name = os.getenv('FLASK_ENV', 'development')
 
+    # Determine the correct paths for templates and static files
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    if os.path.basename(current_dir) == 'sermon_search':
+        # Development environment
+        template_dir = os.path.join(current_dir, 'templates')
+        static_dir = os.path.join(current_dir, 'static')
+    else:
+        # Docker environment (flattened structure)
+        template_dir = os.path.join(current_dir, 'templates')
+        static_dir = os.path.join(current_dir, 'static')
+        
     app = Flask(__name__, 
-                template_folder=os.path.join(os.path.dirname(os.path.abspath(__file__)), '../templates'),
-                static_folder=os.path.join(os.path.dirname(os.path.abspath(__file__)), '../static'))
+                template_folder=template_dir,
+                static_folder=static_dir)
     
     # Get configuration based on environment
     Config = get_config(config_name)
@@ -65,11 +76,17 @@ def create_app(config_name=None):
     # Set Babel configuration
     app.config['BABEL_DEFAULT_LOCALE'] = 'en'
     app.config['BABEL_SUPPORTED_LOCALES'] = ['en', 'es']
-    # Use absolute path to translations directory
-    translations_path = os.path.join(
-        os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 
-        'translations'
-    )
+    # Determine the translations directory path
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    if os.path.basename(current_dir) == 'sermon_search':
+        # Development environment - translations is one level up
+        translations_path = os.path.join(
+            os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+            'translations'
+        )
+    else:
+        # Docker environment - translations is in the same directory
+        translations_path = os.path.join(current_dir, 'translations')
     app.config['BABEL_TRANSLATION_DIRECTORIES'] = translations_path
     app.logger.info(f"Setting translations directory to: {translations_path}")
     
@@ -81,7 +98,7 @@ def create_app(config_name=None):
     # Initialize the database (and other extensions) within the app context
     with app.app_context():
         init_main_db()
-        init_metrics_db.init_db()
+        init_metrics_db()
 
     # Register blueprint
     from sermon_search.routes import bp as main_bp

@@ -1,7 +1,7 @@
 import pytest
 import os
 import tempfile
-from app import create_app
+from sermon_search.app_factory import create_app
 
 def pytest_addoption(parser):
     """Add command-line options to pytest."""

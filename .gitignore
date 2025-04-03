@@ -95,3 +95,5 @@ ENV/
 
 # VS Code settings:
 .vscode/
+venv/
+__pycache__/

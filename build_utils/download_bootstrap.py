@@ -18,9 +18,11 @@ def download_file(url, save_path):
 
 def main():
     """Download Bootstrap CSS and JS files."""
-    base_dir = os.path.dirname(os.path.abspath(__file__))
-    css_path = os.path.join(base_dir, "static", "css")
-    js_path = os.path.join(base_dir, "static", "js")
+    # Get root directory (parent of build_utils)
+    root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    # Set paths to sermon_search/static directory
+    css_path = os.path.join(root_dir, "sermon_search", "static", "css")
+    js_path = os.path.join(root_dir, "sermon_search", "static", "js")
     
     # Create directories if they don't exist
     os.makedirs(css_path, exist_ok=True)

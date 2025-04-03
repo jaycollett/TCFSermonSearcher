@@ -128,23 +128,19 @@ def search():
     language = request.cookies.get("language", "en")
     selected_categories = request.args.getlist("categories")
     all_categories = get_all_categories(language)
-
     if not query:
         return render_template(
-            "search.html", 
-            all_categories=all_categories, 
+            "search.html",
+            all_categories=all_categories,
             selected_categories=selected_categories
         )
-
     try:
         page = int(request.args.get("page", 1))
         if page < 1:
             page = 1
     except ValueError:
         page = 1
-
     try:
-        # Get search results
         search_results = search_sermons(
             query=query,
             language=language,
@@ -152,10 +148,11 @@ def search():
             page=page,
             per_page=10
         )
-        
-        sermons = search_results['sermons']
-        total_count = search_results['total_count']
-        total_pages = math.ceil(total_count search_sermonsppets(sermon["transcription"], query)
+        sermons = search_results["sermons"]
+        total_count = search_results["total_count"]
+        results = []
+        for sermon in sermons:
+            snippets = extract_relevant_snippets(sermon["transcription"], query)
             if not snippets or snippets == ["(No exact match found)"]:
                 snippets = [sermon["transcription"][:200]]
             results.append({
@@ -165,17 +162,16 @@ def search():
                 "categories": sermon["categories"],
                 "snippets": snippets
             })
-
+        total_pages = math.ceil(total_count / 10)
     except Exception as e:
         current_app.logger.error(f"Error during search: {str(e)}", exc_info=True)
         return render_template(
-            "error.html", 
+            "error.html",
             message=_("An error occurred while processing your search. Please try again.")
         )
-
     return render_template(
-        "results.html", 
-        query=query, 
+        "results.html",
+        query=query,
         results=results,
         highlight_search_terms=highlight_search_terms,
         all_categories=all_categories,
@@ -248,6 +244,17 @@ def sermon_index():
     """Display an index of available sermons."""
     db = get_db()
     language = request.cookies.get("language", "en")
+    
+    # Debug log the query and language
+    current_app.logger.info(f"Sermon index query with language: {language}")
+    
+    # Check for existing sermons and their insert_date values
+    debug_cur = db.execute("SELECT sermon_title, insert_date FROM sermons WHERE language = ? ORDER BY insert_date DESC LIMIT 5", (language,))
+    debug_sermons = debug_cur.fetchall()
+    for sermon in debug_sermons:
+        current_app.logger.info(f"DEBUG - Found sermon: {sermon['sermon_title']} with insert_date: {sermon['insert_date']}")
+    
+    # Execute the actual query
     cur = db.execute(
         "SELECT sermon_guid, sermon_title, audiofilename, transcription, categories "
         "FROM sermons WHERE language = ? ORDER BY insert_date DESC LIMIT 12", 
@@ -365,10 +372,10 @@ def update_stats():
         filtered_words = [w for w in words if w not in stop_words]
         counter = Counter(filtered_words)
         top_ten_list = [{"word": word, "count": count} for word, count in counter.most_common(10)]
-        top_ten_words = json.dumps(top_ten_list)sermon_title
+        top_ten_words = json.dumps(top_ten_list)
 
         # Generate word cloud
-        static_images_dir = os.path.join(current_app.root_path, "..", "static", "images")
+        static_images_dir = os.path.join(current_app.root_path, "static", "images")
         if not os.path.exists(static_images_dir):
             os.makedirs(static_images_dir)
         word_cloud_path = os.path.join(static_images_dir, "data_cloud.png")
@@ -404,7 +411,7 @@ def update_stats():
                     if cat:
                         category_counter[cat] += 1
         most_common_category = category_counter.most_common(1)[0][0] if category_counter else None
-        now = datetime.datetime.utcnow().isoformat()
+        now = datetime.datetime.now(datetime.UTC).isoformat()
 
         # Update database with new statistics
         db.execute("DELETE FROM stats_for_nerds")

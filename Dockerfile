@@ -1,5 +1,5 @@
-# Use the official Python 3.12 Alpine-based image
-FROM python:3.12-alpine
+# Build stage
+FROM python:3.12-alpine AS builder
 
 # Install system dependencies (ffmpeg for audio, sqlite for database)
 RUN apk add --no-cache \
@@ -12,26 +12,65 @@ RUN apk add --no-cache \
     openssl-dev
 
 # Set the working directory inside the container
-WORKDIR /app
+WORKDIR /build
 
 # Copy requirements first to leverage Docker cache
-COPY requirements.txt /app/
+COPY requirements.txt /build/
 
 # Install Python dependencies
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
+# Download NLTK data
+RUN python -m nltk.downloader stopwords
+
 # Copy the application code
-COPY . /app/
+COPY sermon_search/ /build/sermon_search/
+COPY app.py /build/app.py
+COPY config/ /build/config/
+COPY build_utils/ /build/build_utils/
+COPY translations/ /build/translations/
 
 # Create directories if they don't exist
 RUN mkdir -p /data/audiofiles
 
 # Download Bootstrap locally
-RUN python download_bootstrap.py
+RUN cd /build && python build_utils/download_bootstrap.py
 
 # Compile translations
-RUN pybabel compile -d translations
+RUN pybabel compile -d /build/translations
+
+# Copy tests for test stage only (not in final image)
+COPY tests/ /tests/
+
+# Run tests
+RUN cd /tests && PYTHONPATH=/build pytest --maxfail=1 --disable-warnings || echo "Tests failed but continuing build"
+
+# Production stage - creates the final image without test files
+FROM python:3.12-alpine
+
+# Install only the runtime dependencies
+RUN apk add --no-cache \
+    ffmpeg \
+    sqlite
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy requirements and install dependencies
+COPY requirements.txt /app/
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
+
+# Download NLTK data
+RUN python -m nltk.downloader stopwords
+
+# Copy the application from the builder stage
+COPY --from=builder /build/sermon_search/ /app/sermon_search/
+COPY --from=builder /build/app.py /app/app.py
+COPY --from=builder /build/config/ /app/config/
+COPY --from=builder /build/translations/ /app/translations/
+COPY --from=builder /data/ /data/
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1 \
@@ -39,9 +78,6 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     FLASK_ENV=production \
     DATABASE_PATH=/data/sermons.db \
     AUDIOFILES_DIR=/data/audiofiles
-
-# Run tests (with option to skip during build if needed)
-RUN pytest --maxfail=1 --disable-warnings || echo "Tests failed but continuing build"
 
 # Expose the application port
 EXPOSE 5000
