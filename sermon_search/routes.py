@@ -139,6 +139,8 @@ def get_search_metrics(days: int = 30, limit: int = 100) -> dict:
 def log_search_metrics(query: str, categories: list = None, search_type: str = "new_search") -> None:
     """
     Log search query metrics to the metrics database.
+    Implements rate limiting to prevent spamming the database with
+    identical searches from the same IP within a short time window.
     
     Args:
         query: The search query entered by the user
@@ -154,12 +156,28 @@ def log_search_metrics(query: str, categories: list = None, search_type: str = "
         if categories and len(categories) > 0:
             category_filters = ",".join(categories)
         
-        db.execute(
-            "INSERT INTO Search_History (search_query, ip, category_filters, search_type) VALUES (?, ?, ?, ?)",
-            (query, ip_address, category_filters, search_type)
+        # Check for duplicate searches within a time window (5 minutes)
+        # Only for the same query, categories and type from the same IP
+        five_minutes_ago = (datetime.datetime.now() - datetime.timedelta(minutes=5)).strftime('%Y-%m-%d %H:%M:%S')
+        cursor = db.execute(
+            "SELECT COUNT(*) as count FROM Search_History "
+            "WHERE search_query = ? AND ip = ? AND "
+            "(category_filters = ? OR (category_filters IS NULL AND ? IS NULL)) "
+            "AND search_type = ? AND timestamp > ?",
+            (query, ip_address, category_filters, category_filters, search_type, five_minutes_ago)
         )
-        db.commit()
-        current_app.logger.debug(f"Logged {search_type} query: '{query}' with categories: {category_filters} from IP: {ip_address}")
+        recent_search_count = cursor.fetchone()["count"]
+        
+        # Only log if this is not a duplicate search within the time window
+        if recent_search_count == 0:
+            db.execute(
+                "INSERT INTO Search_History (search_query, ip, category_filters, search_type) VALUES (?, ?, ?, ?)",
+                (query, ip_address, category_filters, search_type)
+            )
+            db.commit()
+            current_app.logger.debug(f"Logged {search_type} query: '{query}' with categories: {category_filters} from IP: {ip_address}")
+        else:
+            current_app.logger.debug(f"Skipped logging duplicate search: '{query}' from IP: {ip_address} (duplicate within time window)")
     except Exception as e:
         current_app.logger.error(f"Failed to log search metrics: {str(e)}", exc_info=True)
 
@@ -167,6 +185,8 @@ def log_search_metrics(query: str, categories: list = None, search_type: str = "
 def log_sermon_access(sermon_guid: str) -> None:
     """
     Log sermon access to the metrics database.
+    Only records one access per IP address per sermon per hour to prevent
+    duplicate entries from page refreshes.
     
     Args:
         sermon_guid: The unique identifier of the accessed sermon
@@ -175,12 +195,25 @@ def log_sermon_access(sermon_guid: str) -> None:
         db = get_metrics_db()
         ip_address = get_client_ip()
         
-        db.execute(
-            "INSERT INTO Sermon_Access (sermon_guid, ip) VALUES (?, ?)",
-            (sermon_guid, ip_address)
+        # Check if this IP has accessed this sermon recently (within the last hour)
+        one_hour_ago = (datetime.datetime.now() - datetime.timedelta(hours=1)).strftime('%Y-%m-%d %H:%M:%S')
+        cursor = db.execute(
+            "SELECT COUNT(*) as count FROM Sermon_Access "
+            "WHERE sermon_guid = ? AND ip = ? AND timestamp > ?",
+            (sermon_guid, ip_address, one_hour_ago)
         )
-        db.commit()
-        current_app.logger.debug(f"Logged sermon access: {sermon_guid} from IP: {ip_address}")
+        recent_access_count = cursor.fetchone()["count"]
+        
+        # Only log if this is a new access (not a refresh within the time window)
+        if recent_access_count == 0:
+            db.execute(
+                "INSERT INTO Sermon_Access (sermon_guid, ip) VALUES (?, ?)",
+                (sermon_guid, ip_address)
+            )
+            db.commit()
+            current_app.logger.debug(f"Logged sermon access: {sermon_guid} from IP: {ip_address}")
+        else:
+            current_app.logger.debug(f"Skipped logging duplicate sermon access: {sermon_guid} from IP: {ip_address}")
     except Exception as e:
         current_app.logger.error(f"Failed to log sermon access: {str(e)}", exc_info=True)
 
