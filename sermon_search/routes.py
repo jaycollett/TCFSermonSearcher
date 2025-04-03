@@ -691,7 +691,7 @@ def update_stats():
         
         # Use the top words we already counted instead of regenerating from all text
         # This is much more efficient than feeding the entire corpus to WordCloud
-        word_freq = {item["word"]: item["count"] for item in counter.most_common(300)}
+        word_freq = {word: count for word, count in counter.most_common(300)}
         
         combined_stopwords = STOPWORDS.union(set(stopwords.words('english')))
         wc = WordCloud(
