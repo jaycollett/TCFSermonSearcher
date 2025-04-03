@@ -163,15 +163,15 @@ def log_search_metrics(query: str, categories: list = None, search_type: str = "
         if categories and len(categories) > 0:
             category_filters = ",".join(categories)
         
-        # Check for duplicate searches within a time window (5 minutes)
+        # Check for duplicate searches within a time window (1 minute)
         # Only for the same query, categories and type from the same visitor
-        five_minutes_ago = (datetime.datetime.now() - datetime.timedelta(minutes=5)).strftime('%Y-%m-%d %H:%M:%S')
+        one_minute_ago = (datetime.datetime.now() - datetime.timedelta(minutes=1)).strftime('%Y-%m-%d %H:%M:%S')
         cursor = db.execute(
             "SELECT COUNT(*) as count FROM Search_History "
             "WHERE search_query = ? AND visitor_id = ? AND "
             "(category_filters = ? OR (category_filters IS NULL AND ? IS NULL)) "
             "AND search_type = ? AND timestamp > ?",
-            (query, visitor_id, category_filters, category_filters, search_type, five_minutes_ago)
+            (query, visitor_id, category_filters, category_filters, search_type, one_minute_ago)
         )
         recent_search_count = cursor.fetchone()["count"]
         
@@ -184,7 +184,7 @@ def log_search_metrics(query: str, categories: list = None, search_type: str = "
             db.commit()
             current_app.logger.debug(f"Logged {search_type} query: '{query}' with categories: {category_filters} from visitor: {visitor_id}")
         else:
-            current_app.logger.debug(f"Skipped logging duplicate search: '{query}' from visitor: {visitor_id} (duplicate within time window)")
+            current_app.logger.debug(f"Skipped logging duplicate search: '{query}' from visitor: {visitor_id} (duplicate within 1-minute window)")
     except Exception as e:
         current_app.logger.error(f"Failed to log search metrics: {str(e)}", exc_info=True)
 
