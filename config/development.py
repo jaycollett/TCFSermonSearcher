@@ -11,7 +11,7 @@ class DevelopmentConfig(DefaultConfig):
     
     # Default API token for development (DO NOT USE IN PRODUCTION)
     if not os.environ.get('SERMON_API_TOKEN'):
-        os.environ['SERMON_API_TOKEN'] = 'dev-api-token-for-testing'
+        os.environ['SERMON_API_TOKEN'] = 'ABC123ABC123'
 
     # Directory creation is moved to app initialization to avoid permission issues during import
     @classmethod
