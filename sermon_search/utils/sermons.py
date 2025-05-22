@@ -11,9 +11,102 @@ from sermon_search.database.models import get_db
 from sermon_search.database.init_metrics_db import get_metrics_db
 
 
+def get_omitted_categories(language: str = 'en') -> List[str]:
+    """
+    Get the list of categories that should be omitted from display.
+    
+    Args:
+        language: Language code (e.g., 'en', 'es')
+        
+    Returns:
+        List[str]: List of categories to omit
+    """
+    db = get_db()
+    cur = db.execute(
+        "SELECT category FROM omitted_categories WHERE language = ?",
+        (language,)
+    )
+    rows = cur.fetchall()
+    
+    return [row["category"] for row in rows]
+
+
+def add_omitted_category(category: str, language: str = 'en') -> bool:
+    """
+    Add a category to the omitted list.
+    
+    Args:
+        category: Category name to omit
+        language: Language code (e.g., 'en', 'es')
+        
+    Returns:
+        bool: True if successful, False otherwise
+    """
+    try:
+        db = get_db()
+        db.execute(
+            "INSERT OR IGNORE INTO omitted_categories (category, language) VALUES (?, ?)",
+            (category, language)
+        )
+        db.commit()
+        return True
+    except Exception as e:
+        current_app.logger.error(f"Error adding omitted category: {str(e)}")
+        return False
+
+
+def remove_omitted_category(category: str, language: str = 'en') -> bool:
+    """
+    Remove a category from the omitted list.
+    
+    Args:
+        category: Category name to remove from omitted list
+        language: Language code (e.g., 'en', 'es')
+        
+    Returns:
+        bool: True if successful, False otherwise
+    """
+    try:
+        db = get_db()
+        db.execute(
+            "DELETE FROM omitted_categories WHERE category = ? AND language = ?",
+            (category, language)
+        )
+        db.commit()
+        return True
+    except Exception as e:
+        current_app.logger.error(f"Error removing omitted category: {str(e)}")
+        return False
+
+
+def clear_omitted_categories(language: str = None) -> bool:
+    """
+    Clear all omitted categories.
+    
+    Args:
+        language: Optional language code to clear only categories for a specific language.
+                 If None, clears all languages.
+        
+    Returns:
+        bool: True if successful, False otherwise
+    """
+    try:
+        db = get_db()
+        if language:
+            db.execute("DELETE FROM omitted_categories WHERE language = ?", (language,))
+        else:
+            db.execute("DELETE FROM omitted_categories")
+        db.commit()
+        return True
+    except Exception as e:
+        current_app.logger.error(f"Error clearing omitted categories: {str(e)}")
+        return False
+
+
 def get_all_categories(language: str) -> List[str]:
     """
-    Return a sorted list of distinct categories for the given language.
+    Return a sorted list of distinct categories for the given language,
+    excluding any categories that have been marked for omission.
     
     Args:
         language: Language code (e.g., 'en', 'es')
@@ -32,6 +125,10 @@ def get_all_categories(language: str) -> List[str]:
                 trimmed = cat.strip()
                 if trimmed:
                     cats_set.add(trimmed)
+    
+    # Get categories to omit and remove them from the set
+    omitted = set(get_omitted_categories(language))
+    cats_set = cats_set - omitted
                     
     return sorted(list(cats_set))
 

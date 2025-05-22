@@ -43,6 +43,10 @@ from sermon_search.utils import (
     extract_first_sentences,
     search_sermons,
     get_sermon_statistics,
+    get_omitted_categories,
+    add_omitted_category,
+    remove_omitted_category,
+    clear_omitted_categories,
     get_or_create_visitor_id,
     set_visitor_id_cookie
 )
@@ -228,6 +232,103 @@ def log_sermon_access(sermon_guid: str) -> None:
             current_app.logger.debug(f"Skipped logging duplicate sermon access: {sermon_guid} from visitor: {visitor_id}")
     except Exception as e:
         current_app.logger.error(f"Failed to log sermon access: {str(e)}", exc_info=True)
+
+
+# --- Admin Routes ---
+
+@bp.route("/api/omitted-categories", methods=["GET", "POST"])
+@verify_api_token
+def manage_omitted_categories():
+    """
+    Admin endpoint to manage omitted categories.
+    
+    This endpoint requires API token authentication.
+    
+    GET: Returns the current list of omitted categories
+    POST: Adds or removes categories from the omitted list
+    
+    Returns:
+        JSON response with status and data
+    """
+    language = request.args.get("language", "en")
+    
+    if request.method == "GET":
+        # Get current omitted categories
+        omitted = get_omitted_categories(language)
+        all_cats = get_all_categories(language)
+        
+        # Also get categories that would be omitted (those in the database but not shown)
+        db = get_db()
+        cur = db.execute("SELECT categories FROM sermons WHERE language = ?", (language,))
+        rows = cur.fetchall()
+        
+        all_possible_cats = set()
+        for row in rows:
+            if row["categories"]:
+                for cat in row["categories"].split(","):
+                    trimmed = cat.strip()
+                    if trimmed:
+                        all_possible_cats.add(trimmed)
+        
+        # Categories that exist but are being omitted
+        currently_omitted = [cat for cat in omitted if cat in all_possible_cats]
+        
+        return jsonify({
+            "status": "success",
+            "data": {
+                "omitted_categories": omitted,
+                "all_categories": sorted(list(all_possible_cats)),
+                "visible_categories": all_cats,
+                "currently_omitted": currently_omitted
+            }
+        })
+    
+    elif request.method == "POST":
+        action = request.form.get("action")
+        category = request.form.get("category")
+        
+        if not action or not category:
+            return jsonify({
+                "status": "error",
+                "message": "Missing required parameters: action and category"
+            }), 400
+        
+        if action == "add":
+            # Add category to omitted list
+            if add_omitted_category(category, language):
+                return jsonify({
+                    "status": "success",
+                    "message": f"Category '{category}' added to omitted list",e
+                    "data": {
+                        "omitted_categories": get_omitted_categories(language)
+                    }
+                })
+            else:
+                return jsonify({
+                    "status": "error",
+                    "message": f"Failed to add category '{category}' to omitted list"
+                }), 500
+        
+        elif action == "remove":
+            # Remove category from omitted list
+            if remove_omitted_category(category, language):
+                return jsonify({
+                    "status": "success",
+                    "message": f"Category '{category}' removed from omitted list",
+                    "data": {
+                        "omitted_categories": get_omitted_categories(language)
+                    }
+                })
+            else:
+                return jsonify({
+                    "status": "error",
+                    "message": f"Failed to remove category '{category}' from omitted list"
+                }), 500
+        else:
+            return jsonify({
+                "status": "error",
+                "message": f"Invalid action: {action}. Must be 'add' or 'remove'."
+            }), 400
 
 
 # --- Route Handlers ---

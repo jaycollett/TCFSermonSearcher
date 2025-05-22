@@ -179,6 +179,7 @@ def init_main_db() -> None:
         _create_stats_table(conn)
         _create_ip_bans_table(conn)
         _create_ai_sermon_content_table(conn)
+        _create_omitted_categories_table(conn)
         _create_fulltext_search_table(conn)
         _create_triggers(conn)
         
@@ -314,9 +315,41 @@ def _create_ai_sermon_content_table(conn: sqlite3.Connection) -> None:
             )
         ''')
         conn.commit()
+        
         current_app.logger.info("ai_sermon_content table created successfully.")
     except sqlite3.Error as e:
         current_app.logger.error(f"Error creating ai_sermon_content table: {e}")
+
+
+def _create_omitted_categories_table(conn: sqlite3.Connection) -> None:
+    """
+    Create the omitted_categories table to store categories that should be
+    omitted from display in the UI.
+    
+    Args:
+        conn: SQLite connection
+    """
+    try:
+        current_app.logger.info("Creating omitted_categories table...")
+        conn.execute('''
+            CREATE TABLE IF NOT EXISTS omitted_categories (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                category TEXT NOT NULL,
+                language TEXT NOT NULL DEFAULT 'en',
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE(category, language)
+            )
+        ''')
+        
+        # Create index for faster lookups
+        conn.execute('''
+            CREATE INDEX IF NOT EXISTS idx_omitted_categories_language 
+            ON omitted_categories(language)
+        ''')
+        
+        current_app.logger.info("omitted_categories table created successfully.")
+    except sqlite3.Error as e:
+        current_app.logger.error(f"Error creating omitted_categories table: {e}")
 
 
 def _create_fulltext_search_table(conn: sqlite3.Connection) -> None:
