@@ -24,5 +24,9 @@ from sermon_search.utils.security import (
 from sermon_search.utils.sermons import (
     get_all_categories,
     search_sermons,
-    get_sermon_statistics
+    get_sermon_statistics,
+    get_omitted_categories,
+    add_omitted_category,
+    remove_omitted_category,
+    clear_omitted_categories
 )
