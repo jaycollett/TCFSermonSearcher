@@ -44,7 +44,9 @@ docker run -d \
   --name $CONTAINER_NAME \
   -p $PORT:5000 \
   -v "$DATA_DIR:/data" \
-  -e FLASK_ENV=production \
+  -e FLASK_ENV=development \
+  -e FLASK_DEBUG=1 \
+  -e SERMON_API_TOKEN=ABC123ABC123 \
   -e DATABASE_PATH=/data/sermons.db \
   -e AUDIOFILES_DIR=/data/audiofiles \
   --restart unless-stopped \

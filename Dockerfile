@@ -44,12 +44,13 @@ FROM python:3.12-alpine
 # Install only the runtime dependencies
 RUN apk add --no-cache ffmpeg sqlite
 
-# Set environment variables
+# Set environment variables (defaults that can be overridden at runtime)
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     FLASK_ENV=production \
     DATABASE_PATH=/data/sermons.db \
-    AUDIOFILES_DIR=/data/audiofiles
+    AUDIOFILES_DIR=/data/audiofiles \
+    SERMON_API_TOKEN=""
 
 # Set the working directory inside the container
 WORKDIR /app
