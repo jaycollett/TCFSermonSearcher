@@ -100,44 +100,65 @@ def set_visitor_id_cookie(response: Response) -> Response:
     return response
 
 
-def verify_api_token() -> Tuple[bool, Optional[str]]:
+def verify_api_token(f):
     """
-    Verify the API token from request headers.
+    Decorator to verify the API token from request headers.
     
-    Returns:
-        Tuple[bool, Optional[str]]: (is_valid, error_message)
-    """
-    ip = get_client_ip()
-    db = get_db()
-    
-    if is_ip_banned(ip):
-        return False, "Too many failed attempts. Try again later."
-    
-    api_token = request.headers.get("X-API-Token")
-    expected_token = os.environ.get("SERMON_API_TOKEN", "")
-    
-    if not api_token or api_token != expected_token:
-        # Track failed attempts
-        cur = db.execute("SELECT failed_attempts FROM ip_bans WHERE ip_address = ?", (ip,))
-        row = cur.fetchone()
-        attempts = row["failed_attempts"] + 1 if row else 1
+    Args:
+        f: The function to decorate
         
-        if attempts >= 3:
-            # Ban for 24 hours
-            banned_until = int(datetime.datetime.now(datetime.UTC).timestamp()) + 86400
-            db.execute(
-                "REPLACE INTO ip_bans (ip_address, failed_attempts, banned_until) VALUES (?, ?, ?)",
-                (ip, attempts, banned_until)
-            )
-        else:
-            db.execute(
-                "REPLACE INTO ip_bans (ip_address, failed_attempts, banned_until) VALUES (?, ?, NULL)",
-                (ip, attempts)
-            )
-        db.commit()
-        return False, "Unauthorized"
+    Returns:
+        The decorated function that checks for a valid API token
+    """
+    from functools import wraps
+    from flask import jsonify
     
-    # Clear any previous failed attempts
-    db.execute("DELETE FROM ip_bans WHERE ip_address = ?", (ip,))
-    db.commit()
-    return True, None
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        ip = get_client_ip()
+        db = get_db()
+        
+        if is_ip_banned(ip):
+            return jsonify({
+                "status": "error",
+                "message": "Too many failed attempts. Try again later."
+            }), 429
+        
+        api_token = request.headers.get("Authorization")
+        if api_token and api_token.startswith("Bearer "):
+            api_token = api_token[7:]  # Remove 'Bearer ' prefix
+        else:
+            api_token = request.headers.get("X-API-Token")  # Fallback to X-API-Token for backward compatibility
+            
+        expected_token = os.environ.get("SERMON_API_TOKEN", "")
+        
+        if not api_token or api_token != expected_token:
+            # Track failed attempts
+            cur = db.execute("SELECT failed_attempts FROM ip_bans WHERE ip_address = ?", (ip,))
+            row = cur.fetchone()
+            attempts = row["failed_attempts"] + 1 if row else 1
+            
+            if attempts >= 3:
+                # Ban for 24 hours
+                banned_until = int(datetime.datetime.now(datetime.UTC).timestamp()) + 86400
+                db.execute(
+                    "REPLACE INTO ip_bans (ip_address, failed_attempts, banned_until) VALUES (?, ?, ?)",
+                    (ip, attempts, banned_until)
+                )
+            else:
+                db.execute(
+                    "REPLACE INTO ip_bans (ip_address, failed_attempts, banned_until) VALUES (?, ?, NULL)",
+                    (ip, attempts)
+                )
+            db.commit()
+            return jsonify({
+                "status": "error",
+                "message": "Unauthorized"
+            }), 401
+        
+        # Clear any previous failed attempts
+        db.execute("DELETE FROM ip_bans WHERE ip_address = ?", (ip,))
+        db.commit()
+        return f(*args, **kwargs)
+    
+    return decorated_function
