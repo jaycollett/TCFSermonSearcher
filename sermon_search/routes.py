@@ -298,7 +298,7 @@ def manage_omitted_categories():
             if add_omitted_category(category, language):
                 return jsonify({
                     "status": "success",
-                    "message": f"Category '{category}' added to omitted list",e
+                    "message": f"Category '{category}' added to omitted list",
                     "data": {
                         "omitted_categories": get_omitted_categories(language)
                     }
