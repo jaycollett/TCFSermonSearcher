@@ -101,6 +101,10 @@ def create_app(config_name=None):
     babel.locale_selector_func = get_locale  # Explicitly attach get_locale
     app.babel = babel
 
+    # Initialize the configuration-specific settings if available
+    if hasattr(Config, 'init_app'):
+        Config.init_app(app)
+    
     # Initialize the database (and other extensions) within the app context
     with app.app_context():
         init_main_db()

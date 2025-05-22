@@ -8,6 +8,10 @@ class DevelopmentConfig(DefaultConfig):
     DATABASE = os.getenv('DEV_DATABASE_PATH', './data/sermons.db')
     AUDIOFILES_DIR = os.getenv('DEV_AUDIOFILES_DIR', './data/audiofiles')
     METRICS_DATABASE = os.getenv('DEV_METRICS_DATABASE', './data/metrics.db')
+    
+    # Default API token for development (DO NOT USE IN PRODUCTION)
+    if not os.environ.get('SERMON_API_TOKEN'):
+        os.environ['SERMON_API_TOKEN'] = 'dev-api-token-for-testing'
 
     # Directory creation is moved to app initialization to avoid permission issues during import
     @classmethod
@@ -20,3 +24,10 @@ class DevelopmentConfig(DefaultConfig):
             # Log but don't fail during tests
             import logging
             logging.warning(f"Could not create directories: {e}")
+            
+    @classmethod
+    def init_app(cls, app):
+        """Initialize the application with development-specific settings."""
+        super().init_app(app) if hasattr(super(), 'init_app') else None
+        app.logger.info(f"Using development API token: {os.environ.get('SERMON_API_TOKEN')}")
+        cls.init_directories()
