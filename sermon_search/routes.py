@@ -237,7 +237,6 @@ def log_sermon_access(sermon_guid: str) -> None:
 # --- Admin Routes ---
 
 @bp.route("/api/omitted-categories", methods=["GET", "POST"])
-@verify_api_token
 def manage_omitted_categories():
     """
     Admin endpoint to manage omitted categories.
@@ -250,6 +249,10 @@ def manage_omitted_categories():
     Returns:
         JSON response with status and data
     """
+    is_valid, error_message = verify_api_token()
+    if not is_valid:
+        return jsonify({"error": error_message}), 403 if error_message == "Too many failed attempts. Try again later." else 401
+        
     language = request.args.get("language", "en")
     
     if request.method == "GET":
